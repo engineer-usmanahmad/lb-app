@@ -10,28 +10,28 @@ export const supabase = supabaseUrl && supabaseAnonKey
 export const trainers = [
   {
     id: 'engr-usman-ahmad',
-    name: 'Engr. Usman Ahmad',
+    name: 'Usman Ahmad',
     title: 'Senior Cloud Solutions Architect & DevOps Expert',
     image: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400',
-    bio: 'Usman is a seasoned cloud architect with over 8 years of experience in designing and implementing scalable cloud solutions. He holds multiple AWS and Azure certifications and has helped over 2000 students achieve their cloud certification goals.',
-    specializations: ['AWS', 'Azure', 'DevOps', 'Kubernetes', 'Terraform', 'CI/CD'],
+    bio: 'Usman is a seasoned cloud architect with over 10 years of experience in designing and implementing scalable cloud solutions. He holds multiple AWS and Azure certifications and has helped over 2000 students achieve their cloud certification goals.',
+    specializations: ['AWS', 'Azure', 'GCP', 'DevOps', 'Kubernetes', 'Terraform', 'CI/CD'],
     teachingPhilosophy: 'I believe in hands-on learning combined with real-world scenarios. My approach focuses on practical implementation rather than just theoretical knowledge, ensuring students are job-ready.',
     experience: [
-      'Senior Cloud Solutions Architect at Tech Mahindra (5+ years)',
-      'DevOps Lead at Systems Limited (3+ years)',
+      'Senior Cloud Solutions Architect at 10Pearls (5+ years)',
+      'DevOps Lead at LbisTech (3+ years)',
       'AWS Community Builder and Speaker',
       'Led cloud migration projects worth $2M+ for enterprise clients',
-      'Designed and implemented CI/CD pipelines for 50+ applications'
+      'Designed and implemented CI/CD pipelines for 20+ applications'
     ],
     certifications: [
+      'AWS Solutions Architect Associate',
       'AWS Solutions Architect Professional',
-      'AWS DevOps Engineer Professional',
-      'Azure Solutions Architect Expert',
+      'Associate Cloud Engineer',
+      'Azure Administrator Associate',
       'Certified Kubernetes Administrator (CKA)',
-      'HashiCorp Certified: Terraform Associate',
-      'Google Cloud Professional Cloud Architect'
+      'HashiCorp Certified: Terraform Associate'
     ],
-    coursesTeaching: ['aws-3-in-1', 'devops-zero-to-hero', 'kubernetes-mastery'],
+    coursesTeaching: ['devops-zero-to-hero', 'docker-containerization', 'kubernetes-mastery', 'jenkins-training'],
     successStats: {
       passRate: '98%',
       careerAdvancement: '95%',
@@ -61,7 +61,7 @@ export const trainers = [
       'GIAC Penetration Tester (GPEN)',
       'Certified Information Security Manager (CISM)'
     ],
-    coursesTeaching: ['cybersecurity-zero-to-hero', 'ethical-hacking-advanced'],
+    coursesTeaching: ['aws-3-in-1', 'cybersecurity-zero-to-hero', 'ethical-hacking-advanced'],
     successStats: {
       passRate: '96%',
       careerAdvancement: '92%',
@@ -200,8 +200,8 @@ export const courses: Course[] = [
       'Practice Exams & Certification Guidance',
       'Job Interview Preparation & Resume Building'
     ],
-    price: 112500, // PKR equivalent
-    originalPrice: 135000,
+    price: 48000, // PKR equivalent
+    originalPrice: 60000,
     is_free: false,
     modules: [
       {
@@ -285,8 +285,8 @@ export const courses: Course[] = [
       'Security in DevOps (DevSecOps Practices)',
       'Real-world Project Implementation'
     ],
-    price: 125000, // PKR equivalent
-    originalPrice: 150000,
+    price: 60000, // PKR equivalent
+    originalPrice: 75000,
     is_free: false,
     modules: [
       {
@@ -500,8 +500,8 @@ export const courses: Course[] = [
       'AZ-900 Certification Preparation',
       'Practice Exams and Study Materials'
     ],
-    price: 50000, // PKR equivalent
-    originalPrice: 60000,
+    price: 40000, // PKR equivalent
+    originalPrice: 50000,
     is_free: false,
     modules: [
       {
@@ -571,8 +571,8 @@ export const courses: Course[] = [
       'Docker in Production Environments',
       'Integration with CI/CD Pipelines'
     ],
-    price: 87500, // PKR equivalent
-    originalPrice: 105000,
+    price: 8750, // PKR equivalent
+    originalPrice: 10500,
     is_free: false,
     modules: [
       {
@@ -644,8 +644,8 @@ export const courses: Course[] = [
       'Production Cluster Management',
       'CKA Certification Preparation'
     ],
-    price: 87500, // PKR equivalent
-    originalPrice: 105000,
+    price: 8750, // PKR equivalent
+    originalPrice: 10500,
     is_free: false,
     modules: [
       {

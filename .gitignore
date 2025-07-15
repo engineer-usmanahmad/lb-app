@@ -1,2 +1,21 @@
+# Dependency directory
 node_modules/
+
+# Build output
+dist/
+
+# Logs
+logs/
+*.log
+
+# Env files
 .env
+.env.local
+.env.*.local
+
+# OS/System files
+.DS_Store
+*.swp
+
+.astro
+.astro/

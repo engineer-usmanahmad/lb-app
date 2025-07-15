@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    name: 'lbistech-app',
+    name: 'lbistech-new',
     script: './dist/server/entry.mjs',
     instances: 'max',
     exec_mode: 'cluster',

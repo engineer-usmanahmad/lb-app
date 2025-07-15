@@ -1,8 +1,14 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(import.meta.env.RESEND_API_KEY);
+const resendApiKey = import.meta.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 export async function sendContactNotification(data: any) {
+  if (!resend) {
+    console.warn('Resend API key not configured. Email notification skipped.');
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   try {
     const result = await resend.emails.send({
       from: 'LbisTech <noreply@lbistech.com>',
@@ -70,6 +76,11 @@ export async function sendContactNotification(data: any) {
 }
 
 export async function sendEnrollmentNotification(data: any) {
+  if (!resend) {
+    console.warn('Resend API key not configured. Email notification skipped.');
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   try {
     const result = await resend.emails.send({
       from: 'LbisTech <noreply@lbistech.com>',
@@ -142,6 +153,11 @@ export async function sendEnrollmentNotification(data: any) {
 }
 
 export async function sendEnrollmentConfirmation(data: any) {
+  if (!resend) {
+    console.warn('Resend API key not configured. Email notification skipped.');
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   try {
     const result = await resend.emails.send({
       from: 'LbisTech <noreply@lbistech.com>',
@@ -203,6 +219,11 @@ export async function sendEnrollmentConfirmation(data: any) {
 }
 
 export async function sendContactConfirmation(data: any) {
+  if (!resend) {
+    console.warn('Resend API key not configured. Email notification skipped.');
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   try {
     const result = await resend.emails.send({
       from: 'LbisTech <noreply@lbistech.com>',
