@@ -1069,4 +1069,78 @@ export const courses: Course[] = [
       }
     ]
   },
+  // Additional courses for proper mapping
+  {
+    id: 'linux-deep-dive',
+    title: 'Linux Deep Dive',
+    description: 'Comprehensive Linux system administration training covering everything from basics to advanced server management and automation.',
+    duration: '8-10 weeks',
+    level: 'Beginner to Advanced',
+    image: 'https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?auto=compress&cs=tinysrgb&w=800',
+    features: [
+      'Linux fundamentals and command line mastery',
+      'System administration and user management',
+      'File systems and storage management',
+      'Network configuration and security',
+      'Shell scripting and automation',
+      'Process management and monitoring',
+      'Package management and software installation',
+      'System performance tuning',
+      'Backup and recovery strategies',
+      'Enterprise Linux deployment'
+    ],
+    price: 27000,
+    originalPrice: 35000,
+    is_free: false,
+    modules: [
+      {
+        id: 'linux-basics',
+        title: 'Linux Fundamentals',
+        duration: '2 weeks',
+        topics: [
+          'Linux history and distributions',
+          'Command line interface basics',
+          'File system navigation',
+          'Basic commands and utilities',
+          'Text editors and file manipulation'
+        ]
+      },
+      {
+        id: 'system-admin',
+        title: 'System Administration',
+        duration: '3 weeks',
+        topics: [
+          'User and group management',
+          'File permissions and ownership',
+          'Process management',
+          'System monitoring and logging',
+          'Service management with systemd'
+        ]
+      },
+      {
+        id: 'networking-security',
+        title: 'Networking and Security',
+        duration: '2 weeks',
+        topics: [
+          'Network configuration',
+          'Firewall setup and management',
+          'SSH configuration and security',
+          'System hardening techniques',
+          'Security monitoring and auditing'
+        ]
+      },
+      {
+        id: 'automation-scripting',
+        title: 'Automation and Scripting',
+        duration: '2 weeks',
+        topics: [
+          'Shell scripting fundamentals',
+          'Automation with cron jobs',
+          'System backup strategies',
+          'Performance monitoring scripts',
+          'Advanced scripting techniques'
+        ]
+      }
+    ]
+  }
 ];

@@ -2,6 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import TrainerSocialLinks from '../../components/TrainerSocialLinks.astro';
+import TrainerReviewSlider from '../../components/TrainerReviewSlider.astro';
 import NeedHelpCard from '../../components/NeedHelpCard.astro';
 import { trainers } from '../../lib/supabase';
 
@@ -37,6 +39,7 @@ export function getStaticPaths() {
           <div class="text-center md:text-left">
             <h1 class="text-4xl md:text-5xl font-bold mb-2">{trainer.name}</h1>
             <p class="text-xl text-coral-500 mb-4">{trainer.title}</p>
+            <TrainerSocialLinks trainerId={trainer.id} />
             <div class="flex flex-wrap gap-2 justify-center md:justify-start">
               {(trainer.specializations || []).map(spec => (
                 <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
@@ -100,6 +103,11 @@ export function getStaticPaths() {
                 ))}
               </div>
             </div>
+          </div>
+          
+          <!-- Trainer Reviews -->
+          <div class="lg:col-span-2">
+            <TrainerReviewSlider trainerId={trainer.id} />
           </div>
           
           <!-- Sidebar -->

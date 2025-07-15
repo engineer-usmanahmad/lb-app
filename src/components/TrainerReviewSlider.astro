@@ -1,0 +1,175 @@
+---
+import TestimonialCard from './TestimonialCard.astro';
+import { trainerReviews } from '../data/trainer-reviews.js';
+
+interface Props {
+  trainerId: string;
+}
+
+const { trainerId } = Astro.props;
+const reviews = trainerReviews[trainerId] || [];
+---
+
+{reviews.length > 0 && (
+  <section class="py-8">
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">Student Reviews</h2>
+      <p class="text-gray-600">
+        See what our students say about their learning experience with this trainer.
+      </p>
+    </div>
+    
+    <div class="trainer-review-slider relative">
+      <div class="review-track flex transition-transform duration-500 ease-in-out">
+        {reviews.map((review, index) => (
+          <div class="review-slide flex-none w-full md:w-1/2 px-4">
+            <TestimonialCard {...review} />
+          </div>
+        ))}
+      </div>
+      
+      {reviews.length > 1 && (
+        <>
+          <!-- Navigation Arrows -->
+          <button class="review-prev absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white hover:bg-gray-50 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 z-10">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+          
+          <button class="review-next absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white hover:bg-gray-50 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 z-10">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          
+          <!-- Dots Indicator -->
+          <div class="flex justify-center mt-6 space-x-2">
+            {reviews.map((_, index) => (
+              <button class={`review-dot w-3 h-3 rounded-full transition-all duration-300 ${index === 0 ? 'bg-coral-500' : 'bg-gray-300'}`} data-slide={index}></button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  </section>
+)}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const track = document.querySelector('.review-track');
+    const slides = document.querySelectorAll('.review-slide');
+    const prevBtn = document.querySelector('.review-prev');
+    const nextBtn = document.querySelector('.review-next');
+    const dots = document.querySelectorAll('.review-dot');
+    
+    if (!track || slides.length <= 1) return;
+    
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    let slidesToShow = 1;
+    let autoSlideInterval;
+    
+    // Determine slides to show based on screen size
+    function updateSlidesToShow() {
+      if (window.innerWidth >= 768) {
+        slidesToShow = 2;
+      } else {
+        slidesToShow = 1;
+      }
+    }
+    
+    function updateSlider() {
+      const translateX = -(currentSlide * (100 / slidesToShow));
+      track.style.transform = `translateX(${translateX}%)`;
+      
+      // Update dots
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('bg-coral-500', index === currentSlide);
+        dot.classList.toggle('bg-gray-300', index !== currentSlide);
+      });
+    }
+    
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % (totalSlides - slidesToShow + 1);
+      if (currentSlide >= totalSlides - slidesToShow + 1) {
+        currentSlide = 0;
+      }
+      updateSlider();
+    }
+    
+    function prevSlide() {
+      currentSlide = currentSlide === 0 ? totalSlides - slidesToShow : currentSlide - 1;
+      updateSlider();
+    }
+    
+    function startAutoSlide() {
+      autoSlideInterval = setInterval(nextSlide, 5000);
+    }
+    
+    function stopAutoSlide() {
+      clearInterval(autoSlideInterval);
+    }
+    
+    // Event listeners
+    nextBtn?.addEventListener('click', () => {
+      nextSlide();
+      stopAutoSlide();
+      startAutoSlide();
+    });
+    
+    prevBtn?.addEventListener('click', () => {
+      prevSlide();
+      stopAutoSlide();
+      startAutoSlide();
+    });
+    
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        currentSlide = index;
+        updateSlider();
+        stopAutoSlide();
+        startAutoSlide();
+      });
+    });
+    
+    // Pause on hover
+    const slider = document.querySelector('.trainer-review-slider');
+    slider?.addEventListener('mouseenter', stopAutoSlide);
+    slider?.addEventListener('mouseleave', startAutoSlide);
+    
+    // Initialize
+    updateSlidesToShow();
+    updateSlider();
+    if (totalSlides > slidesToShow) {
+      startAutoSlide();
+    }
+    
+    // Handle resize
+    window.addEventListener('resize', () => {
+      updateSlidesToShow();
+      currentSlide = 0;
+      updateSlider();
+    });
+  });
+</script>
+
+<style>
+  .trainer-review-slider {
+    overflow: hidden;
+  }
+  
+  .review-track {
+    display: flex;
+  }
+  
+  .review-slide {
+    flex: 0 0 auto;
+  }
+  
+  @media (min-width: 768px) {
+    .review-slide {
+      width: 50%;
+    }
+  }
+</style>

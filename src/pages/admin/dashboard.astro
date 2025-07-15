@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
 import { supabase } from '../../lib/supabase';
 
 export const prerender = false;
@@ -41,6 +42,7 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
 ---
 
 <Layout title="Admin Dashboard - LbisTech">
+  <Header />
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
     <div class="bg-white shadow-sm border-b">
@@ -141,26 +143,63 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
         <div class="bg-white shadow rounded-lg">
           <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Contacts</h3>
-            <div class="space-y-4">
+            <div class="space-y-2">
               {recentContacts?.map(contact => (
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p class="text-sm font-medium text-gray-900">{contact.first_name} {contact.last_name}</p>
-                    <p class="text-sm text-gray-500">{contact.email}</p>
-                    <p class="text-xs text-gray-400">Interested in: {contact.course_interest}</p>
-                  </div>
-                  <div class="text-right">
-                    <span class={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      contact.status === 'new' ? 'bg-red-100 text-red-800' :
-                      contact.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
-                      contact.status === 'resolved' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {contact.status}
-                    </span>
-                    <p class="text-xs text-gray-400 mt-1">
-                      {new Date(contact.created_at).toLocaleDateString()}
-                    </p>
+                <div class="contact-item border border-gray-200 rounded-lg">
+                  <button class="contact-header w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left" data-contact={contact.id}>
+                    <div class="flex items-center">
+                      <span class="w-8 h-8 bg-coral-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                        📧
+                      </span>
+                      <div>
+                        <h4 class="font-semibold text-gray-900">Contact #{contact.id} - {contact.first_name} {contact.last_name}</h4>
+                        <p class="text-sm text-gray-500">{new Date(contact.created_at).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <span class={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        contact.status === 'new' ? 'bg-red-100 text-red-800' :
+                        contact.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
+                        contact.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {contact.status}
+                      </span>
+                      <svg class="contact-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </div>
+                  </button>
+                  
+                  <div class="contact-content hidden p-4 bg-white border-t border-gray-200">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Full Name:</span>
+                        <span class="text-sm text-gray-900 ml-2">{contact.first_name} {contact.last_name}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Email:</span>
+                        <span class="text-sm text-gray-900 ml-2">{contact.email}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Phone:</span>
+                        <span class="text-sm text-gray-900 ml-2">{contact.phone}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Course Interest:</span>
+                        <span class="text-sm text-gray-900 ml-2">{contact.course_interest}</span>
+                      </div>
+                    </div>
+                    <div class="mb-4">
+                      <span class="text-sm font-medium text-gray-700">Message:</span>
+                      <div class="mt-1 p-3 bg-gray-50 rounded border-l-4 border-coral-500">
+                        <p class="text-sm text-gray-900">{contact.message}</p>
+                      </div>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button class="bg-coral-500 hover:bg-coral-600 text-white px-3 py-1 rounded text-sm">Reply</button>
+                      <button class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">Mark Resolved</button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -172,26 +211,75 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
         <div class="bg-white shadow rounded-lg">
           <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Enrollments</h3>
-            <div class="space-y-4">
+            <div class="space-y-2">
               {recentEnrollments?.map(enrollment => (
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p class="text-sm font-medium text-gray-900">{enrollment.first_name} {enrollment.last_name}</p>
-                    <p class="text-sm text-gray-500">{enrollment.email}</p>
-                    <p class="text-xs text-gray-400">Course: {enrollment.course_id}</p>
-                  </div>
-                  <div class="text-right">
-                    <span class={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      enrollment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      enrollment.status === 'enrolled' ? 'bg-green-100 text-green-800' :
-                      enrollment.status === 'payment_pending' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {enrollment.status}
-                    </span>
-                    <p class="text-xs text-gray-400 mt-1">
-                      {new Date(enrollment.created_at).toLocaleDateString()}
-                    </p>
+                <div class="enrollment-item border border-gray-200 rounded-lg">
+                  <button class="enrollment-header w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left" data-enrollment={enrollment.id}>
+                    <div class="flex items-center">
+                      <span class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                        🎓
+                      </span>
+                      <div>
+                        <h4 class="font-semibold text-gray-900">Enrollment #{enrollment.id} - {enrollment.first_name} {enrollment.last_name}</h4>
+                        <p class="text-sm text-gray-500">{enrollment.course_id} - {new Date(enrollment.created_at).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <span class={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        enrollment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        enrollment.status === 'enrolled' ? 'bg-green-100 text-green-800' :
+                        enrollment.status === 'payment_pending' ? 'bg-blue-100 text-blue-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {enrollment.status}
+                      </span>
+                      <svg class="enrollment-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </div>
+                  </button>
+                  
+                  <div class="enrollment-content hidden p-4 bg-white border-t border-gray-200">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">First Name:</span>
+                        <span class="text-sm text-gray-900 ml-2">{enrollment.first_name}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Last Name:</span>
+                        <span class="text-sm text-gray-900 ml-2">{enrollment.last_name}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Email:</span>
+                        <span class="text-sm text-gray-900 ml-2">{enrollment.email}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Phone:</span>
+                        <span class="text-sm text-gray-900 ml-2">{enrollment.phone}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Course:</span>
+                        <span class="text-sm text-gray-900 ml-2">{enrollment.course_id}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Experience Level:</span>
+                        <span class="text-sm text-gray-900 ml-2 capitalize">{enrollment.experience_level}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Course Type:</span>
+                        <span class="text-sm text-gray-900 ml-2">{enrollment.is_free ? 'Free' : 'Paid'}</span>
+                      </div>
+                    </div>
+                    <div class="mb-4">
+                      <span class="text-sm font-medium text-gray-700">Learning Goals:</span>
+                      <div class="mt-1 p-3 bg-gray-50 rounded border-l-4 border-green-500">
+                        <p class="text-sm text-gray-900">{enrollment.learning_goals}</p>
+                      </div>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">Send Course Details</button>
+                      <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Update Status</button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -217,4 +305,48 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
       </div>
     </div>
   </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Contact expandable functionality
+      const contactHeaders = document.querySelectorAll('.contact-header');
+      contactHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+          const contactItem = this.closest('.contact-item');
+          const content = contactItem.querySelector('.contact-content');
+          const arrow = this.querySelector('.contact-arrow');
+          
+          // Toggle content visibility
+          content.classList.toggle('hidden');
+          
+          // Rotate arrow
+          if (content.classList.contains('hidden')) {
+            arrow.style.transform = 'rotate(0deg)';
+          } else {
+            arrow.style.transform = 'rotate(180deg)';
+          }
+        });
+      });
+      
+      // Enrollment expandable functionality
+      const enrollmentHeaders = document.querySelectorAll('.enrollment-header');
+      enrollmentHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+          const enrollmentItem = this.closest('.enrollment-item');
+          const content = enrollmentItem.querySelector('.enrollment-content');
+          const arrow = this.querySelector('.enrollment-arrow');
+          
+          // Toggle content visibility
+          content.classList.toggle('hidden');
+          
+          // Rotate arrow
+          if (content.classList.contains('hidden')) {
+            arrow.style.transform = 'rotate(0deg)';
+          } else {
+            arrow.style.transform = 'rotate(180deg)';
+          }
+        });
+      });
+    });
+  </script>
 </Layout>
