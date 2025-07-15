@@ -66,7 +66,7 @@ import { courses, trainers } from '../lib/supabase';
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {courses.slice(0, 3).map(course => (
+        {courses.filter(course => ['aws-3-in-1', 'devops-zero-to-hero', 'voip-training'].includes(course.id)).map(course => (
           <CourseCard course={course} />
         ))}
       </div>
