@@ -1,0 +1,240 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import CourseModules from '../../components/CourseModules.astro';
+import YouTubeEmbed from '../../components/YouTubeEmbed.astro';
+import { courses } from '../../lib/supabase';
+
+const course = courses.find(c => c.id === 'voip-training');
+
+if (!course) {
+  return Astro.redirect('/courses');
+}
+---
+
+<Layout title={`${course.title} - LbisTech`} description={course.description}>
+  <Header />
+  
+  <!-- Course Header -->
+  <section class="bg-gradient-to-r from-primary-900 to-primary-800 text-white py-16">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex items-center justify-center mb-4">
+          <span class="bg-green-500 text-white px-6 py-2 rounded-full text-lg font-bold animate-pulse">
+            🎉 COMPLETELY FREE
+          </span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 text-center">{course.title}</h1>
+        <p class="text-xl text-gray-200 mb-6 text-center">{course.description}</p>
+        <div class="flex flex-wrap gap-4 justify-center">
+          <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full text-sm">
+            Duration: {course.duration}
+          </span>
+          <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full text-sm">
+            Level: {course.level}
+          </span>
+          <span class="bg-green-500 px-4 py-2 rounded-full text-sm font-semibold">
+            FREE COURSE
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Course Content -->
+  <section class="py-16">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+          <!-- Free Course Notice -->
+          <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
+            <div class="flex items-center mb-4">
+              <svg class="w-8 h-8 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <h2 class="text-2xl font-bold text-green-800">Free Training Series</h2>
+            </div>
+            <p class="text-green-700 mb-4">
+              This comprehensive VoIP training is completely free! After enrollment, you'll get immediate access to our complete YouTube training playlist with step-by-step tutorials.
+            </p>
+            <div class="bg-white p-4 rounded border border-green-300">
+              <h3 class="font-semibold text-green-800 mb-2">What's Included:</h3>
+              <ul class="text-green-700 space-y-1">
+                <li>✅ Complete video training series</li>
+                <li>✅ Hands-on practical examples</li>
+                <li>✅ Real-world implementation guides</li>
+                <li>✅ Lifetime access to materials</li>
+                <li>✅ Community support</li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- YouTube Playlist Embed -->
+          {course.youtubePlaylist && (
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+              <h2 class="text-2xl font-bold text-gray-900 mb-6">Training Videos</h2>
+              <YouTubeEmbed 
+                playlistId={course.youtubePlaylist} 
+                title="Open Source VoIP Training Playlist"
+                height="450"
+              />
+              <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                <p class="text-blue-800 text-sm">
+                  <strong>Note:</strong> This playlist contains the complete training series. 
+                  Enroll to get structured access and track your progress.
+                </p>
+              </div>
+            </div>
+          )}
+          
+          <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">What You'll Learn</h2>
+            <div class="grid grid-cols-1 gap-4">
+              {course.features.map(feature => (
+                <div class="flex items-center">
+                  <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="text-gray-700">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <!-- Course Modules -->
+          {course.modules && (
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+              <CourseModules modules={course.modules} />
+            </div>
+          )}
+          
+          <!-- Why This Course is Free -->
+          <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Why is This Course Free?</h2>
+            <div class="prose prose-lg max-w-none text-gray-600">
+              <p class="mb-4">
+                At LbisTech, we believe in making quality education accessible to everyone. This Open Source VoIP training 
+                is our way of giving back to the community and introducing you to our teaching methodology.
+              </p>
+              <p class="mb-4">
+                This course serves as an introduction to our comprehensive training programs. After completing this free course, 
+                you'll have a solid foundation in VoIP technologies and can explore our advanced paid courses for deeper expertise.
+              </p>
+              <div class="bg-coral-50 p-6 rounded-lg border-l-4 border-coral-500">
+                <h3 class="text-lg font-semibold text-coral-800 mb-2">Ready for More?</h3>
+                <p class="text-coral-700">
+                  If you enjoy this free training, check out our advanced courses in DevOps, Cloud Computing, 
+                  and Cybersecurity to take your career to the next level.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow-lg p-8 sticky top-8">
+            <div class="text-center mb-6">
+              <div class="text-4xl font-bold text-green-500 mb-2">FREE</div>
+              <p class="text-gray-600">Completely Free Training</p>
+            </div>
+            
+            <div class="space-y-4 mb-6">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Duration:</span>
+                <span class="font-semibold">{course.duration}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Level:</span>
+                <span class="font-semibold">{course.level}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Certificate:</span>
+                <span class="font-semibold">Yes</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Support:</span>
+                <span class="font-semibold">Community</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Access:</span>
+                <span class="font-semibold">Immediate</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Language:</span>
+                <span class="font-semibold">English/Urdu</span>
+              </div>
+            </div>
+            
+            <div class="space-y-3 mb-6">
+              <a 
+                href={`/enroll/${course.id}`} 
+                class="w-full bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold text-center block transition-colors"
+              >
+                Enroll Free Now
+              </a>
+              <a 
+                href="/contact" 
+                class="w-full border border-gray-300 hover:border-green-500 text-gray-700 hover:text-green-500 px-6 py-3 rounded-lg font-semibold text-center block transition-colors"
+              >
+                Ask Questions
+              </a>
+            </div>
+            
+            <!-- Course Features -->
+            <div class="border-t pt-6">
+              <h3 class="font-semibold text-gray-900 mb-4">This free course includes:</h3>
+              <div class="space-y-3 text-sm">
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="text-gray-600">Complete video training series</span>
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="text-gray-600">Hands-on practical examples</span>
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="text-gray-600">Community support</span>
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="text-gray-600">Certificate of completion</span>
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="text-gray-600">Lifetime access</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Upgrade Notice -->
+            <div class="mt-6 p-4 bg-coral-50 rounded-lg border border-coral-200">
+              <h4 class="font-semibold text-coral-800 mb-2">Want More?</h4>
+              <p class="text-coral-700 text-sm mb-3">
+                Explore our advanced paid courses for deeper expertise in cloud technologies and DevOps.
+              </p>
+              <a href="/courses" class="text-coral-600 hover:text-coral-700 font-semibold text-sm">
+                View All Courses →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <Footer />
+</Layout>

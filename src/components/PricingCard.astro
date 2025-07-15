@@ -1,0 +1,82 @@
+---
+interface Props {
+  price: number;
+  originalPrice?: number;
+  currency?: string;
+  isFree?: boolean;
+  features?: string[];
+  popular?: boolean;
+}
+
+const { 
+  price, 
+  originalPrice, 
+  currency = "PKR", 
+  isFree = false, 
+  features = [],
+  popular = false 
+} = Astro.props;
+
+const savings = originalPrice && originalPrice > price ? originalPrice - price : 0;
+const savingsPercentage = originalPrice && originalPrice > price 
+  ? Math.round(((originalPrice - price) / originalPrice) * 100) 
+  : 0;
+---
+
+<div class={`pricing-card bg-white rounded-lg shadow-lg p-6 ${popular ? 'ring-2 ring-coral-500 relative' : ''}`}>
+  {popular && (
+    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+      <span class="bg-coral-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+        Most Popular
+      </span>
+    </div>
+  )}
+  
+  <div class="text-center mb-6">
+    {isFree ? (
+      <div class="text-4xl font-bold text-green-500 mb-2">FREE</div>
+    ) : (
+      <div>
+        {originalPrice && originalPrice > price && (
+          <div class="text-lg text-gray-500 line-through mb-1">
+            {currency} {originalPrice.toLocaleString()}
+          </div>
+        )}
+        <div class="text-4xl font-bold text-coral-500 mb-2">
+          {currency} {price.toLocaleString()}
+        </div>
+        {savings > 0 && (
+          <div class="inline-flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+            Save {currency} {savings.toLocaleString()} ({savingsPercentage}% OFF)
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+  
+  {features.length > 0 && (
+    <div class="space-y-3 mb-6">
+      {features.map(feature => (
+        <div class="flex items-center">
+          <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span class="text-gray-600">{feature}</span>
+        </div>
+      ))}
+    </div>
+  )}
+  
+  <slot />
+</div>
+
+<style>
+  .pricing-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .pricing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+</style>

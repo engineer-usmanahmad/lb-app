@@ -165,7 +165,11 @@ export interface Course {
   image: string;
   features: string[];
   price: number;
+  originalPrice?: number;
   is_free: boolean;
+  schedule?: string;
+  timing?: string;
+  youtubePlaylist?: string;
   modules?: Module[];
 }
 
@@ -196,7 +200,8 @@ export const courses: Course[] = [
       'Practice Exams & Certification Guidance',
       'Job Interview Preparation & Resume Building'
     ],
-    price: 450,
+    price: 112500, // PKR equivalent
+    originalPrice: 135000,
     is_free: false,
     modules: [
       {
@@ -280,7 +285,8 @@ export const courses: Course[] = [
       'Security in DevOps (DevSecOps Practices)',
       'Real-world Project Implementation'
     ],
-    price: 500,
+    price: 125000, // PKR equivalent
+    originalPrice: 150000,
     is_free: false,
     modules: [
       {
@@ -388,7 +394,8 @@ export const courses: Course[] = [
       'Hands-on Labs with Real-world Scenarios',
       'Industry Certification Preparation (CEH, CISSP)'
     ],
-    price: 400,
+    price: 100000, // PKR equivalent
+    originalPrice: 120000,
     is_free: false,
     modules: [
       {
@@ -493,7 +500,8 @@ export const courses: Course[] = [
       'AZ-900 Certification Preparation',
       'Practice Exams and Study Materials'
     ],
-    price: 200,
+    price: 50000, // PKR equivalent
+    originalPrice: 60000,
     is_free: false,
     modules: [
       {
@@ -563,8 +571,9 @@ export const courses: Course[] = [
       'Docker in Production Environments',
       'Integration with CI/CD Pipelines'
     ],
-    price: 0,
-    is_free: true,
+    price: 87500, // PKR equivalent
+    originalPrice: 105000,
+    is_free: false,
     modules: [
       {
         id: 'docker-basics',
@@ -635,7 +644,8 @@ export const courses: Course[] = [
       'Production Cluster Management',
       'CKA Certification Preparation'
     ],
-    price: 350,
+    price: 87500, // PKR equivalent
+    originalPrice: 105000,
     is_free: false,
     modules: [
       {
@@ -711,5 +721,472 @@ export const courses: Course[] = [
         ]
       }
     ]
-  }
+  },
+  // New Courses
+  {
+    id: 'ansible-training',
+    title: 'Be an Ansible Expert',
+    description: 'Professional training on Ansible from basics to advanced level. Ansible is an open-source software provisioning, configuration management, and application-deployment tool enabling infrastructure as code.',
+    duration: '6 Sessions (2 sessions per week)',
+    level: 'Beginner to Advanced',
+    image: 'https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?auto=compress&cs=tinysrgb&w=800',
+    features: [
+      'Ansible fundamentals and architecture',
+      'Playbooks and inventory management',
+      'Roles and modules development',
+      'Configuration management best practices',
+      'Integration with Jenkins and CI/CD',
+      'Ansible Vault for secrets management',
+      'Advanced automation techniques',
+      'Troubleshooting and debugging',
+      'Real-world project implementation',
+      'Best practices and optimization'
+    ],
+    price: 8000,
+    originalPrice: 10000,
+    is_free: false,
+    schedule: 'Every Saturday & Sunday',
+    timing: '12:30 PM - 02:30 PM',
+    modules: [
+      {
+        id: 'ansible-basics',
+        title: 'Ansible Fundamentals',
+        duration: '2 sessions',
+        topics: [
+          'Introduction to Ansible and Infrastructure as Code',
+          'Ansible architecture and components',
+          'Installation and initial setup',
+          'Inventory management and host patterns',
+          'Basic ad-hoc commands'
+        ]
+      },
+      {
+        id: 'ansible-playbooks',
+        title: 'Playbooks and Configuration',
+        duration: '2 sessions',
+        topics: [
+          'Writing and structuring playbooks',
+          'Variables and facts management',
+          'Conditionals and loops',
+          'Handlers and notifications',
+          'Template management with Jinja2'
+        ]
+      },
+      {
+        id: 'ansible-advanced',
+        title: 'Advanced Ansible Features',
+        duration: '2 sessions',
+        topics: [
+          'Roles development and Galaxy',
+          'Ansible Vault for security',
+          'Custom modules and plugins',
+          'Integration with CI/CD pipelines',
+          'Performance optimization and best practices'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'jenkins-training',
+    title: 'Be a Jenkins Expert',
+    description: 'Your roadmap to become a Jenkins expert - Jenkins from basics to advanced level. Master build automation, CI/CD pipelines, and deployment strategies.',
+    duration: '6 Sessions (2 sessions per week)',
+    level: 'Beginner to Advanced',
+    image: 'https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?auto=compress&cs=tinysrgb&w=800',
+    features: [
+      'Jenkins installation and configuration',
+      'Build automation and CI/CD pipelines',
+      'Plugin management and ecosystem',
+      'Integration with version control systems',
+      'Deployment strategies and best practices',
+      'Jenkins security and user management',
+      'Pipeline as Code with Jenkinsfile',
+      'Distributed builds and scaling',
+      'Monitoring and troubleshooting',
+      'Integration with Docker and Kubernetes'
+    ],
+    price: 9600,
+    originalPrice: 12000,
+    is_free: false,
+    schedule: 'Flexible timing',
+    timing: 'To be arranged',
+    modules: [
+      {
+        id: 'jenkins-basics',
+        title: 'Jenkins Fundamentals',
+        duration: '2 sessions',
+        topics: [
+          'Introduction to Jenkins and CI/CD concepts',
+          'Jenkins installation and initial setup',
+          'Understanding Jenkins architecture',
+          'Basic job creation and configuration',
+          'Build triggers and scheduling'
+        ]
+      },
+      {
+        id: 'jenkins-pipelines',
+        title: 'Pipeline Development',
+        duration: '2 sessions',
+        topics: [
+          'Freestyle vs Pipeline jobs',
+          'Declarative and Scripted pipelines',
+          'Pipeline syntax and best practices',
+          'Multi-branch pipelines',
+          'Pipeline libraries and shared code'
+        ]
+      },
+      {
+        id: 'jenkins-advanced',
+        title: 'Advanced Jenkins Features',
+        duration: '2 sessions',
+        topics: [
+          'Plugin development and management',
+          'Jenkins security and RBAC',
+          'Distributed builds and agents',
+          'Integration with external tools',
+          'Monitoring, logging, and troubleshooting'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'voip-training',
+    title: 'Open Source VoIP Training',
+    description: 'Comprehensive training on Open Source VoIP technologies and implementation. Learn to build and manage VoIP systems using open-source solutions.',
+    duration: 'Self-paced',
+    level: 'Beginner to Intermediate',
+    image: 'https://images.pexels.com/photos/7688336/pexels-photo-7688336.jpeg?auto=compress&cs=tinysrgb&w=800',
+    features: [
+      'VoIP fundamentals and protocols',
+      'Open source VoIP solutions overview',
+      'Asterisk PBX configuration and management',
+      'SIP protocol implementation',
+      'VoIP security considerations',
+      'Quality of Service (QoS) optimization',
+      'Troubleshooting and optimization techniques',
+      'Integration with existing systems',
+      'Cost-effective VoIP deployment',
+      'Real-world implementation scenarios'
+    ],
+    price: 0,
+    originalPrice: 0,
+    is_free: true,
+    youtubePlaylist: 'https://youtube.com/playlist?list=PLe-5mmZeZbmhFG8u8rHkcFUKr0PEmimY3&si=TstGNcDleFfNh_17',
+    modules: [
+      {
+        id: 'voip-basics',
+        title: 'VoIP Fundamentals',
+        duration: 'Self-paced',
+        topics: [
+          'Introduction to Voice over IP',
+          'VoIP vs traditional telephony',
+          'VoIP protocols (SIP, RTP, RTCP)',
+          'Network requirements for VoIP',
+          'Quality of Service basics'
+        ]
+      },
+      {
+        id: 'asterisk-pbx',
+        title: 'Asterisk PBX Configuration',
+        duration: 'Self-paced',
+        topics: [
+          'Asterisk installation and setup',
+          'Configuration files and structure',
+          'Extension and dialplan configuration',
+          'Trunk configuration and routing',
+          'Voicemail and call features'
+        ]
+      },
+      {
+        id: 'voip-security',
+        title: 'VoIP Security and Optimization',
+        duration: 'Self-paced',
+        topics: [
+          'VoIP security threats and mitigation',
+          'Firewall configuration for VoIP',
+          'Performance monitoring and optimization',
+          'Troubleshooting common issues',
+          'Best practices for production deployment'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'cyber-security-professional',
+    title: 'Cyber Security Professional',
+    description: 'Comprehensive cybersecurity training from basics to mid-level expertise. Master the essential skills needed to protect organizations from cyber threats.',
+    duration: '8 Sessions (2 sessions per week)',
+    level: 'Beginner to Intermediate',
+    image: 'https://images.pexels.com/photos/60504/security-protection-anti-virus-software-60504.jpeg?auto=compress&cs=tinysrgb&w=800',
+    features: [
+      'Cybersecurity fundamentals and threat landscape',
+      'Network security and vulnerability assessment',
+      'Ethical hacking and penetration testing',
+      'Incident response and digital forensics',
+      'Security compliance and governance',
+      'Application and web security testing',
+      'Cloud security architecture',
+      'Advanced threat hunting techniques',
+      'Security automation and tools',
+      'Industry certifications preparation'
+    ],
+    price: 100000,
+    originalPrice: 120000,
+    is_free: false,
+    modules: [
+      {
+        id: 'cybersec-intro',
+        title: 'Introduction to Cybersecurity',
+        duration: '1 session',
+        topics: [
+          'Cybersecurity fundamentals',
+          'Threat landscape overview',
+          'Security principles and frameworks',
+          'Risk assessment basics',
+          'Compliance requirements'
+        ]
+      },
+      {
+        id: 'network-security',
+        title: 'Network Security',
+        duration: '1 session',
+        topics: [
+          'Network protocols and vulnerabilities',
+          'Firewalls and IDS/IPS systems',
+          'VPN technologies and implementation',
+          'Network monitoring and analysis',
+          'Wireless security considerations'
+        ]
+      },
+      {
+        id: 'ethical-hacking',
+        title: 'Ethical Hacking and Penetration Testing',
+        duration: '1 session',
+        topics: [
+          'Reconnaissance and scanning techniques',
+          'Vulnerability assessment tools',
+          'Exploitation methodologies',
+          'Post-exploitation techniques',
+          'Reporting and remediation'
+        ]
+      },
+      {
+        id: 'incident-response',
+        title: 'Incident Response and Forensics',
+        duration: '1 session',
+        topics: [
+          'Incident response procedures',
+          'Digital forensics techniques',
+          'Evidence collection and analysis',
+          'Malware analysis basics',
+          'Recovery and lessons learned'
+        ]
+      },
+      {
+        id: 'compliance-governance',
+        title: 'Security Compliance and Governance',
+        duration: '1 session',
+        topics: [
+          'Risk assessment and management',
+          'Compliance frameworks (ISO 27001, NIST)',
+          'Security policies and procedures',
+          'Audit and assessment processes',
+          'Business continuity planning'
+        ]
+      },
+      {
+        id: 'app-security',
+        title: 'Application Security',
+        duration: '1 session',
+        topics: [
+          'Secure coding practices',
+          'Web application security testing',
+          'Mobile application security',
+          'API security considerations',
+          'DevSecOps integration'
+        ]
+      },
+      {
+        id: 'cloud-security',
+        title: 'Cloud Security',
+        duration: '1 session',
+        topics: [
+          'Cloud security architecture',
+          'AWS/Azure security services',
+          'Container security',
+          'Identity and access management',
+          'Cloud compliance and governance'
+        ]
+      },
+      {
+        id: 'advanced-topics',
+        title: 'Advanced Topics',
+        duration: '1 session',
+        topics: [
+          'Threat hunting techniques',
+          'Security automation',
+          'Emerging threats and trends',
+          'Career development in cybersecurity',
+          'Continuous learning and certification paths'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'ai-generalist-expert',
+    title: 'AI Generalist Expert',
+    description: 'Comprehensive AI training covering machine learning, deep learning, and practical AI implementation. Master the skills needed to become an AI professional.',
+    duration: '10 Sessions (2 sessions per week)',
+    level: 'Beginner to Advanced',
+    image: 'https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=800',
+    features: [
+      'AI fundamentals and machine learning basics',
+      'Python programming for AI development',
+      'Deep learning and neural networks',
+      'Computer vision and image processing',
+      'Natural language processing techniques',
+      'Generative AI and large language models',
+      'AI model deployment and MLOps',
+      'AI in business applications',
+      'Advanced AI topics and research trends',
+      'Hands-on projects and portfolio development'
+    ],
+    price: 100000,
+    originalPrice: 120000,
+    is_free: false,
+    modules: [
+      {
+        id: 'ai-fundamentals',
+        title: 'AI Fundamentals',
+        duration: '1 session',
+        topics: [
+          'Introduction to Artificial Intelligence',
+          'Types of AI and machine learning',
+          'AI ethics and responsible AI',
+          'AI applications across industries',
+          'Setting up development environment'
+        ]
+      },
+      {
+        id: 'python-for-ai',
+        title: 'Python for AI',
+        duration: '1 session',
+        topics: [
+          'Python programming essentials',
+          'Data structures and libraries',
+          'NumPy, Pandas, and Matplotlib',
+          'Jupyter notebooks and development workflow',
+          'Data manipulation and visualization'
+        ]
+      },
+      {
+        id: 'ml-basics',
+        title: 'Machine Learning Basics',
+        duration: '1 session',
+        topics: [
+          'Supervised and unsupervised learning',
+          'Feature engineering and selection',
+          'Model evaluation and validation',
+          'Cross-validation and hyperparameter tuning',
+          'Common algorithms and their applications'
+        ]
+      },
+      {
+        id: 'deep-learning',
+        title: 'Deep Learning Fundamentals',
+        duration: '1 session',
+        topics: [
+          'Neural networks architecture',
+          'Backpropagation and optimization',
+          'TensorFlow and PyTorch basics',
+          'Training deep neural networks',
+          'Regularization and optimization techniques'
+        ]
+      },
+      {
+        id: 'computer-vision',
+        title: 'Computer Vision',
+        duration: '1 session',
+        topics: [
+          'Image processing techniques',
+          'Convolutional Neural Networks',
+          'Object detection and recognition',
+          'Image classification projects',
+          'Advanced computer vision applications'
+        ]
+      },
+      {
+        id: 'nlp',
+        title: 'Natural Language Processing',
+        duration: '1 session',
+        topics: [
+          'Text preprocessing and tokenization',
+          'Sentiment analysis and classification',
+          'Language models and transformers',
+          'Named entity recognition',
+          'Text generation and summarization'
+        ]
+      },
+      {
+        id: 'generative-ai',
+        title: 'Generative AI and Large Language Models',
+        duration: '1 session',
+        topics: [
+          'Introduction to GPT and transformer models',
+          'Prompt engineering techniques',
+          'Fine-tuning and custom model development',
+          'Working with APIs and pre-trained models',
+          'Building AI-powered applications'
+        ]
+      },
+      {
+        id: 'ai-deployment',
+        title: 'AI Model Deployment',
+        duration: '1 session',
+        topics: [
+          'Model serving and APIs',
+          'Cloud deployment strategies',
+          'MLOps and model monitoring',
+          'Containerization for AI models',
+          'Scaling and performance optimization'
+        ]
+      },
+      {
+        id: 'ai-business',
+        title: 'AI in Business Applications',
+        duration: '1 session',
+        topics: [
+          'AI strategy and implementation',
+          'ROI measurement and business cases',
+          'Industry-specific AI applications',
+          'Change management for AI adoption',
+          'Building AI teams and capabilities'
+        ]
+      },
+      {
+        id: 'advanced-ai',
+        title: 'Advanced AI Topics',
+        duration: '1 session',
+        topics: [
+          'Reinforcement learning',
+          'AI research trends',
+          'Future of AI and emerging technologies',
+          'Career paths in AI',
+          'Continuous learning and development'
+        ]
+      },
+      {
+        id: 'ai-projects',
+        title: 'Capstone Projects',
+        duration: 'Throughout course',
+        topics: [
+          'End-to-end AI project development',
+          'Portfolio building and presentation',
+          'Code review and best practices',
+          'Project deployment and documentation',
+          'Career guidance and next steps'
+        ]
+      }
+    ]
+  },
 ];

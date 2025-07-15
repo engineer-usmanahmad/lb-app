@@ -42,12 +42,40 @@ const { course } = Astro.props;
         </span>
         <span class="text-sm text-gray-500">
           <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
-          {course.level}
+          <div class="text-right">
+            {course.originalPrice && course.originalPrice > course.price && (
+              <div class="bg-red-500 text-white px-2 py-1 rounded text-xs mb-1">
+                Save PKR {course.originalPrice - course.price}
+              </div>
+            )}
+            <span class="bg-coral-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+              PKR {course.price.toLocaleString()}
+            </span>
+          </div>
         </span>
       </div>
     </div>
+    
+    {course.schedule && (
+      <div class="mb-4 p-3 bg-blue-50 rounded-lg">
+        <div class="text-sm text-blue-800">
+          <div class="font-semibold">Schedule: {course.schedule}</div>
+          {course.timing && <div>Time: {course.timing}</div>}
+        </div>
+      </div>
+    )}
+    
+    {!course.is_free && course.originalPrice && course.originalPrice > course.price && (
+      <div class="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-gray-600 line-through">PKR {course.originalPrice.toLocaleString()}</span>
+          <span class="text-green-600 font-semibold">
+            {Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}% OFF
+          </span>
+        </div>
+        <div class="text-lg font-bold text-green-700">PKR {course.price.toLocaleString()}</div>
+      </div>
+    )}
     
     <div class="mb-4">
       <h4 class="font-semibold text-gray-900 mb-2">What you'll learn:</h4>
@@ -68,7 +96,7 @@ const { course } = Astro.props;
         href={`/enroll/${course.id}`} 
         class="flex-1 bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg text-center font-semibold transition-colors"
       >
-        Enroll Now
+        {course.is_free ? 'Enroll Free' : 'Enroll Now'}
       </a>
       <a 
         href={`/courses/${course.id}`} 

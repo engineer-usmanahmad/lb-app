@@ -193,10 +193,29 @@ export function getStaticPaths() {
           <div class="bg-white rounded-lg shadow-lg p-8 sticky top-8">
             <div class="text-center mb-6">
               <div class="text-3xl font-bold text-coral-500 mb-2">
-                {course.is_free ? 'Free' : `$${course.price}`}
+                {course.is_free ? 'Free' : `PKR ${course.price.toLocaleString()}`}
               </div>
-              <p class="text-gray-600">One-time payment</p>
+              {!course.is_free && course.originalPrice && course.originalPrice > course.price && (
+                <div class="mb-2">
+                  <span class="text-lg text-gray-500 line-through">PKR {course.originalPrice.toLocaleString()}</span>
+                  <div class="text-sm text-green-600 font-semibold">
+                    Save PKR {(course.originalPrice - course.price).toLocaleString()} 
+                    ({Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}% OFF)
+                  </div>
+                </div>
+              )}
+              <p class="text-gray-600">{course.is_free ? 'Completely Free' : 'One-time payment'}</p>
             </div>
+            
+            {course.schedule && (
+              <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                <h4 class="font-semibold text-gray-900 mb-2">Schedule Information</h4>
+                <div class="text-sm text-gray-600">
+                  <div><strong>Schedule:</strong> {course.schedule}</div>
+                  {course.timing && <div><strong>Timing:</strong> {course.timing}</div>}
+                </div>
+              </div>
+            )}
             
             <div class="space-y-4 mb-6">
               <div class="flex justify-between">
@@ -217,7 +236,7 @@ export function getStaticPaths() {
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">Access:</span>
-                <span class="font-semibold">Lifetime</span>
+                <span class="font-semibold">{course.is_free ? 'Immediate' : 'Lifetime'}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">Language:</span>

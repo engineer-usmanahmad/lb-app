@@ -74,9 +74,20 @@ export const prerender = false;
                 <div class="flex items-center justify-between">
                   <span class="text-lg font-semibold text-gray-900">Price</span>
                   <span class="text-2xl font-bold text-coral-500">
-                    {courseData.is_free ? 'Free' : `$${courseData.price}`}
+                    {courseData.is_free ? 'Free' : `PKR ${courseData.price.toLocaleString()}`}
                   </span>
                 </div>
+                {!courseData.is_free && courseData.originalPrice && courseData.originalPrice > courseData.price && (
+                  <div class="mt-2">
+                    <div class="text-sm text-gray-500 line-through">
+                      Original: PKR {courseData.originalPrice.toLocaleString()}
+                    </div>
+                    <div class="text-sm text-green-600 font-semibold">
+                      You save: PKR {(courseData.originalPrice - courseData.price).toLocaleString()} 
+                      ({Math.round(((courseData.originalPrice - courseData.price) / courseData.originalPrice) * 100)}% OFF)
+                    </div>
+                  </div>
+                )}
                 {courseData.is_free && (
                   <p class="text-sm text-green-600 mt-2">🎉 This course is currently free!</p>
                 )}
@@ -88,6 +99,20 @@ export const prerender = false;
         <!-- Enrollment Form -->
         <div class="bg-white rounded-lg shadow-lg p-8">
           <h2 class="text-2xl font-bold text-gray-900 mb-6">Enrollment Form</h2>
+          
+          {courseData.youtubePlaylist && (
+            <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div class="flex items-center mb-2">
+                <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span class="text-green-800 font-semibold">Free Course - Instant Access!</span>
+              </div>
+              <p class="text-green-700 text-sm">
+                After enrollment, you'll get immediate access to the complete video training series.
+              </p>
+            </div>
+          )}
           
           <form id="enrollment-form" class="space-y-6">
             <input type="hidden" name="course_id" value={courseData.id} />
@@ -171,7 +196,7 @@ export const prerender = false;
               class="w-full bg-coral-500 hover:bg-coral-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               id="submit-btn"
             >
-              {courseData.is_free ? 'Enroll Now - Free' : `Enroll Now - $${courseData.price}`}
+              {courseData.is_free ? 'Enroll Now - Free' : `Enroll Now - PKR ${courseData.price.toLocaleString()}`}
             </button>
           </form>
           
@@ -182,6 +207,23 @@ export const prerender = false;
               </svg>
               <span class="text-green-800">Enrollment successful! Check your email for confirmation and next steps.</span>
             </div>
+            {courseData.youtubePlaylist && (
+              <div class="mt-4 p-4 bg-white rounded border">
+                <h4 class="font-semibold text-gray-900 mb-2">🎉 Welcome to the course!</h4>
+                <p class="text-sm text-gray-600 mb-3">You now have access to the complete training series:</p>
+                <a 
+                  href={courseData.youtubePlaylist} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-semibold transition-colors"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                  Start Learning Now
+                </a>
+              </div>
+            )}
           </div>
           
           <div id="error-message" class="hidden bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
@@ -234,7 +276,9 @@ export const prerender = false;
       errorMessage.classList.remove('hidden');
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = form.querySelector('input[name="is_free"]')?.value === 'true' ? 'Enroll Now - Free' : 'Enroll Now';
+      const isFree = form.querySelector('input[name="is_free"]')?.value === 'true';
+      const coursePrice = form.querySelector('input[name="course_id"]')?.value;
+      submitBtn.textContent = isFree ? 'Enroll Now - Free' : 'Enroll Now';
     }
   });
 </script>

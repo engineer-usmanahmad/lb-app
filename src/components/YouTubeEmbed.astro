@@ -1,0 +1,45 @@
+---
+interface Props {
+  playlistId: string;
+  title?: string;
+  width?: string;
+  height?: string;
+}
+
+const { playlistId, title = "YouTube Playlist", width = "100%", height = "400" } = Astro.props;
+
+// Extract playlist ID from URL if full URL is provided
+const extractPlaylistId = (url: string) => {
+  const match = url.match(/[?&]list=([^&]+)/);
+  return match ? match[1] : url;
+};
+
+const cleanPlaylistId = extractPlaylistId(playlistId);
+---
+
+<div class="youtube-embed-container">
+  <div class="relative" style={`width: ${width}; height: ${height}px;`}>
+    <iframe
+      src={`https://www.youtube.com/embed/videoseries?list=${cleanPlaylistId}&rel=0&modestbranding=1`}
+      title={title}
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+      class="absolute inset-0 w-full h-full rounded-lg shadow-lg"
+      loading="lazy"
+    ></iframe>
+  </div>
+</div>
+
+<style>
+  .youtube-embed-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  @media (max-width: 768px) {
+    .youtube-embed-container iframe {
+      height: 250px;
+    }
+  }
+</style>
