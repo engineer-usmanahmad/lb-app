@@ -1,0 +1,227 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import CourseCard from '../components/CourseCard.astro';
+import Footer from '../components/Footer.astro';
+import { courses, trainers } from '../lib/supabase';
+---
+
+<Layout title="LbisTech - Professional Technology Education">
+  <Header />
+  <Hero />
+  
+  <!-- Why Choose LbisTech -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose LbisTech?</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          We're committed to providing world-class technology education that prepares you for real-world challenges.
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-coral-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Expert Instructors</h3>
+          <p class="text-gray-600">Learn from industry professionals with years of real-world experience.</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-16 h-16 bg-coral-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Hands-on Learning</h3>
+          <p class="text-gray-600">Practice with real projects and scenarios you'll encounter in your career.</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-16 h-16 bg-coral-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">24/7 Support</h3>
+          <p class="text-gray-600">Get help whenever you need it with our dedicated support team.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Featured Courses -->
+  <section class="py-16">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Courses</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Master the most in-demand technologies with our comprehensive certification programs.
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {courses.slice(0, 3).map(course => (
+          <CourseCard course={course} />
+        ))}
+      </div>
+      
+      <div class="text-center mt-12">
+        <a href="/courses" class="bg-coral-500 hover:bg-coral-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+          View All Courses
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Student Testimonials -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Meet Our Expert Trainers</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Learn from industry professionals with years of real-world experience in cloud technologies and DevOps practices.
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {trainers.map(trainer => (
+          <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="relative">
+              <img 
+                src={trainer.image} 
+                alt={trainer.name}
+                class="w-full h-48 object-cover"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+              <div class="absolute bottom-4 left-4 text-white">
+                <h3 class="text-lg font-bold">{trainer.name}</h3>
+                <p class="text-coral-300 text-sm">{trainer.title}</p>
+              </div>
+            </div>
+            
+            <div class="p-6">
+              <div class="mb-4">
+                <div class="flex flex-wrap gap-2">
+                  {trainer.specializations.slice(0, 3).map(spec => (
+                    <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                      {spec}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-4 mb-4 text-center">
+                <div>
+                  <div class="text-lg font-bold text-coral-500">{trainer.successStats.passRate}</div>
+                  <div class="text-xs text-gray-500">Pass Rate</div>
+                </div>
+                <div>
+                  <div class="text-lg font-bold text-coral-500">{trainer.successStats.studentsmentored}</div>
+                  <div class="text-xs text-gray-500">Students</div>
+                </div>
+              </div>
+              
+              <a 
+                href={`/trainers/${trainer.id}`} 
+                class="w-full bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg text-center font-semibold transition-colors block text-sm"
+              >
+                View Profile
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div class="text-center mt-12">
+        <a href="/trainers" class="bg-coral-500 hover:bg-coral-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+          Meet All Trainers
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Student Testimonials -->
+  <section class="py-16 bg-primary-900 text-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">What Our Students Say</h2>
+        <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+          Don't just take our word for it. Here's what our successful graduates have to say.
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white bg-opacity-10 rounded-lg p-6">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-coral-500 rounded-full flex items-center justify-center mr-4">
+              <span class="text-white font-bold">AH</span>
+            </div>
+            <div>
+              <h4 class="font-semibold">Ahmed Hassan</h4>
+              <p class="text-gray-300 text-sm">AWS Solutions Architect</p>
+            </div>
+          </div>
+          <p class="text-gray-200">
+            "The AWS certification course was incredible. The hands-on approach and real-world projects helped me land my dream job at a top tech company."
+          </p>
+        </div>
+        
+        <div class="bg-white bg-opacity-10 rounded-lg p-6">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-coral-500 rounded-full flex items-center justify-center mr-4">
+              <span class="text-white font-bold">SK</span>
+            </div>
+            <div>
+              <h4 class="font-semibold">Sarah Khan</h4>
+              <p class="text-gray-300 text-sm">DevOps Engineer</p>
+            </div>
+          </div>
+          <p class="text-gray-200">
+            "LbisTech's DevOps course transformed my career. The instructors are amazing and the curriculum is cutting-edge."
+          </p>
+        </div>
+        
+        <div class="bg-white bg-opacity-10 rounded-lg p-6">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-coral-500 rounded-full flex items-center justify-center mr-4">
+              <span class="text-white font-bold">MA</span>
+            </div>
+            <div>
+              <h4 class="font-semibold">Muhammad Ali</h4>
+              <p class="text-gray-300 text-sm">Cloud Architect</p>
+            </div>
+          </div>
+          <p class="text-gray-200">
+            "The Azure certification program gave me the skills and confidence to advance in my career. Highly recommended!"
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="py-16 bg-coral-500 text-white">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Career?</h2>
+      <p class="text-lg mb-8 max-w-2xl mx-auto">
+        Join thousands of students who have accelerated their tech careers with LbisTech's professional certification programs.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/contact" class="bg-white text-coral-500 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition-colors">
+          Get Started Today
+        </a>
+        <a href="/courses" class="border-2 border-white text-white hover:bg-white hover:text-coral-500 px-8 py-3 rounded-lg font-semibold transition-colors">
+          Browse Courses
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <Footer />
+</Layout>

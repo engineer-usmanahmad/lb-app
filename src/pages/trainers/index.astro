@@ -1,0 +1,108 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { trainers } from '../../lib/supabase';
+---
+
+<Layout title="Our Expert Trainers - LbisTech" description="Meet our world-class trainers who bring years of industry experience to help you master cloud and DevOps technologies">
+  <Header />
+  
+  <!-- Page Header -->
+  <section class="bg-gradient-to-r from-primary-900 to-primary-800 text-white py-16">
+    <div class="container mx-auto px-4">
+      <div class="text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Our Expert Trainers</h1>
+        <p class="text-xl text-gray-200 max-w-2xl mx-auto">
+          Learn from industry professionals with years of real-world experience in cloud technologies and DevOps practices.
+        </p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Trainers Grid -->
+  <section class="py-16">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {trainers.map(trainer => (
+          <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="relative">
+              <img 
+                src={trainer.image} 
+                alt={trainer.name}
+                class="w-full h-64 object-cover"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+              <div class="absolute bottom-4 left-4 text-white">
+                <h3 class="text-xl font-bold">{trainer.name}</h3>
+                <p class="text-coral-300">{trainer.title}</p>
+              </div>
+            </div>
+            
+            <div class="p-6">
+              <p class="text-gray-600 mb-4 line-clamp-3">{trainer.bio}</p>
+              
+              <div class="mb-4">
+                <h4 class="font-semibold text-gray-900 mb-2">Specializations:</h4>
+                <div class="flex flex-wrap gap-2">
+                  {trainer.specializations.slice(0, 3).map(spec => (
+                    <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">
+                      {spec}
+                    </span>
+                  ))}
+                  {trainer.specializations.length > 3 && (
+                    <span class="bg-coral-100 text-coral-700 px-2 py-1 rounded text-sm">
+                      +{trainer.specializations.length - 3} more
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-3 gap-4 mb-6 text-center">
+                <div>
+                  <div class="text-lg font-bold text-coral-500">{trainer.successStats.passRate}</div>
+                  <div class="text-xs text-gray-500">Pass Rate</div>
+                </div>
+                <div>
+                  <div class="text-lg font-bold text-coral-500">{trainer.successStats.careerAdvancement}</div>
+                  <div class="text-xs text-gray-500">Career Growth</div>
+                </div>
+                <div>
+                  <div class="text-lg font-bold text-coral-500">{trainer.successStats.studentsmentored}</div>
+                  <div class="text-xs text-gray-500">Students</div>
+                </div>
+              </div>
+              
+              <a 
+                href={`/trainers/${trainer.id}`} 
+                class="w-full bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg text-center font-semibold transition-colors block"
+              >
+                View Profile
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="py-16 bg-primary-900 text-white">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-3xl font-bold mb-4">Ready to Learn from the Best?</h2>
+      <p class="text-lg mb-8 max-w-2xl mx-auto">
+        Our expert trainers are here to guide you through your learning journey with personalized attention and industry insights.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/contact" class="bg-coral-500 hover:bg-coral-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+          Contact Our Team
+        </a>
+        <a href="/courses" class="border-2 border-white text-white hover:bg-white hover:text-primary-900 px-8 py-3 rounded-lg font-semibold transition-colors">
+          View Courses
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <Footer />
+</Layout>

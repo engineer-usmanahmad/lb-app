@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Terms of Service - LbisTech" description="LbisTech Terms of Service and User Agreement">
+  <Header />
+  
+  <section class="py-16">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold text-gray-900 mb-8">Terms of Service</h1>
+        
+        <div class="prose prose-lg max-w-none">
+          <p class="text-gray-600 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Acceptance of Terms</h2>
+          <p class="text-gray-600 mb-6">
+            By accessing and using LbisTech services, you accept and agree to be bound by the terms 
+            and provision of this agreement.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Course Access</h2>
+          <p class="text-gray-600 mb-6">
+            Upon enrollment and payment, you will receive lifetime access to course materials 
+            and updates.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Refund Policy</h2>
+          <p class="text-gray-600 mb-6">
+            We offer a 30-day money-back guarantee for all paid courses. Contact us within 30 days 
+            of enrollment for a full refund.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Contact Information</h2>
+          <p class="text-gray-600">
+            For questions about these Terms of Service, please contact us at team@lbistech.com.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <Footer />
+</Layout>

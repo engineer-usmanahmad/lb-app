@@ -1,0 +1,40 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Privacy Policy - LbisTech" description="LbisTech Privacy Policy and Data Protection">
+  <Header />
+  
+  <section class="py-16">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
+        
+        <div class="prose prose-lg max-w-none">
+          <p class="text-gray-600 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Information We Collect</h2>
+          <p class="text-gray-600 mb-6">
+            We collect information you provide directly to us, such as when you create an account, 
+            enroll in courses, or contact us for support.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">How We Use Your Information</h2>
+          <p class="text-gray-600 mb-6">
+            We use the information we collect to provide, maintain, and improve our services, 
+            process transactions, and communicate with you.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Contact Us</h2>
+          <p class="text-gray-600">
+            If you have any questions about this Privacy Policy, please contact us at team@lbistech.com.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <Footer />
+</Layout>

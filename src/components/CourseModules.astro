@@ -1,0 +1,90 @@
+---
+interface Module {
+  id: string;
+  title: string;
+  topics: string[];
+  duration: string;
+}
+
+interface Props {
+  modules: Module[];
+}
+
+const { modules } = Astro.props;
+---
+
+<div class="course-modules">
+  <h3 class="text-xl font-semibold text-gray-900 mb-6">Course Curriculum</h3>
+  <div class="space-y-4">
+    {modules.map((module, index) => (
+      <div class="module-item border border-gray-200 rounded-lg overflow-hidden">
+        <button 
+          class="module-header w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+          data-module={module.id}
+        >
+          <div class="flex items-center">
+            <span class="w-8 h-8 bg-coral-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+              {index + 1}
+            </span>
+            <div>
+              <h4 class="font-semibold text-gray-900">{module.title}</h4>
+              <p class="text-sm text-gray-500">{module.duration}</p>
+            </div>
+          </div>
+          <svg class="module-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        
+        <div class="module-content hidden p-4 bg-white border-t border-gray-200">
+          <ul class="space-y-2">
+            {module.topics.map(topic => (
+              <li class="flex items-center text-gray-600">
+                <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                {topic}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const moduleHeaders = document.querySelectorAll('.module-header');
+    
+    moduleHeaders.forEach(header => {
+      header.addEventListener('click', function() {
+        const moduleItem = this.closest('.module-item');
+        const content = moduleItem.querySelector('.module-content');
+        const arrow = this.querySelector('.module-arrow');
+        
+        // Toggle content visibility
+        content.classList.toggle('hidden');
+        
+        // Rotate arrow
+        if (content.classList.contains('hidden')) {
+          arrow.style.transform = 'rotate(0deg)';
+        } else {
+          arrow.style.transform = 'rotate(180deg)';
+        }
+        
+        // Close other modules
+        moduleHeaders.forEach(otherHeader => {
+          if (otherHeader !== this) {
+            const otherModuleItem = otherHeader.closest('.module-item');
+            const otherContent = otherModuleItem.querySelector('.module-content');
+            const otherArrow = otherHeader.querySelector('.module-arrow');
+            
+            otherContent.classList.add('hidden');
+            otherArrow.style.transform = 'rotate(0deg)';
+          }
+        });
+      });
+    });
+  });
+</script>

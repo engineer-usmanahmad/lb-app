@@ -1,0 +1,220 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { supabase } from '../../lib/supabase';
+
+export const prerender = false;
+
+// Fetch dashboard data
+const { data: contactStats } = await supabase
+  .from('contact_submissions')
+  .select('status')
+  .order('created_at', { ascending: false });
+
+const { data: enrollmentStats } = await supabase
+  .from('enrollment_submissions')
+  .select('status, course_id')
+  .order('created_at', { ascending: false });
+
+const { data: recentContacts } = await supabase
+  .from('contact_submissions')
+  .select('*')
+  .order('created_at', { ascending: false })
+  .limit(5);
+
+const { data: recentEnrollments } = await supabase
+  .from('enrollment_submissions')
+  .select('*')
+  .order('created_at', { ascending: false })
+  .limit(5);
+
+// Calculate stats
+const totalContacts = contactStats?.length || 0;
+const newContacts = contactStats?.filter(c => c.status === 'new').length || 0;
+const totalEnrollments = enrollmentStats?.length || 0;
+const pendingEnrollments = enrollmentStats?.filter(e => e.status === 'pending').length || 0;
+
+// Course enrollment stats
+const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
+  acc[curr.course_id] = (acc[curr.course_id] || 0) + 1;
+  return acc;
+}, {} as Record<string, number>) || {};
+---
+
+<Layout title="Admin Dashboard - LbisTech">
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p class="text-gray-600">Manage contacts and enrollments</p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-sm text-gray-500">Last updated: {new Date().toLocaleString()}</span>
+            <a href="/" class="text-coral-500 hover:text-coral-600">← Back to Site</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Total Contacts</dt>
+                  <dd class="text-lg font-medium text-gray-900">{totalContacts}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-coral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM9 17H4l5 5v-5zM15 7h5l-5-5v5zM9 7H4L9 2v5z"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">New Contacts</dt>
+                  <dd class="text-lg font-medium text-coral-500">{newContacts}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Total Enrollments</dt>
+                  <dd class="text-lg font-medium text-gray-900">{totalEnrollments}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Pending Enrollments</dt>
+                  <dd class="text-lg font-medium text-yellow-600">{pendingEnrollments}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Recent Contacts -->
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Contacts</h3>
+            <div class="space-y-4">
+              {recentContacts?.map(contact => (
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">{contact.first_name} {contact.last_name}</p>
+                    <p class="text-sm text-gray-500">{contact.email}</p>
+                    <p class="text-xs text-gray-400">Interested in: {contact.course_interest}</p>
+                  </div>
+                  <div class="text-right">
+                    <span class={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      contact.status === 'new' ? 'bg-red-100 text-red-800' :
+                      contact.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
+                      contact.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {contact.status}
+                    </span>
+                    <p class="text-xs text-gray-400 mt-1">
+                      {new Date(contact.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Enrollments -->
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Enrollments</h3>
+            <div class="space-y-4">
+              {recentEnrollments?.map(enrollment => (
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">{enrollment.first_name} {enrollment.last_name}</p>
+                    <p class="text-sm text-gray-500">{enrollment.email}</p>
+                    <p class="text-xs text-gray-400">Course: {enrollment.course_id}</p>
+                  </div>
+                  <div class="text-right">
+                    <span class={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      enrollment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      enrollment.status === 'enrolled' ? 'bg-green-100 text-green-800' :
+                      enrollment.status === 'payment_pending' ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {enrollment.status}
+                    </span>
+                    <p class="text-xs text-gray-400 mt-1">
+                      {new Date(enrollment.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Enrollment Stats -->
+      <div class="mt-8 bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Course Enrollment Statistics</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Object.entries(courseEnrollments).map(([courseId, count]) => (
+              <div class="p-4 bg-gray-50 rounded-lg">
+                <p class="text-sm font-medium text-gray-900 capitalize">{courseId.replace('-', ' ')}</p>
+                <p class="text-2xl font-bold text-coral-500">{count}</p>
+                <p class="text-xs text-gray-500">Total Enrollments</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
