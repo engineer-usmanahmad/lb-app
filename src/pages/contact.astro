@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import ContactForm from '../components/ContactForm.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import NeedHelpCard from '../components/NeedHelpCard.astro';
 import Footer from '../components/Footer.astro';
 ---
 
@@ -87,6 +89,15 @@ import Footer from '../components/Footer.astro';
         <div class="bg-white rounded-lg shadow-lg p-8">
           <h2 class="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
           <ContactForm />
+          
+          <!-- WhatsApp Community Section -->
+          <div class="mt-8 p-6 bg-green-50 rounded-lg border border-green-200">
+            <h3 class="text-lg font-semibold text-green-800 mb-2">Join Our Community</h3>
+            <p class="text-green-700 mb-4 text-sm">
+              Connect with fellow students, get instant support, and stay updated with the latest course announcements.
+            </p>
+            <WhatsAppButton size="md" />
+          </div>
         </div>
       </div>
     </div>
@@ -136,5 +147,6 @@ import Footer from '../components/Footer.astro';
     </div>
   </section>
   
+  <NeedHelpCard />
   <Footer />
 </Layout>

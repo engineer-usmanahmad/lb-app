@@ -3,6 +3,9 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import CourseModules from '../../components/CourseModules.astro';
+import TestimonialCard from '../../components/TestimonialCard.astro';
+import WhatsAppButton from '../../components/WhatsAppButton.astro';
+import NeedHelpCard from '../../components/NeedHelpCard.astro';
 import { courses, trainers } from '../../lib/supabase';
 
 const { id } = Astro.params;
@@ -16,6 +19,26 @@ if (!course) {
 const courseTrainers = trainers.filter(trainer => 
   trainer.coursesTeaching.includes(course.id)
 );
+
+// Sample testimonials for this course
+const courseTestimonials = [
+  {
+    name: "Muhammad Hassan",
+    title: "DevOps Engineer",
+    company: "Systems Limited",
+    rating: 5,
+    review: "This course completely transformed my understanding of the subject. The practical approach and expert guidance made all the difference.",
+    course: course.title
+  },
+  {
+    name: "Ayesha Khan",
+    title: "Cloud Solutions Architect",
+    company: "TechLogix",
+    rating: 5,
+    review: "Excellent training with real-world scenarios. I was able to apply what I learned immediately in my job.",
+    course: course.title
+  }
+];
 
 export function getStaticPaths() {
   return courses.map(course => ({
@@ -114,7 +137,7 @@ export function getStaticPaths() {
           )}
           
           <!-- Course Prerequisites -->
-          <div class="bg-white rounded-lg shadow-lg p-8">
+          <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
             <h2 class="text-2xl font-bold text-gray-900 mb-6">Prerequisites & Requirements</h2>
             
             {course.id === 'aws-3-in-1' && (
@@ -185,6 +208,16 @@ export function getStaticPaths() {
                 </div>
               </div>
             )}
+          </div>
+          
+          <!-- Course Testimonials -->
+          <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">What Students Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {courseTestimonials.map(testimonial => (
+                <TestimonialCard {...testimonial} />
+              ))}
+            </div>
           </div>
         </div>
         
@@ -259,6 +292,15 @@ export function getStaticPaths() {
               </a>
             </div>
             
+            <!-- WhatsApp Community -->
+            <div class="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
+              <h4 class="font-semibold text-green-800 mb-2">Join Our Community</h4>
+              <p class="text-green-700 text-sm mb-3">
+                Connect with fellow students and get instant support.
+              </p>
+              <WhatsAppButton size="sm" />
+            </div>
+            
             <!-- Course Features -->
             <div class="border-t pt-6">
               <h3 class="font-semibold text-gray-900 mb-4">This course includes:</h3>
@@ -301,5 +343,6 @@ export function getStaticPaths() {
     </div>
   </section>
   
+  <NeedHelpCard />
   <Footer />
 </Layout>

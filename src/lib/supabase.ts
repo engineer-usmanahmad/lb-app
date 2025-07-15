@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { trainersData } from '../data/trainers.js';
 
 const supabaseUrl = import.meta.env.SUPABASE_URL || 'https://your-project.supabase.co';
 const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY || 'your-anon-key';
@@ -7,128 +8,7 @@ export const supabase = supabaseUrl && supabaseAnonKey
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null;
 
-export const trainers = [
-  {
-    id: 'engr-usman-ahmad',
-    name: 'Usman Ahmad',
-    title: 'Senior Cloud Solutions Architect & DevOps Expert',
-    image: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400',
-    bio: 'Usman is a seasoned cloud architect with over 10 years of experience in designing and implementing scalable cloud solutions. He holds multiple AWS and Azure certifications and has helped over 2000 students achieve their cloud certification goals.',
-    specializations: ['AWS', 'Azure', 'GCP', 'DevOps', 'Kubernetes', 'Terraform', 'CI/CD'],
-    teachingPhilosophy: 'I believe in hands-on learning combined with real-world scenarios. My approach focuses on practical implementation rather than just theoretical knowledge, ensuring students are job-ready.',
-    experience: [
-      'Senior Cloud Solutions Architect at 10Pearls (5+ years)',
-      'DevOps Lead at LbisTech (3+ years)',
-      'AWS Community Builder and Speaker',
-      'Led cloud migration projects worth $2M+ for enterprise clients',
-      'Designed and implemented CI/CD pipelines for 20+ applications'
-    ],
-    certifications: [
-      'AWS Solutions Architect Associate',
-      'AWS Solutions Architect Professional',
-      'Associate Cloud Engineer',
-      'Azure Administrator Associate',
-      'Certified Kubernetes Administrator (CKA)',
-      'HashiCorp Certified: Terraform Associate'
-    ],
-    coursesTeaching: ['devops-zero-to-hero', 'docker-containerization', 'kubernetes-mastery', 'jenkins-training'],
-    successStats: {
-      passRate: '98%',
-      careerAdvancement: '95%',
-      studentsmentored: 2000
-    }
-  },
-  {
-    id: 'sarah-khan',
-    name: 'Sarah Khan',
-    title: 'Cybersecurity Expert & Ethical Hacker',
-    image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400',
-    bio: 'Sarah is a certified ethical hacker and cybersecurity consultant with 6+ years of experience in penetration testing and security operations. She has conducted security assessments for major financial institutions and government organizations.',
-    specializations: ['Ethical Hacking', 'Penetration Testing', 'Security Operations', 'Incident Response', 'Compliance'],
-    teachingPhilosophy: 'Cybersecurity is not just about tools and techniques, but understanding the mindset of both attackers and defenders. I teach students to think like hackers to better protect systems.',
-    experience: [
-      'Senior Cybersecurity Consultant at Deloitte (4+ years)',
-      'Penetration Tester at CyberSec Solutions (2+ years)',
-      'Conducted 200+ security assessments',
-      'Speaker at international cybersecurity conferences',
-      'Published researcher in cybersecurity journals'
-    ],
-    certifications: [
-      'Certified Ethical Hacker (CEH)',
-      'Offensive Security Certified Professional (OSCP)',
-      'Certified Information Systems Security Professional (CISSP)',
-      'CompTIA Security+',
-      'GIAC Penetration Tester (GPEN)',
-      'Certified Information Security Manager (CISM)'
-    ],
-    coursesTeaching: ['aws-3-in-1', 'cybersecurity-zero-to-hero', 'ethical-hacking-advanced'],
-    successStats: {
-      passRate: '96%',
-      careerAdvancement: '92%',
-      studentsmentored: 1500
-    }
-  },
-  {
-    id: 'ahmed-hassan',
-    name: 'Ahmed Hassan',
-    title: 'DevOps Automation Specialist',
-    image: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400',
-    bio: 'Ahmed specializes in DevOps automation and infrastructure as code. With 7+ years of experience, he has implemented DevOps practices across various industries, helping organizations achieve faster deployment cycles and improved reliability.',
-    specializations: ['Jenkins', 'Docker', 'Kubernetes', 'Ansible', 'GitLab CI/CD', 'Infrastructure as Code'],
-    teachingPhilosophy: 'DevOps is a culture, not just tools. I focus on teaching the principles and practices that make teams more collaborative and efficient, backed by the right automation tools.',
-    experience: [
-      'DevOps Lead at Techlogix (5+ years)',
-      'Senior DevOps Engineer at Netsol Technologies (2+ years)',
-      'Implemented DevOps practices for 100+ projects',
-      'Reduced deployment time by 80% across multiple organizations',
-      'Mentored 50+ junior DevOps engineers'
-    ],
-    certifications: [
-      'Docker Certified Associate',
-      'Certified Kubernetes Administrator (CKA)',
-      'Jenkins Certified Engineer',
-      'Ansible Certified Specialist',
-      'GitLab Certified CI/CD Specialist',
-      'AWS Certified DevOps Engineer'
-    ],
-    coursesTeaching: ['devops-zero-to-hero', 'docker-containerization', 'kubernetes-mastery'],
-    successStats: {
-      passRate: '97%',
-      careerAdvancement: '90%',
-      studentsmentored: 1200
-    }
-  },
-  {
-    id: 'fatima-ali',
-    name: 'Fatima Ali',
-    title: 'Cloud Security Architect',
-    image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400',
-    bio: 'Fatima combines cloud expertise with cybersecurity knowledge, specializing in secure cloud architectures and compliance frameworks. She has designed security solutions for cloud environments serving millions of users.',
-    specializations: ['Cloud Security', 'AWS Security', 'Azure Security', 'Compliance', 'Risk Assessment'],
-    teachingPhilosophy: 'Security should be built into every layer of cloud architecture, not added as an afterthought. I teach students to design secure-by-default cloud solutions.',
-    experience: [
-      'Cloud Security Architect at IBM (4+ years)',
-      'Security Consultant at PwC (3+ years)',
-      'Designed security frameworks for Fortune 500 companies',
-      'Led compliance initiatives for GDPR, SOX, and HIPAA',
-      'Published expert in cloud security best practices'
-    ],
-    certifications: [
-      'AWS Certified Security - Specialty',
-      'Azure Security Engineer Associate',
-      'Certified Cloud Security Professional (CCSP)',
-      'Certified Information Systems Auditor (CISA)',
-      'ISO 27001 Lead Auditor',
-      'NIST Cybersecurity Framework Certified'
-    ],
-    coursesTeaching: ['aws-3-in-1', 'cybersecurity-zero-to-hero', 'cloud-security-mastery'],
-    successStats: {
-      passRate: '95%',
-      careerAdvancement: '93%',
-      studentsmentored: 800
-    }
-  }
-];
+export const trainers = trainersData;
 
 export interface ContactSubmission {
   id?: number;

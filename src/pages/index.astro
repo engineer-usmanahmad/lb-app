@@ -3,8 +3,15 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
 import CourseCard from '../components/CourseCard.astro';
+import TestimonialSlider from '../components/TestimonialSlider.astro';
+import NeedHelpCard from '../components/NeedHelpCard.astro';
 import Footer from '../components/Footer.astro';
 import { courses, trainers } from '../lib/supabase';
+
+// Featured courses for home page (exactly 6)
+const featuredCourses = courses.filter(course => 
+  ['aws-3-in-1', 'devops-zero-to-hero', 'cybersecurity-zero-to-hero', 'azure-fundamentals', 'docker-containerization', 'voip-training'].includes(course.id)
+);
 ---
 
 <Layout title="LbisTech - Professional Technology Education">
@@ -66,7 +73,7 @@ import { courses, trainers } from '../lib/supabase';
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {courses.filter(course => ['aws-3-in-1', 'devops-zero-to-hero', 'voip-training'].includes(course.id)).map(course => (
+        {featuredCourses.map(course => (
           <CourseCard course={course} />
         ))}
       </div>
@@ -79,7 +86,7 @@ import { courses, trainers } from '../lib/supabase';
     </div>
   </section>
   
-  <!-- Student Testimonials -->
+  <!-- Meet Our Expert Trainers -->
   <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
       <div class="text-center mb-12">
@@ -146,64 +153,8 @@ import { courses, trainers } from '../lib/supabase';
     </div>
   </section>
   
-  <!-- Student Testimonials -->
-  <section class="py-16 bg-primary-900 text-white">
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">What Our Students Say</h2>
-        <p class="text-lg text-gray-300 max-w-2xl mx-auto">
-          Don't just take our word for it. Here's what our successful graduates have to say.
-        </p>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div class="bg-white bg-opacity-10 rounded-lg p-6">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-coral-500 rounded-full flex items-center justify-center mr-4">
-              <span class="text-white font-bold">AH</span>
-            </div>
-            <div>
-              <h4 class="font-semibold">Ahmed Hassan</h4>
-              <p class="text-gray-300 text-sm">AWS Solutions Architect</p>
-            </div>
-          </div>
-          <p class="text-gray-200">
-            "The AWS certification course was incredible. The hands-on approach and real-world projects helped me land my dream job at a top tech company."
-          </p>
-        </div>
-        
-        <div class="bg-white bg-opacity-10 rounded-lg p-6">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-coral-500 rounded-full flex items-center justify-center mr-4">
-              <span class="text-white font-bold">SK</span>
-            </div>
-            <div>
-              <h4 class="font-semibold">Sarah Khan</h4>
-              <p class="text-gray-300 text-sm">DevOps Engineer</p>
-            </div>
-          </div>
-          <p class="text-gray-200">
-            "LbisTech's DevOps course transformed my career. The instructors are amazing and the curriculum is cutting-edge."
-          </p>
-        </div>
-        
-        <div class="bg-white bg-opacity-10 rounded-lg p-6">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-coral-500 rounded-full flex items-center justify-center mr-4">
-              <span class="text-white font-bold">MA</span>
-            </div>
-            <div>
-              <h4 class="font-semibold">Muhammad Ali</h4>
-              <p class="text-gray-300 text-sm">Cloud Architect</p>
-            </div>
-          </div>
-          <p class="text-gray-200">
-            "The Azure certification program gave me the skills and confidence to advance in my career. Highly recommended!"
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- Student Testimonials Slider -->
+  <TestimonialSlider />
   
   <!-- CTA Section -->
   <section class="py-16 bg-coral-500 text-white">
@@ -223,5 +174,6 @@ import { courses, trainers } from '../lib/supabase';
     </div>
   </section>
   
+  <NeedHelpCard />
   <Footer />
 </Layout>

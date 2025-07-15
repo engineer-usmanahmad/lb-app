@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import NeedHelpCard from '../../components/NeedHelpCard.astro';
 import { trainers } from '../../lib/supabase';
 ---
 
@@ -104,5 +105,6 @@ import { trainers } from '../../lib/supabase';
     </div>
   </section>
   
+  <NeedHelpCard />
   <Footer />
 </Layout>
