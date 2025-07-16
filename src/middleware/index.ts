@@ -1,53 +1,51 @@
-import type { MiddlewareHandler } from 'astro';
-import { verifyUserSession, verifyAdminSession } from '../lib/auth';
+import { defineMiddleware } from "astro/middleware";
+import { verifyUserSession, verifyAdminSession } from "../lib/auth";
 
-export const onRequest: MiddlewareHandler = async ({ request, redirect, locals, url }) => {
-  // Get session token from cookies
-  const cookies = request.headers.get('cookie');
-  const sessionToken = cookies?.split(';')
-    .find(c => c.trim().startsWith('session='))
-    ?.split('=')[1];
+export const onRequest = defineMiddleware(async ({ request, redirect, locals, url }, next) => {
+  const cookies = request.headers.get("cookie");
+  const sessionToken = cookies?.split(";")
+    .find(c => c.trim().startsWith("session="))
+    ?.split("=")[1];
 
-  const adminToken = cookies?.split(';')
-    .find(c => c.trim().startsWith('admin_session='))
-    ?.split('=')[1];
+  const adminToken = cookies?.split(";")
+    .find(c => c.trim().startsWith("admin_session="))
+    ?.split("=")[1];
 
   // Admin routes protection
-  if (url.pathname.startsWith('/admin/')) {
-    if (url.pathname === '/admin/login') {
-      // Allow access to login page
-      return;
+  if (url.pathname.startsWith("/admin/")) {
+    if (url.pathname === "/admin/login") {
+      return next(); // allow access
     }
 
     if (!adminToken) {
-      return redirect('/admin/login');
+      return redirect("/admin/login");
     }
 
     const adminUser = await verifyAdminSession(adminToken);
     if (!adminUser) {
-      return redirect('/admin/login');
+      return redirect("/admin/login");
     }
 
     locals.admin = adminUser;
-    return;
+    return next();
   }
 
-  // User authenticated routes
-  if (url.pathname.startsWith('/dashboard/')) {
+  // User routes protection
+  if (url.pathname.startsWith("/dashboard/")) {
     if (!sessionToken) {
-      return redirect('/auth/login');
+      return redirect("/auth/login");
     }
 
     const user = await verifyUserSession(sessionToken);
     if (!user) {
-      return redirect('/auth/login');
+      return redirect("/auth/login");
     }
 
     locals.user = user;
-    return;
+    return next();
   }
 
-  // Set user in locals if authenticated (for conditional rendering)
+  // Set optional locals for non-protected routes
   if (sessionToken) {
     const user = await verifyUserSession(sessionToken);
     if (user) {
@@ -62,6 +60,6 @@ export const onRequest: MiddlewareHandler = async ({ request, redirect, locals, 
     }
   }
 
-  // Continue to the next middleware or route handler
-  return;
-};
+  return next(); // ✅ let Astro handle rendering
+});
+
