@@ -1,11 +1,6 @@
 import { supabase } from './supabase';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = import.meta.env.JWT_SECRET || 'your-secret-key';
-const JWT_EXPIRES_IN = '7d';
-
-export interface User {
+interface User {
   id: string;
   email: string;
   first_name: string;
@@ -15,44 +10,61 @@ export interface User {
   created_at: string;
 }
 
-export interface AdminUser {
+interface AdminUser {
   id: string;
   email: string;
   first_name: string;
   last_name: string;
   role: string;
   is_active: boolean;
-  last_login?: string;
+  last_login: string;
 }
 
-export interface UserSession {
-  id: string;
-  user_id: string;
-  session_token: string;
-  expires_at: string;
+
+if (!import.meta.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not set.');
+}
+const JWT_SECRET = import.meta.env.JWT_SECRET;
+
+const JWT_EXPIRES_IN = '7d';
+
+// ✅ Load jsonwebtoken using dynamic import for ESM compatibility
+async function getJwt() {
+  const jwt = await import('jsonwebtoken');
+  return jwt.default; // needed because it's a CommonJS export
 }
 
-// Password utilities
 export const hashPassword = async (password: string): Promise<string> => {
+  const bcrypt = await import('bcryptjs');
   return await bcrypt.hash(password, 12);
 };
 
 export const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
+  const bcrypt = await import('bcryptjs');
   return await bcrypt.compare(password, hash);
 };
 
-// JWT utilities
-export const generateToken = (payload: any): string => {
+type TokenPayload = {
+  userId?: string;
+  adminId?: string;
+  type: 'user' | 'admin';
+};
+
+export const generateToken = async (payload: any): Promise<string> => {
+  const jwt = await getJwt();
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
 
-export const verifyToken = (token: string): any => {
+export const verifyToken = async (token: string): Promise<any> => {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    const jwt = await getJwt();
+    return await jwt.verify(token, JWT_SECRET);
   } catch (error) {
     return null;
   }
 };
+
+// --- The rest of the code remains unchanged (authentication, session, etc.) ---
 
 // Admin authentication
 export const authenticateAdmin = async (email: string, password: string): Promise<AdminUser | null> => {
@@ -64,12 +76,11 @@ export const authenticateAdmin = async (email: string, password: string): Promis
       .eq('is_active', true)
       .single();
 
-    if (error || !data) return null;
-
+    if (error || !data || typeof data.password_hash !== 'string') return null;
+    
     const isValidPassword = await verifyPassword(password, data.password_hash);
     if (!isValidPassword) return null;
 
-    // Update last login
     await supabase
       .from('admin_users')
       .update({ last_login: new Date().toISOString() })
@@ -99,7 +110,7 @@ export const authenticateUser = async (email: string, password: string): Promise
       .eq('email', email)
       .single();
 
-    if (error || !data) return null;
+    if (error || !data || typeof data.password_hash !== 'string') return null;
 
     const isValidPassword = await verifyPassword(password, data.password_hash);
     if (!isValidPassword) return null;
@@ -174,7 +185,7 @@ export const registerUser = async (userData: {
 // Session management
 export const createUserSession = async (userId: string, ipAddress?: string, userAgent?: string): Promise<string | null> => {
   try {
-    const sessionToken = generateToken({ userId, type: 'user' });
+    const sessionToken = await generateToken({ userId, type: 'user' });
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
 
@@ -202,7 +213,7 @@ export const createUserSession = async (userId: string, ipAddress?: string, user
 
 export const createAdminSession = async (adminId: string): Promise<string | null> => {
   try {
-    const sessionToken = generateToken({ adminId, type: 'admin' });
+    const sessionToken = await generateToken({ adminId, type: 'admin' });
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 8); // 8 hours
 
@@ -229,7 +240,7 @@ export const createAdminSession = async (adminId: string): Promise<string | null
 // Session verification
 export const verifyUserSession = async (sessionToken: string): Promise<User | null> => {
   try {
-    const decoded = verifyToken(sessionToken);
+    const decoded = await verifyToken(sessionToken);	  
     if (!decoded || decoded.type !== 'user') return null;
 
     const { data: sessionData, error: sessionError } = await supabase
@@ -266,7 +277,7 @@ export const verifyUserSession = async (sessionToken: string): Promise<User | nu
 
 export const verifyAdminSession = async (sessionToken: string): Promise<AdminUser | null> => {
   try {
-    const decoded = verifyToken(sessionToken);
+    const decoded = await verifyToken(sessionToken);
     if (!decoded || decoded.type !== 'admin') return null;
 
     const { data: sessionData, error: sessionError } = await supabase
