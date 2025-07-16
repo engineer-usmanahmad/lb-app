@@ -1,0 +1,255 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+// Redirect if already logged in
+if (Astro.locals.user) {
+  return Astro.redirect('/dashboard');
+}
+---
+
+<Layout title="Sign Up - LbisTech">
+  <Header />
+  
+  <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+      <div class="flex justify-center">
+        <div class="w-12 h-12 bg-gradient-to-br from-primary-900 to-primary-700 rounded-full flex items-center justify-center">
+          <span class="text-white font-bold text-xl">L</span>
+        </div>
+      </div>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        Create your account
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600">
+        Or{' '}
+        <a href="/auth/login" class="font-medium text-coral-600 hover:text-coral-500">
+          sign in to your existing account
+        </a>
+      </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <form id="signup-form" class="space-y-6">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="first_name" class="block text-sm font-medium text-gray-700">
+                First name
+              </label>
+              <div class="mt-1">
+                <input
+                  id="first_name"
+                  name="first_name"
+                  type="text"
+                  autocomplete="given-name"
+                  required
+                  class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-coral-500 focus:border-coral-500 sm:text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label for="last_name" class="block text-sm font-medium text-gray-700">
+                Last name
+              </label>
+              <div class="mt-1">
+                <input
+                  id="last_name"
+                  name="last_name"
+                  type="text"
+                  autocomplete="family-name"
+                  required
+                  class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-coral-500 focus:border-coral-500 sm:text-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">
+              Email address
+            </label>
+            <div class="mt-1">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                required
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-coral-500 focus:border-coral-500 sm:text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="phone" class="block text-sm font-medium text-gray-700">
+              Phone number (optional)
+            </label>
+            <div class="mt-1">
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autocomplete="tel"
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-coral-500 focus:border-coral-500 sm:text-sm"
+                placeholder="+92 300 1234567"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <div class="mt-1">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="new-password"
+                required
+                minlength="8"
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-coral-500 focus:border-coral-500 sm:text-sm"
+              />
+            </div>
+            <p class="mt-1 text-sm text-gray-500">
+              Must be at least 8 characters long
+            </p>
+          </div>
+
+          <div>
+            <label for="confirm_password" class="block text-sm font-medium text-gray-700">
+              Confirm password
+            </label>
+            <div class="mt-1">
+              <input
+                id="confirm_password"
+                name="confirm_password"
+                type="password"
+                autocomplete="new-password"
+                required
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-coral-500 focus:border-coral-500 sm:text-sm"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-center">
+            <input
+              id="terms"
+              name="terms"
+              type="checkbox"
+              required
+              class="h-4 w-4 text-coral-600 focus:ring-coral-500 border-gray-300 rounded"
+            />
+            <label for="terms" class="ml-2 block text-sm text-gray-900">
+              I agree to the{' '}
+              <a href="/terms" class="text-coral-600 hover:text-coral-500">Terms of Service</a>
+              {' '}and{' '}
+              <a href="/privacy" class="text-coral-600 hover:text-coral-500">Privacy Policy</a>
+            </label>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              id="signup-btn"
+              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-coral-500 hover:bg-coral-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Create account
+            </button>
+          </div>
+        </form>
+
+        <div id="error-message" class="hidden mt-4 bg-red-50 border border-red-200 rounded-md p-4">
+          <div class="flex">
+            <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="ml-3">
+              <p class="text-sm text-red-800" id="error-text"></p>
+            </div>
+          </div>
+        </div>
+
+        <div id="success-message" class="hidden mt-4 bg-green-50 border border-green-200 rounded-md p-4">
+          <div class="flex">
+            <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <div class="ml-3">
+              <p class="text-sm text-green-800">
+                Account created successfully! Redirecting to dashboard...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <Footer />
+</Layout>
+
+<script>
+  const form = document.getElementById('signup-form') as HTMLFormElement;
+  const signupBtn = document.getElementById('signup-btn') as HTMLButtonElement;
+  const errorMessage = document.getElementById('error-message') as HTMLDivElement;
+  const successMessage = document.getElementById('success-message') as HTMLDivElement;
+  const errorText = document.getElementById('error-text') as HTMLParagraphElement;
+
+  // Password confirmation validation
+  const password = document.getElementById('password') as HTMLInputElement;
+  const confirmPassword = document.getElementById('confirm_password') as HTMLInputElement;
+
+  confirmPassword.addEventListener('input', () => {
+    if (password.value !== confirmPassword.value) {
+      confirmPassword.setCustomValidity('Passwords do not match');
+    } else {
+      confirmPassword.setCustomValidity('');
+    }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    if (password.value !== confirmPassword.value) {
+      errorText.textContent = 'Passwords do not match';
+      errorMessage.classList.remove('hidden');
+      return;
+    }
+
+    signupBtn.disabled = true;
+    signupBtn.textContent = 'Creating account...';
+    errorMessage.classList.add('hidden');
+    successMessage.classList.add('hidden');
+
+    const formData = new FormData(form);
+    
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        successMessage.classList.remove('hidden');
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 2000);
+      } else {
+        errorText.textContent = result.error || 'Signup failed. Please try again.';
+        errorMessage.classList.remove('hidden');
+      }
+    } catch (error) {
+      errorText.textContent = 'Network error. Please try again.';
+      errorMessage.classList.remove('hidden');
+    } finally {
+      signupBtn.disabled = false;
+      signupBtn.textContent = 'Create account';
+    }
+  });
+</script>

@@ -1,0 +1,134 @@
+---
+interface Props {
+  courseId: string;
+  courseName: string;
+  isEnrolled?: boolean;
+  user?: any;
+}
+
+const { courseId, courseName, isEnrolled = false, user } = Astro.props;
+---
+
+{!isEnrolled && (
+  <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+    <div class="flex items-center mb-4">
+      <svg class="w-8 h-8 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+      </svg>
+      <h3 class="text-xl font-bold text-blue-800">Course Content Locked</h3>
+    </div>
+    
+    <p class="text-blue-700 mb-6">
+      To access the complete course content including videos and resources, please enroll in this free course.
+    </p>
+    
+    {user ? (
+      <form id="quick-enroll-form" class="space-y-4">
+        <input type="hidden" name="course_id" value={courseId} />
+        <input type="hidden" name="course_name" value={courseName} />
+        
+        <div>
+          <label for="learning_goals" class="block text-sm font-medium text-blue-800 mb-2">
+            What do you hope to achieve with this course? (Optional)
+          </label>
+          <textarea 
+            id="learning_goals" 
+            name="learning_goals" 
+            rows="3" 
+            class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Describe your learning goals..."
+          ></textarea>
+        </div>
+        
+        <button 
+          type="submit" 
+          id="enroll-btn"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
+        >
+          Enroll Free Now
+        </button>
+      </form>
+    ) : (
+      <div class="space-y-4">
+        <p class="text-blue-700">
+          Please sign in or create an account to enroll in this free course.
+        </p>
+        <div class="flex space-x-4">
+          <a 
+            href="/auth/login" 
+            class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Sign In
+          </a>
+          <a 
+            href="/auth/signup" 
+            class="border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Create Account
+          </a>
+        </div>
+      </div>
+    )}
+    
+    <div id="enroll-success" class="hidden mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span class="text-green-800">Successfully enrolled! Refreshing page...</span>
+      </div>
+    </div>
+    
+    <div id="enroll-error" class="hidden mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        <span class="text-red-800" id="error-text">Enrollment failed. Please try again.</span>
+      </div>
+    </div>
+  </div>
+)}
+
+<script>
+  const form = document.getElementById('quick-enroll-form') as HTMLFormElement;
+  const enrollBtn = document.getElementById('enroll-btn') as HTMLButtonElement;
+  const successMessage = document.getElementById('enroll-success') as HTMLDivElement;
+  const errorMessage = document.getElementById('enroll-error') as HTMLDivElement;
+  const errorText = document.getElementById('error-text') as HTMLSpanElement;
+  
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    enrollBtn.disabled = true;
+    enrollBtn.textContent = 'Enrolling...';
+    successMessage.classList.add('hidden');
+    errorMessage.classList.add('hidden');
+    
+    try {
+      const formData = new FormData(form);
+      const response = await fetch('/api/courses/enroll-free', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok && result.success) {
+        successMessage.classList.remove('hidden');
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        errorText.textContent = result.error || 'Enrollment failed. Please try again.';
+        errorMessage.classList.remove('hidden');
+      }
+    } catch (error) {
+      errorText.textContent = 'Network error. Please try again.';
+      errorMessage.classList.remove('hidden');
+    } finally {
+      enrollBtn.disabled = false;
+      enrollBtn.textContent = 'Enroll Free Now';
+    }
+  });
+</script>

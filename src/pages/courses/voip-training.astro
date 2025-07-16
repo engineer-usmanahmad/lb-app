@@ -4,9 +4,19 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import CourseModules from '../../components/CourseModules.astro';
 import YouTubeEmbed from '../../components/YouTubeEmbed.astro';
+import EnrollmentGate from '../../components/EnrollmentGate.astro';
+import { checkCourseAccess } from '../../lib/auth';
 import { courses } from '../../lib/supabase';
 
+export const prerender = false;
+
 const course = courses.find(c => c.id === 'voip-training');
+const user = Astro.locals.user;
+
+let isEnrolled = false;
+if (user) {
+  isEnrolled = await checkCourseAccess(user.id, 'voip-training');
+}
 
 if (!course) {
   return Astro.redirect('/courses');
@@ -73,18 +83,50 @@ if (!course) {
           
           <!-- YouTube Playlist Embed -->
           {course.youtubePlaylist && (
-            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-              <h2 class="text-2xl font-bold text-gray-900 mb-6">Training Videos</h2>
-              <YouTubeEmbed 
-                playlistId={course.youtubePlaylist} 
-                title="Open Source VoIP Training Playlist"
-                height="450"
+            <>
+              <EnrollmentGate 
+                courseId="voip-training"
+                courseName={course.title}
+                isEnrolled={isEnrolled}
+                user={user}
               />
-              <div class="mt-4 p-4 bg-blue-50 rounded-lg">
-                <p class="text-blue-800 text-sm">
-                  <strong>Note:</strong> This playlist contains the complete training series. 
-                  Enroll to get structured access and track your progress.
-                </p>
+              
+              {isEnrolled && (
+                <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                  <h2 class="text-2xl font-bold text-gray-900 mb-6">Training Videos</h2>
+                  <YouTubeEmbed 
+                    playlistId={course.youtubePlaylist} 
+                    title="Open Source VoIP Training Playlist"
+                    height="450"
+                  />
+                  <div class="mt-4 p-4 bg-green-50 rounded-lg">
+                    <p class="text-green-800 text-sm">
+                      <strong>🎉 Welcome!</strong> You now have full access to the complete training series. 
+                      Track your progress and engage with the community.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+          
+          {!course.youtubePlaylist && (
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+              <EnrollmentGate 
+                courseId="voip-training"
+                courseName={course.title}
+                isEnrolled={isEnrolled}
+                user={user}
+              />
+              
+              {isEnrolled && (
+                <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                  <h3 class="text-lg font-semibold text-green-800 mb-2">🎉 Enrollment Successful!</h3>
+                  <p class="text-green-700">
+                    You're now enrolled in the VoIP training course. Course materials and videos will be available soon.
+                  </p>
+                </div>
+              )}
               </div>
             </div>
           )}
@@ -169,12 +211,19 @@ if (!course) {
             </div>
             
             <div class="space-y-3 mb-6">
-              <a 
-                href={`/enroll/${course.id}`} 
-                class="w-full bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold text-center block transition-colors"
-              >
-                Enroll Free Now
-              </a>
+              {isEnrolled ? (
+                <div class="w-full bg-green-500 text-white px-6 py-3 rounded-lg font-semibold text-center">
+                  ✅ Enrolled
+                </div>
+              ) : (
+                <a 
+                  href={user ? '#' : '/auth/login'}
+                  class="w-full bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold text-center block transition-colors"
+                  onclick={user ? 'document.getElementById("quick-enroll-form")?.scrollIntoView()' : ''}
+                >
+                  {user ? 'Enroll Free Now' : 'Sign In to Enroll'}
+                </a>
+              )}
               <a 
                 href="/contact" 
                 class="w-full border border-gray-300 hover:border-green-500 text-gray-700 hover:text-green-500 px-6 py-3 rounded-lg font-semibold text-center block transition-colors"

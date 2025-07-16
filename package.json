@@ -13,8 +13,12 @@
   "dependencies": {
     "@astrojs/node": "^9.3.0",
     "@astrojs/tailwind": "^6.0.2",
-    "astro": "^5.2.5",
     "@supabase/supabase-js": "^2.39.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "astro": "^5.2.5",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
     "resend": "^3.2.0"
   },
   "devDependencies": {

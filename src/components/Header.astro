@@ -30,9 +30,28 @@ const currentPath = Astro.url.pathname;
         <a href="/contact" class={`hover:text-coral-500 transition-colors ${currentPath === '/contact' ? 'text-coral-500 font-semibold' : 'text-gray-700'}`}>
           Contact
         </a>
-        <a href="/contact" class="bg-coral-500 hover:bg-coral-600 text-white px-6 py-2 rounded-lg transition-colors">
-          Get Started
-        </a>
+        
+        {Astro.locals.user ? (
+          <div class="flex items-center space-x-4">
+            <a href="/dashboard" class="text-gray-700 hover:text-coral-500 transition-colors">
+              Dashboard
+            </a>
+            <div class="w-8 h-8 bg-coral-500 rounded-full flex items-center justify-center">
+              <span class="text-white text-sm font-semibold">
+                {Astro.locals.user.first_name[0]}{Astro.locals.user.last_name[0]}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div class="flex items-center space-x-4">
+            <a href="/auth/login" class="text-gray-700 hover:text-coral-500 transition-colors">
+              Sign In
+            </a>
+            <a href="/auth/signup" class="bg-coral-500 hover:bg-coral-600 text-white px-6 py-2 rounded-lg transition-colors">
+              Get Started
+            </a>
+          </div>
+        )}
       </div>
       
       <!-- Mobile Menu Button -->
@@ -51,9 +70,22 @@ const currentPath = Astro.url.pathname;
         <a href="/trainers" class="text-gray-700 hover:text-coral-500 py-2">Trainers</a>
         <a href="/about" class="text-gray-700 hover:text-coral-500 py-2">About</a>
         <a href="/contact" class="text-gray-700 hover:text-coral-500 py-2">Contact</a>
-        <a href="/contact" class="bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg text-center">
-          Get Started
-        </a>
+        
+        {Astro.locals.user ? (
+          <div class="space-y-2">
+            <a href="/dashboard" class="text-gray-700 hover:text-coral-500 py-2 block">Dashboard</a>
+            <div class="text-sm text-gray-500 py-2">
+              Signed in as {Astro.locals.user.first_name} {Astro.locals.user.last_name}
+            </div>
+          </div>
+        ) : (
+          <div class="space-y-2">
+            <a href="/auth/login" class="text-gray-700 hover:text-coral-500 py-2 block">Sign In</a>
+            <a href="/auth/signup" class="bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg text-center block">
+              Get Started
+            </a>
+          </div>
+        )}
       </div>
     </div>
   </nav>
