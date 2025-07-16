@@ -61,4 +61,7 @@ export const onRequest: MiddlewareHandler = async ({ request, redirect, locals, 
       locals.admin = admin;
     }
   }
+
+  // Continue to the next middleware or route handler
+  return;
 };
