@@ -58,6 +58,7 @@ export interface Module {
   title: string;
   topics: string[];
   duration: string;
+  projects: string;
 }
 
 export const courses: Course[] = [
@@ -106,7 +107,8 @@ export const courses: Course[] = [
           'Amazon ECS & EKS - Container Services',
           'AWS Elastic Beanstalk - Application Deployment',
           'Auto Scaling and Load Balancing'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'storage-database',
@@ -118,7 +120,8 @@ export const courses: Course[] = [
           'Amazon RDS - Relational Database Service',
           'Amazon DynamoDB - NoSQL Database',
           'Amazon ElastiCache - In-Memory Caching'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'networking-security',
@@ -130,7 +133,8 @@ export const courses: Course[] = [
           'AWS CloudFront - Content Delivery Network',
           'AWS Route 53 - DNS Service',
           'AWS Certificate Manager'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'monitoring-automation',
@@ -142,7 +146,8 @@ export const courses: Course[] = [
           'AWS CloudFormation - Infrastructure as Code',
           'AWS Systems Manager',
           'AWS Config - Configuration Management'
-        ]
+        ],
+        projects: 'ABC'
       }
     ]
   },
@@ -163,6 +168,8 @@ export const courses: Course[] = [
       'Monitoring & Logging with Prometheus & Grafana',
       'Cloud DevOps with AWS/Azure Integration',
       'Security in DevOps (DevSecOps Practices)',
+      'Real-world Project Implementation',
+      'Practical AI tools for DevOps engineers',
       'Real-world Project Implementation'
     ],
     price: 60000, // PKR equivalent
@@ -170,88 +177,132 @@ export const courses: Course[] = [
     is_free: false,
     modules: [
       {
-        id: 'devops-fundamentals',
-        title: 'DevOps Fundamentals & Culture',
+        id: 'linux-basics-advance',
+        title: 'Linux Basics to Advance',
         duration: '2 weeks',
         topics: [
-          'Introduction to DevOps Philosophy',
-          'DevOps vs Traditional IT Operations',
-          'Agile and Lean Principles',
-          'DevOps Toolchain Overview',
-          'Building DevOps Culture in Organizations'
-        ]
+          'Shell & Filesystem: bash, permissions, links, sudo',
+          'Processes & Services: ps/top, systemd units, journald',
+          'Users/Groups & SSH hardening; Permission management',
+          'Networking & Storage: ip/ss, DNS, mount',
+          'Scripting & Automation: bash functions, cron, logging',
+          'Troubleshooting: disk/CPU/memory, logs, boot issues',
+          'Projects: Harden SSH, create users/groups, set file permissions, and write a backup/rotate script with systemd timers.'
+        ],
+        projects: 'ABC'
       },
       {
         id: 'version-control',
-        title: 'Version Control & Collaboration',
+        title: 'Git & GitHub',
         duration: '2 weeks',
         topics: [
-          'Git Fundamentals and Advanced Commands',
-          'GitHub/GitLab Workflows',
-          'Branching Strategies (GitFlow, GitHub Flow)',
-          'Code Review Best Practices',
-          'Collaborative Development Workflows'
-        ]
+          'Git fundamentals: commits, branches, merges, rebases',
+          'Branching strategies: Git Flow',
+          'History operations: stash, amend, revert, reset',
+          'PRs & Code Review: branch protection, required checks',
+          'Releases & Tags: semantic versioning, changelogs',
+          'Github Repository creation and management',
+          'Projects: '
+        ],
+        projects: 'ABC'
       },
       {
         id: 'cicd-pipelines',
-        title: 'CI/CD Pipeline Implementation',
-        duration: '4 weeks',
+        title: 'CI/CD with Jenkins',
+        duration: '2 weeks',
         topics: [
-          'Continuous Integration Principles',
-          'Jenkins Installation and Configuration',
-          'Building Automated Testing Pipelines',
-          'Deployment Automation Strategies',
-          'Pipeline as Code with Jenkinsfile'
-        ]
+          'Jenkins architecture: controller, agents, credentials',
+          'Declarative pipelines: stages, parallel, post actions',
+          'Pipeline as Code (Jenkinsfile) with build/test/scan',
+          'Shared libraries & reuse; artifacts and caching',
+          'Docker/Kubernetes agents and environment isolation',
+          'Projects: '
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'configuration-management',
+        title: 'Ansible',
+        duration: '1 week',
+        topics: [
+          'Inventories, ad-hoc commands, playbooks, modules',
+          'Variables, facts & templating',
+          'Roles & collections; reusable structure and best practices',
+          'Conditionals, loops, handlers',
+          'Secrets with Ansible Vault',
+          'Projects: '
+        ],
+        projects: 'ABC'
       },
       {
         id: 'containerization',
         title: 'Containerization with Docker',
-        duration: '3 weeks',
+        duration: '2 weeks',
         topics: [
-          'Docker Architecture and Components',
-          'Creating and Managing Docker Images',
-          'Docker Networking and Storage',
-          'Docker Compose for Multi-container Apps',
-          'Container Security Best Practices'
-        ]
+          'Images & Layers: Dockerfile, multi-stage builds, cache',
+          'Runtime: ENTRYPOINT/CMD, env, resource limits',
+          'Networking & Storage: bridges, ports, volumes, bind mounts',
+          'Docker Compose for multi-container apps & healthchecks',
+          'Security & Debugging: non-root user',
+          'Projects: '
+        ],
+        projects: 'ABC'
       },
       {
         id: 'orchestration',
-        title: 'Container Orchestration',
+        title: 'Container Orchestration with Kubernetes',
         duration: '4 weeks',
         topics: [
-          'Kubernetes Architecture and Components',
-          'Deploying Applications on Kubernetes',
-          'Kubernetes Networking and Storage',
-          'Helm Charts for Package Management',
-          'Kubernetes Security and RBAC'
-        ]
+          'Core objects: Pods, Deployments, Jobs/CronJobs',
+          'Services & Ingress: ClusterIP/LB, Ingress controllers & TLS',
+          'Config & Secrets: ConfigMap, Secret, volumes',
+          'Health & Scaling: probes, requests/limits, HPA basics',
+          'Storage & State: PV/PVC, StorageClasses, StatefulSets',
+          'Security: RBAC, Namespaces, NetworkPolicies',
+          'Projects: '
+        ],
+        projects: 'ABC'
       },
       {
         id: 'infrastructure-code',
-        title: 'Infrastructure as Code',
-        duration: '3 weeks',
+        title: 'Infrastructure as Code with Terraform',
+        duration: '2 weeks',
         topics: [
-          'Infrastructure as Code Principles',
-          'Terraform for Infrastructure Provisioning',
-          'Ansible for Configuration Management',
-          'CloudFormation for AWS Resources',
-          'State Management and Best Practices'
-        ]
+          'HCL basics: providers, resources, variables, outputs',
+          'State management: backends, locking',
+          'Modules: structure, versioning, composition patterns',
+          'Testing & CI: validate/plan, tflint/tfsec guardrails',
+          'Projects: '
+        ],
+        projects: 'ABC'
       },
       {
         id: 'monitoring-logging',
-        title: 'Monitoring & Observability',
+        title: 'Monitoring & Observability with Prometheus & Grafana (Coming Soon)',
         duration: '2 weeks',
         topics: [
-          'Monitoring Strategy and Metrics',
-          'Prometheus for Metrics Collection',
-          'Grafana for Visualization',
-          'ELK Stack for Log Management',
-          'Alerting and Incident Response'
-        ]
+          'Metrics types & label cardinality best practices',
+          'Prometheus: scrape configs, service discovery, exporters',
+          'PromQL essentials: rate/irate, aggregations, quantiles',
+          'Alerting: Alertmanager routes, silences, notifications',
+          'Grafana: datasources, variables, transformations, alerting',
+          'Projects: '
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'ai-tools-devops',
+        title: 'Basic AI Tools for DevOps Engineers (Coming Soon)',
+        duration: '1 week',
+        topics: [
+          'Prompting for ops: structured requests, checklists, guardrails',
+          'Code assist: generate/review Dockerfiles, K8s, Terraform, Jenkinsfiles',
+          'Log & alert triage: summarization, regex/query generation, RCA hints',
+          'Runbooks & docs: turning commands into reproducible procedures',
+          'ChatOps integration & safety: secret hygiene, PR-only changes',
+          'Projects: '
+        ],
+        projects: 'ABC'
       }
     ]
   },
@@ -288,7 +339,8 @@ export const courses: Course[] = [
           'Threat Landscape and Attack Vectors',
           'Risk Assessment and Management',
           'Security Frameworks and Standards'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'ethical-hacking',
@@ -300,7 +352,8 @@ export const courses: Course[] = [
           'Scanning and Enumeration Techniques',
           'Vulnerability Assessment Tools',
           'Social Engineering Techniques'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'network-security',
@@ -312,7 +365,8 @@ export const courses: Course[] = [
           'Network Penetration Testing',
           'Wireless Security Assessment',
           'Network Monitoring and Analysis'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'web-app-security',
@@ -324,7 +378,8 @@ export const courses: Course[] = [
           'SQL Injection and XSS Attacks',
           'Authentication and Session Management',
           'Secure Code Review Practices'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'soc-operations',
@@ -336,7 +391,8 @@ export const courses: Course[] = [
           'Threat Hunting Techniques',
           'Security Incident Detection',
           'Threat Intelligence Integration'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'incident-response',
@@ -348,7 +404,8 @@ export const courses: Course[] = [
           'Malware Analysis Basics',
           'Evidence Collection and Preservation',
           'Post-Incident Analysis and Reporting'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'compliance-governance',
@@ -360,7 +417,8 @@ export const courses: Course[] = [
           'NIST Cybersecurity Framework',
           'GDPR and Privacy Regulations',
           'Security Audit and Assessment'
-        ]
+        ],
+        projects: 'ABC'
       }
     ]
   },
@@ -394,7 +452,8 @@ export const courses: Course[] = [
           'Azure Services Overview',
           'Azure Resource Manager',
           'Azure Subscriptions and Management Groups'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'azure-services',
@@ -406,7 +465,8 @@ export const courses: Course[] = [
           'Azure Networking Services',
           'Azure Database Services',
           'Azure Identity Services'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'azure-security',
@@ -418,7 +478,8 @@ export const courses: Course[] = [
           'Azure Active Directory',
           'Compliance and Privacy',
           'Azure Governance Features'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'azure-pricing',
@@ -430,7 +491,8 @@ export const courses: Course[] = [
           'Azure Support Plans',
           'Service Level Agreements',
           'Azure Advisor Recommendations'
-        ]
+        ],
+        projects: 'ABC'
       }
     ]
   },
@@ -465,7 +527,8 @@ export const courses: Course[] = [
           'Docker Architecture Overview',
           'Basic Docker Commands',
           'Container vs Virtual Machine'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'docker-images',
@@ -477,7 +540,8 @@ export const courses: Course[] = [
           'Dockerfile Best Practices',
           'Image Optimization Techniques',
           'Container Lifecycle Management'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'docker-networking',
@@ -489,7 +553,8 @@ export const courses: Course[] = [
           'Docker Volumes and Bind Mounts',
           'Data Persistence Strategies',
           'Network Security Considerations'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'docker-compose',
@@ -501,7 +566,8 @@ export const courses: Course[] = [
           'Service Dependencies',
           'Environment Configuration',
           'Production Deployment with Compose'
-        ]
+        ],
+        projects: 'ABC'
       }
     ]
   },
@@ -538,7 +604,8 @@ export const courses: Course[] = [
           'kubectl Command Line Tool',
           'Kubernetes API and Objects',
           'Cluster Setup and Configuration'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'k8s-workloads',
@@ -562,7 +629,8 @@ export const courses: Course[] = [
           'Environment Variables',
           'Volume Mounts and Configuration',
           'Resource Quotas and Limits'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'k8s-storage',
@@ -574,7 +642,8 @@ export const courses: Course[] = [
           'StatefulSet Storage Requirements',
           'Backup and Restore Strategies',
           'Storage Performance Optimization'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'k8s-networking',
@@ -586,7 +655,8 @@ export const courses: Course[] = [
           'Network Policies',
           'RBAC and Security Contexts',
           'Pod Security Standards'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'k8s-operations',
@@ -598,7 +668,8 @@ export const courses: Course[] = [
           'Helm Package Manager',
           'Cluster Maintenance and Upgrades',
           'Troubleshooting Common Issues'
-        ]
+        ],
+        projects: 'ABC'
       }
     ]
   },
@@ -638,7 +709,8 @@ export const courses: Course[] = [
           'Installation and initial setup',
           'Inventory management and host patterns',
           'Basic ad-hoc commands'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'ansible-playbooks',
@@ -650,7 +722,8 @@ export const courses: Course[] = [
           'Conditionals and loops',
           'Handlers and notifications',
           'Template management with Jinja2'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'ansible-advanced',
@@ -662,7 +735,8 @@ export const courses: Course[] = [
           'Custom modules and plugins',
           'Integration with CI/CD pipelines',
           'Performance optimization and best practices'
-        ]
+        ],
+        projects: 'ABC'
       }
     ]
   },
@@ -701,7 +775,8 @@ export const courses: Course[] = [
           'Understanding Jenkins architecture',
           'Basic job creation and configuration',
           'Build triggers and scheduling'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'jenkins-pipelines',
@@ -713,7 +788,8 @@ export const courses: Course[] = [
           'Pipeline syntax and best practices',
           'Multi-branch pipelines',
           'Pipeline libraries and shared code'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'jenkins-advanced',
@@ -725,7 +801,8 @@ export const courses: Course[] = [
           'Distributed builds and agents',
           'Integration with external tools',
           'Monitoring, logging, and troubleshooting'
-        ]
+        ],
+        projects: 'ABC'
       }
     ]
   },
@@ -763,7 +840,8 @@ export const courses: Course[] = [
           'VoIP protocols (SIP, RTP, RTCP)',
           'Network requirements for VoIP',
           'Quality of Service basics'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'asterisk-pbx',
@@ -775,7 +853,8 @@ export const courses: Course[] = [
           'Extension and dialplan configuration',
           'Trunk configuration and routing',
           'Voicemail and call features'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'voip-security',
@@ -787,7 +866,8 @@ export const courses: Course[] = [
           'Performance monitoring and optimization',
           'Troubleshooting common issues',
           'Best practices for production deployment'
-        ]
+        ],
+        projects: 'ABC'
       }
     ]
   },
@@ -824,7 +904,8 @@ export const courses: Course[] = [
           'Security principles and frameworks',
           'Risk assessment basics',
           'Compliance requirements'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'network-security',
@@ -836,7 +917,8 @@ export const courses: Course[] = [
           'VPN technologies and implementation',
           'Network monitoring and analysis',
           'Wireless security considerations'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'ethical-hacking',
@@ -848,7 +930,8 @@ export const courses: Course[] = [
           'Exploitation methodologies',
           'Post-exploitation techniques',
           'Reporting and remediation'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'incident-response',
@@ -860,7 +943,8 @@ export const courses: Course[] = [
           'Evidence collection and analysis',
           'Malware analysis basics',
           'Recovery and lessons learned'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'compliance-governance',
@@ -872,7 +956,8 @@ export const courses: Course[] = [
           'Security policies and procedures',
           'Audit and assessment processes',
           'Business continuity planning'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'app-security',
@@ -884,7 +969,8 @@ export const courses: Course[] = [
           'Mobile application security',
           'API security considerations',
           'DevSecOps integration'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'cloud-security',
@@ -896,7 +982,8 @@ export const courses: Course[] = [
           'Container security',
           'Identity and access management',
           'Cloud compliance and governance'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'advanced-topics',
@@ -908,7 +995,8 @@ export const courses: Course[] = [
           'Emerging threats and trends',
           'Career development in cybersecurity',
           'Continuous learning and certification paths'
-        ]
+        ],
+        projects: 'ABC'
       }
     ]
   },
@@ -945,7 +1033,8 @@ export const courses: Course[] = [
           'AI ethics and responsible AI',
           'AI applications across industries',
           'Setting up development environment'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'python-for-ai',
@@ -957,7 +1046,8 @@ export const courses: Course[] = [
           'NumPy, Pandas, and Matplotlib',
           'Jupyter notebooks and development workflow',
           'Data manipulation and visualization'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'ml-basics',
@@ -969,7 +1059,8 @@ export const courses: Course[] = [
           'Model evaluation and validation',
           'Cross-validation and hyperparameter tuning',
           'Common algorithms and their applications'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'deep-learning',
@@ -981,7 +1072,8 @@ export const courses: Course[] = [
           'TensorFlow and PyTorch basics',
           'Training deep neural networks',
           'Regularization and optimization techniques'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'computer-vision',
@@ -993,7 +1085,8 @@ export const courses: Course[] = [
           'Object detection and recognition',
           'Image classification projects',
           'Advanced computer vision applications'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'nlp',
@@ -1005,7 +1098,8 @@ export const courses: Course[] = [
           'Language models and transformers',
           'Named entity recognition',
           'Text generation and summarization'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'generative-ai',
@@ -1017,7 +1111,8 @@ export const courses: Course[] = [
           'Fine-tuning and custom model development',
           'Working with APIs and pre-trained models',
           'Building AI-powered applications'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'ai-deployment',
@@ -1029,7 +1124,8 @@ export const courses: Course[] = [
           'MLOps and model monitoring',
           'Containerization for AI models',
           'Scaling and performance optimization'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'ai-business',
@@ -1041,7 +1137,8 @@ export const courses: Course[] = [
           'Industry-specific AI applications',
           'Change management for AI adoption',
           'Building AI teams and capabilities'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'advanced-ai',
@@ -1053,7 +1150,8 @@ export const courses: Course[] = [
           'Future of AI and emerging technologies',
           'Career paths in AI',
           'Continuous learning and development'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'ai-projects',
@@ -1065,7 +1163,8 @@ export const courses: Course[] = [
           'Code review and best practices',
           'Project deployment and documentation',
           'Career guidance and next steps'
-        ]
+        ],
+        projects: 'ABC'
       }
     ]
   },
@@ -1103,7 +1202,8 @@ export const courses: Course[] = [
           'File system navigation',
           'Basic commands and utilities',
           'Text editors and file manipulation'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'system-admin',
@@ -1115,7 +1215,8 @@ export const courses: Course[] = [
           'Process management',
           'System monitoring and logging',
           'Service management with systemd'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'networking-security',
@@ -1127,7 +1228,8 @@ export const courses: Course[] = [
           'SSH configuration and security',
           'System hardening techniques',
           'Security monitoring and auditing'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'automation-scripting',
@@ -1139,7 +1241,8 @@ export const courses: Course[] = [
           'System backup strategies',
           'Performance monitoring scripts',
           'Advanced scripting techniques'
-        ]
+        ],
+        projects: 'ABC'
       }
     ]
   }

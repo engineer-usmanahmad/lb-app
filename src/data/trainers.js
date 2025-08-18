@@ -3,7 +3,7 @@ export const trainersData = [
     id: 'uzair-azmat',
     name: 'Uzair Azmat',
     title: 'AWS Solutions Architect & Developer Associate Expert',
-    image: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: 'https://lbistech-website-img.s3.eu-central-1.amazonaws.com/Uzair.jpeg',
     bio: 'Uzair is a certified AWS Solutions Architect and Developer with over 8 years of experience in cloud computing. He specializes in AWS 2-in-1 training, helping students achieve both Solutions Architect and Developer Associate certifications. His practical approach and real-world examples have helped over 1500 students pass their AWS certifications.',
     specializations: ['AWS Solutions Architect', 'AWS Developer Associate', 'Cloud Architecture', 'Serverless Computing', 'AWS Security'],
     experience: [
@@ -34,22 +34,22 @@ export const trainersData = [
     id: 'usman-ahmad',
     name: 'Usman Ahmad',
     title: 'DevOps Engineering & Multi-Technology Expert',
-    image: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: 'https://lbistech-website-img.s3.eu-central-1.amazonaws.com/usman.jpeg',
     bio: 'Usman is a comprehensive DevOps practitioner with expertise across multiple technologies including Docker, Ansible, Jenkins, and Kubernetes. With 10+ years in the industry, he has implemented DevOps practices across various organizations, helping teams achieve faster deployment cycles and improved reliability.',
     specializations: ['DevOps Engineering', 'Docker Containerization', 'Ansible Automation', 'Jenkins CI/CD', 'Kubernetes', 'Infrastructure as Code'],
     experience: [
-      'Senior DevOps Engineer at Systems Limited (7+ years)',
-      'DevOps Consultant for multiple Fortune 500 companies',
+      'Principal DevOps Consultant at 10Pearls (4+ years)',
+      'Solutions Architect',
       'Implemented CI/CD pipelines for 100+ applications',
       'Reduced deployment time by 80% across organizations',
       'Mentored 200+ junior DevOps engineers'
     ],
     certifications: [
-      'Docker Certified Associate',
+      'AWS Solutions Architect Professional (SAP)',
+      'AWS Solutions Architect Associate (SAA)',
       'Certified Kubernetes Administrator (CKA)',
-      'Jenkins Certified Engineer',
-      'Ansible Certified Specialist',
-      'AWS Certified DevOps Engineer',
+      'GCP Associate Cloud Engineer',
+      'Microsoft Azure Administrator Associate',
       'HashiCorp Certified: Terraform Associate'
     ],
     coursesTeaching: ['DevOps Zero to Hero', 'Docker Containerization', 'Ansible Training', 'Jenkins Training'],
@@ -66,7 +66,7 @@ export const trainersData = [
     id: 'syed-asad-raza',
     name: 'Syed Asad Raza',
     title: 'Microsoft Azure Cloud Solutions Expert',
-    image: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: 'https://lbistech-website-img.s3.eu-central-1.amazonaws.com/Asad.jpeg',
     bio: 'Syed Asad is a Microsoft Azure certified professional specializing in AZ-900 and AZ-104 certifications. With 6+ years of experience in Microsoft cloud technologies, he has helped organizations migrate to Azure and optimize their cloud infrastructure for cost and performance.',
     specializations: ['Microsoft Azure', 'Azure Fundamentals (AZ-900)', 'Azure Administrator (AZ-104)', 'Cloud Migration', 'Azure Security'],
     experience: [
@@ -92,6 +92,37 @@ export const trainersData = [
     teachingPhilosophy: 'Azure is more than just a cloud platform - it\'s a complete ecosystem. I help students understand not just the how, but the why behind Azure services and architecture decisions.',
     yearsExperience: 6,
     contactEmail: 'asad@lbistech.com'
+  },
+  {
+    id: 'asad-bashir',
+    name: 'Asad Bashir',
+    title: 'Cyber Security Expert & Ethical Hacker',
+    image: 'https://lbistech-website-img.s3.eu-central-1.amazonaws.com/asad-bashir.jpeg',
+    bio: 'An industry-certified cybersecurity professional and ethical hacker with hands-on experience in penetration testing, SOC operations, and incident response—focused on turning labs into job-ready skills.',
+    specializations: ['Cyber Security Professional'],
+    experience: [
+      'Built and tuned SOC workflows',
+      'Performed full-scope penetration tests',
+      'Designed secure cloud architectures (AWS/Azure)',
+      'Drove incident response from triage to post-mortem, including forensics, containment, and executive reporting',
+      'Led red-team and purple-team engagements for enterprise environments'
+    ],
+    certifications: [
+      'Offensive Security Certified Professional (OSCP)',
+      'GIAC Certified Incident Handler (GCIH)',
+      'AWS Certified Security – Specialty',
+      'CEH (Practical) – Certified Ethical Hacker',
+      'CompTIA Security+'
+    ],
+    coursesTeaching: ['Cyber Security Professional'],
+    successStats: {
+      passRate: '93%',
+      careerAdvancement: '90%',
+      studentsmentored: 600
+    },
+    teachingPhilosophy: 'I turn theory into action with lab-first learning, guiding students through real attack-and-defense scenarios. My goal is job readiness: clear mental models, repeatable techniques, and habits that hold up under pressure.',
+    yearsExperience: 5,
+    contactEmail: 'asadbashir@lbistech.com'
   },
   {
     id: 'sufyan-ahmad',

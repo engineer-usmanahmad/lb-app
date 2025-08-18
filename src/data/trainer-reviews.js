@@ -3,46 +3,60 @@ export const trainerReviews = {
     {
       name: "Sarah Ahmed",
       title: "Cloud Engineer",
-      company: "TRG",
+      company: "Freelancer",
       rating: 5,
       review: "Uzair's AWS training methodology is exceptional. His practical approach helped me pass all three associate certifications in one go!"
     },
     {
       name: "Hassan Khan",
       title: "Solutions Architect",
-      company: "Folio3",
+      company: "VibeCode",
       rating: 5,
       review: "The hands-on labs and real-world scenarios Uzair provided were game-changers for my AWS career."
     },
     {
       name: "Zainab Ali",
       title: "DevOps Engineer",
-      company: "Nextbridge",
+      company: "Secondbridge",
       rating: 5,
       review: "Uzair's expertise in AWS is unmatched. His training gave me the confidence to architect complex cloud solutions."
     }
   ],
   'usman-ahmad': [
     {
-      name: "Ahmed Raza",
-      title: "DevOps Lead",
-      company: "Systems Limited",
+      name: "Tayyab Liaqat",
+      title: "Sr. DevOps Engineer",
+      company: "Unifonic",
       rating: 5,
-      review: "Usman's comprehensive DevOps training covered everything from Docker to Jenkins. His practical experience shows in every session."
+      review: "Usman's comprehensive DevOps training covered everything from Linux to Kubernetes. His practical experience shows in every session."
     },
     {
-      name: "Fatima Sheikh",
-      title: "Site Reliability Engineer",
-      company: "Careem",
+      name: "Kashif Khan",
+      title: "DevOps Engineer",
+      company: "Software House",
       rating: 5,
       review: "The CI/CD pipeline implementations Usman taught are exactly what we use in production. Highly practical training!"
     },
     {
-      name: "Ali Hassan",
+      name: "Iram Sheikh",
       title: "Infrastructure Engineer",
-      company: "Jazz",
+      company: "Freelancer",
       rating: 5,
-      review: "Usman's multi-technology expertise in DevOps tools made learning seamless and interconnected."
+      review: "I personally found out really knowledgeable and amazing devops course with Sir Usman he is really hardworking and enthusiastic trainer. Concepts wise he always explain really deeply about topic. Highly recommended."
+    },
+    {
+      name: "Tanzeel Iqbal",
+      title: "Lead DevOps Engr",
+      company: "TestWare",
+      rating: 5,
+      review: "Working with Usman on this project has been a fantastic experience. His expertise and dedication were evident from the very start, and he consistently delivered high-quality results on time. He has strong problem-solving skills and always approached challenges with a positive attitude. Usman’s ability to communicate complex ideas clearly and his willingness to collaborate made the entire process smooth and productive."
+    },
+    {
+      name: "Hasaan Waheed",
+      title: "Cloud DevOps Engineer",
+      company: "Upwork",
+      rating: 5,
+      review: "He an extra ordinary professional with tons of experience and knowledge delivered properly to hi trainees and colleagues. A highly recommended professional in Cloud DevOps domain."
     }
   ],
   'syed-asad-raza': [
@@ -86,7 +100,7 @@ export const trainerReviews = {
       review: "Tanzeel's Linux Deep Dive course gave me the confidence to handle enterprise-level Linux environments."
     },
     {
-      name: "Ayesha Malik",
+      name: "Ayesha Khan",
       title: "System Administrator",
       company: "Ovex Technologies",
       rating: 5,
@@ -96,15 +110,15 @@ export const trainerReviews = {
   'jamshaed': [
     {
       name: "Waqas Ali",
-      title: "DevOps Engineer",
-      company: "Arbisoft",
+      title: "Software Engineer",
+      company: "Progforce",
       rating: 5,
       review: "Jamshaed's Kubernetes training was practical and industry-relevant. Container orchestration became much clearer."
     },
     {
       name: "Rabia Khan",
       title: "Cloud Engineer",
-      company: "10Pearls",
+      company: "VibeCode",
       rating: 5,
       review: "The hands-on Kubernetes labs and real-world deployment scenarios were excellent."
     }
