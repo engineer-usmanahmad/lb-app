@@ -217,11 +217,18 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
                         </p>
                       </div>
                     </div>
-                    <div class="flex space-x-2">
+                    <div class="flex space-x-3">
                       <button class="text-coral-500 hover:text-coral-600 text-sm font-medium">Edit</button>
                       {post.status === 'published' && (
                         <a href={`/blog/${post.slug}`} target="_blank" class="text-blue-500 hover:text-blue-600 text-sm font-medium">View</a>
                       )}
+                      <button
+                        class="delete-post-btn text-red-600 hover:text-red-700 text-sm font-medium"
+                        data-id={post.id}
+                        data-title={post.title}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -264,7 +271,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
                       </svg>
                     </div>
                   </button>
-                  
+
                   <div class="contact-content hidden p-4 bg-white border-t border-gray-200">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
@@ -332,7 +339,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
                       </svg>
                     </div>
                   </button>
-                  
+
                   <div class="enrollment-content hidden p-4 bg-white border-t border-gray-200">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
@@ -414,34 +421,34 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
             </button>
           </div>
         </div>
-        
+
         <form id="create-post-form" class="p-6 space-y-4">
           <div>
             <label for="post-title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
             <input type="text" id="post-title" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
           </div>
-          
+
           <div>
             <label for="post-slug" class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
             <input type="text" id="post-slug" name="slug" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
             <p class="text-xs text-gray-500 mt-1">URL-friendly version (auto-generated from title)</p>
           </div>
-          
+
           <div>
             <label for="post-excerpt" class="block text-sm font-medium text-gray-700 mb-1">Excerpt (Optional)</label>
             <textarea id="post-excerpt" name="excerpt" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"></textarea>
           </div>
-          
+
           <div>
             <label for="post-featured-image" class="block text-sm font-medium text-gray-700 mb-1">Featured Image URL (Optional)</label>
             <input type="url" id="post-featured-image" name="featured_image" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
           </div>
-          
+
           <div>
             <label for="post-content" class="block text-sm font-medium text-gray-700 mb-1">Content</label>
             <textarea id="post-content" name="content" rows="8" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"></textarea>
           </div>
-          
+
           <div>
             <label for="post-status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
             <select id="post-status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
@@ -449,7 +456,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
               <option value="published">Published</option>
             </select>
           </div>
-          
+
           <div class="flex justify-end space-x-3 pt-4">
             <button type="button" id="cancel-post" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors">
               Cancel
@@ -462,7 +469,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
       </div>
     </div>
   </div>
-  
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Contact expandable functionality
@@ -472,11 +479,8 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
           const contactItem = this.closest('.contact-item');
           const content = contactItem.querySelector('.contact-content');
           const arrow = this.querySelector('.contact-arrow');
-          
-          // Toggle content visibility
+
           content.classList.toggle('hidden');
-          
-          // Rotate arrow
           if (content.classList.contains('hidden')) {
             arrow.style.transform = 'rotate(0deg)';
           } else {
@@ -484,7 +488,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
           }
         });
       });
-      
+
       // Enrollment expandable functionality
       const enrollmentHeaders = document.querySelectorAll('.enrollment-header');
       enrollmentHeaders.forEach(header => {
@@ -492,11 +496,8 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
           const enrollmentItem = this.closest('.enrollment-item');
           const content = enrollmentItem.querySelector('.enrollment-content');
           const arrow = this.querySelector('.enrollment-arrow');
-          
-          // Toggle content visibility
+
           content.classList.toggle('hidden');
-          
-          // Rotate arrow
           if (content.classList.contains('hidden')) {
             arrow.style.transform = 'rotate(0deg)';
           } else {
@@ -504,7 +505,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
           }
         });
       });
-      
+
       // Blog post management
       const createPostBtn = document.getElementById('create-post-btn');
       const createPostModal = document.getElementById('create-post-modal');
@@ -513,7 +514,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
       const createPostForm = document.getElementById('create-post-form');
       const postTitle = document.getElementById('post-title');
       const postSlug = document.getElementById('post-slug');
-      
+
       // Auto-generate slug from title
       postTitle?.addEventListener('input', function() {
         const slug = this.value
@@ -522,54 +523,71 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
           .replace(/(^-|-$)/g, '');
         if (postSlug) postSlug.value = slug;
       });
-      
+
       // Modal controls
       createPostBtn?.addEventListener('click', function() {
         createPostModal?.classList.remove('hidden');
       });
-      
       closeModal?.addEventListener('click', function() {
         createPostModal?.classList.add('hidden');
       });
-      
       cancelPost?.addEventListener('click', function() {
         createPostModal?.classList.add('hidden');
       });
-      
-      // Close modal when clicking outside
       createPostModal?.addEventListener('click', function(e) {
-        if (e.target === this) {
-          this.classList.add('hidden');
-        }
+        if (e.target === this) this.classList.add('hidden');
       });
-      
-      // Handle form submission
+
+      // Handle create form submission
       createPostForm?.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
         const formData = new FormData(this);
-        // Add current admin user ID (you might want to get this from session)
-        formData.append('author_id', '00000000-0000-0000-0000-000000000000'); // Replace with actual admin ID
-        
+        // TODO: replace with actual admin ID from your session/auth
+        formData.append('author_id', '00000000-0000-0000-0000-000000000000');
         try {
-          const response = await fetch('/api/admin/blog', {
-            method: 'POST',
-            body: formData
-          });
-          
+          const response = await fetch('/api/admin/blog', { method: 'POST', body: formData });
           const result = await response.json();
-          
-          if (result.success) {
+          if (response.ok && result.success) {
             alert('Blog post created successfully!');
             createPostModal?.classList.add('hidden');
-            location.reload(); // Refresh to show the new post
+            location.reload();
           } else {
-            alert('Error creating post: ' + result.error);
+            alert('Error creating post: ' + (result?.error || 'Unknown error'));
           }
         } catch (error) {
           console.error('Error:', error);
           alert('Error creating post. Please try again.');
         }
+      });
+
+      // --- DELETE POST HANDLER ---
+      const deleteButtons = document.querySelectorAll('.delete-post-btn');
+      deleteButtons.forEach(btn => {
+        btn.addEventListener('click', async function () {
+          const id = this.getAttribute('data-id');
+          const title = this.getAttribute('data-title') || 'this post';
+          if (!id) return alert('Post ID missing.');
+
+          const ok = confirm(`Are you sure you want to delete “${title}”? This action cannot be undone.`);
+          if (!ok) return;
+
+          try {
+            const res = await fetch(`/api/admin/blog?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+            const result = await res.json();
+            if (!res.ok) {
+              console.error('Delete failed:', result);
+              return alert(`Failed to delete: ${result?.error || 'Unknown error'}`);
+            }
+            const postItem = this.closest('.post-item');
+            if (postItem) postItem.remove();
+            alert('Post deleted successfully.');
+            // Optionally refresh counters:
+            // location.reload();
+          } catch (err) {
+            console.error('Delete error:', err);
+            alert('Error deleting post. Please try again.');
+          }
+        });
       });
     });
   </script>
