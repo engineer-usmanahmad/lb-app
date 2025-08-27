@@ -1,0 +1,112 @@
+2) Routes & API (Astro)
+
+Public
+	•	src/pages/forms/[slug].astro
+	•	Server load: fetch active form + fields, render the dynamic form.
+	•	On submit, POST to /api/forms/submit with { formSlug, data }.
+	•	Show success/failure toast. Keep styling consistent with current inputs/buttons.
+
+API
+	•	src/pages/api/forms/submit.ts
+	•	Accept POST JSON: { formSlug: string, data: Record<string, any> }.
+	•	Validate required fields based on form_fields.required.
+	•	If form is inactive or slug not found → 404.
+	•	Insert into form_submissions (jsonb).
+	•	Basic anti-spam: throttle per IP (simple 1 submission/10s in-memory or skip if not needed).
+	•	Respond { ok: true } or { ok: false, error }.
+	•	src/pages/api/admin/forms.ts
+	•	Use service role key.
+	•	Methods:
+	•	POST /api/admin/forms → create form { name, slug, description, is_active }
+	•	PUT /api/admin/forms → update form by id
+	•	DELETE /api/admin/forms?id=... → delete form by id
+	•	Return normalized JSON with errors.
+	•	src/pages/api/admin/form-fields.ts
+	•	Use service role key.
+	•	Methods:
+	•	POST → create field { form_id, label, field_name, field_type, required, options[], order_index }
+	•	PUT → update field by id
+	•	DELETE ?id= → delete field by id
+	•	src/pages/api/admin/submissions.ts (optional listing)
+	•	GET ?form_id= → list submissions (for admin table/export CSV).
+
+Keep error logging (console.error) for quick debugging.
+
+⸻
+
+3) Admin Panel UI (under /admin/dashboard)
+
+Add a “Forms” section similar to your “Blog Management” card:
+	•	Forms List
+	•	Show name, slug, status (active/inactive), created date.
+	•	Actions: Edit, Copy Link, Share WhatsApp, Delete.
+	•	Copy link → /forms/[slug]
+	•	WhatsApp → open https://wa.me/?text=${encodeURIComponent('Fill this form: ' + publicUrl)}
+	•	Create/Edit Form Modal
+	•	Fields: name, slug (auto from name), description, is_active.
+	•	Save via /api/admin/forms (POST/PUT).
+	•	Show link + copy/WhatsApp buttons once saved.
+	•	Manage Fields (per Form)
+	•	Table/list of fields with drag handle for order (simple up/down buttons OK).
+	•	Add Field modal:
+	•	label, field_name (auto from label), field_type (select from supported types),
+	•	required (checkbox),
+	•	options (CSV to array) visible only for radio/checkbox/select,
+	•	order_index.
+	•	Edit/Delete field.
+	•	Persist via /api/admin/form-fields.
+	•	View Submissions (per Form)
+	•	Simple table showing submitted_at and flattened data keys.
+	•	“Export CSV” button (client-only CSV from loaded data OK).
+
+UI rules
+	•	Reuse existing Tailwind classes & button styles.
+	•	Keep the look minimal, aligned with your current cards/modals.
+	•	No global CSS changes.
+
+⸻
+
+4) Dynamic Form Rendering Rules (Public)
+	•	Render by field_type:
+	•	short_answer → <input type="text">
+	•	paragraph → <textarea>
+	•	radio → group of radios from options[]
+	•	checkbox → group of checkboxes from options[] (send array)
+	•	select → <select> options from options[]
+	•	rating → 1–5 clickable inputs or a select (keep minimal)
+	•	date → <input type="date">
+	•	time → <input type="time">
+	•	Use field_name as the submission key.
+	•	Respect required attributes in the DOM and also validate on server.
+	•	On submit, collect values into { [field_name]: value | string[] } and POST to /api/forms/submit.
+
+⸻
+
+5) Supabase Client Usage
+	•	Public pages can use the existing anon client (RLS allows reading active forms & inserting submissions).
+	•	Admin APIs must use SUPABASE_SERVICE_ROLE_KEY on the server (no service key in client/browser).
+
+⸻
+
+6) Validation & Errors
+	•	Server-side validation: required fields, active form, valid field types.
+	•	Handle duplicates (slug unique) with 409.
+	•	Friendly error toasts in admin & public pages.
+
+⸻
+
+7) Acceptance Criteria
+	•	Admin can create/edit/delete forms.
+	•	Admin can add/edit/delete/reorder fields.
+	•	Each form has a public URL and WhatsApp share button.
+	•	Public form renders inputs according to field types and submits successfully.
+	•	Submissions appear in admin View Submissions and can be exported CSV.
+	•	No changes to theme/colors/fonts; UI matches existing style.
+	•	All DB writes happen in Supabase; RLS policies work as defined.
+
+⸻
+
+8) Deliverables
+	•	List of files added/modified.
+	•	Final SQL executed (or migration file).
+	•	Brief usage notes: creating a form, adding fields, copying link/WhatsApp, viewing/exporting submissions.
