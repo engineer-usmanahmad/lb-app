@@ -61,6 +61,24 @@ export interface Module {
   projects: string;
 }
 
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content: string;
+  featured_image?: string;
+  author_id: string;
+  status: 'draft' | 'published' | 'archived';
+  published_at?: string;
+  created_at: string;
+  updated_at: string;
+  author?: {
+    first_name: string;
+    last_name: string;
+  };
+}
+
 export const courses: Course[] = [
   {
     id: 'aws-3-in-1',

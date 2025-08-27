@@ -28,6 +28,17 @@ const { data: recentEnrollments } = await supabase
   .order('created_at', { ascending: false })
   .limit(5);
 
+const { data: recentPosts } = await supabase
+  .from('blog_posts')
+  .select('*')
+  .order('created_at', { ascending: false })
+  .limit(5);
+
+const { data: blogStats } = await supabase
+  .from('blog_posts')
+  .select('status')
+  .order('created_at', { ascending: false });
+
 // Calculate stats
 const totalContacts = contactStats?.length || 0;
 const newContacts = contactStats?.filter(c => c.status === 'new').length || 0;
@@ -39,6 +50,11 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
   acc[curr.course_id] = (acc[curr.course_id] || 0) + 1;
   return acc;
 }, {} as Record<string, number>) || {};
+
+// Blog stats
+const totalPosts = blogStats?.length || 0;
+const publishedPosts = blogStats?.filter(p => p.status === 'published').length || 0;
+const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
 ---
 
 <Layout title="Admin Dashboard - LbisTech">
@@ -63,7 +79,7 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
         <div class="bg-white overflow-hidden shadow rounded-lg">
           <div class="p-5">
             <div class="flex items-center">
@@ -132,6 +148,84 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
                   <dd class="text-lg font-medium text-yellow-600">{pendingEnrollments}</dd>
                 </dl>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Total Blog Posts</dt>
+                  <dd class="text-lg font-medium text-gray-900">{totalPosts}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Published Posts</dt>
+                  <dd class="text-lg font-medium text-green-600">{publishedPosts}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blog Management -->
+      <div class="mb-8">
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Blog Management</h3>
+              <button id="create-post-btn" class="bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg transition-colors">
+                Create New Post
+              </button>
+            </div>
+            <div class="space-y-2">
+              {recentPosts?.map(post => (
+                <div class="post-item border border-gray-200 rounded-lg">
+                  <div class="flex items-center justify-between p-4 bg-gray-50">
+                    <div class="flex items-center">
+                      <span class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                        📝
+                      </span>
+                      <div>
+                        <h4 class="font-semibold text-gray-900">{post.title}</h4>
+                        <p class="text-sm text-gray-500">
+                          {new Date(post.created_at).toLocaleDateString()} - 
+                          <span class={`ml-1 ${post.status === 'published' ? 'text-green-600' : 'text-yellow-600'}`}>
+                            {post.status}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button class="text-coral-500 hover:text-coral-600 text-sm font-medium">Edit</button>
+                      {post.status === 'published' && (
+                        <a href={`/blog/${post.slug}`} target="_blank" class="text-blue-500 hover:text-blue-600 text-sm font-medium">View</a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -305,6 +399,69 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
       </div>
     </div>
   </div>
+
+  <!-- Blog Post Creation Modal -->
+  <div id="create-post-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-90vh overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Create New Blog Post</h3>
+            <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <form id="create-post-form" class="p-6 space-y-4">
+          <div>
+            <label for="post-title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <input type="text" id="post-title" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+          </div>
+          
+          <div>
+            <label for="post-slug" class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+            <input type="text" id="post-slug" name="slug" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+            <p class="text-xs text-gray-500 mt-1">URL-friendly version (auto-generated from title)</p>
+          </div>
+          
+          <div>
+            <label for="post-excerpt" class="block text-sm font-medium text-gray-700 mb-1">Excerpt (Optional)</label>
+            <textarea id="post-excerpt" name="excerpt" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"></textarea>
+          </div>
+          
+          <div>
+            <label for="post-featured-image" class="block text-sm font-medium text-gray-700 mb-1">Featured Image URL (Optional)</label>
+            <input type="url" id="post-featured-image" name="featured_image" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+          </div>
+          
+          <div>
+            <label for="post-content" class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+            <textarea id="post-content" name="content" rows="8" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"></textarea>
+          </div>
+          
+          <div>
+            <label for="post-status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select id="post-status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
+          
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" id="cancel-post" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors">
+              Cancel
+            </button>
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-coral-500 hover:bg-coral-600 rounded-md transition-colors">
+              Create Post
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -346,6 +503,73 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
             arrow.style.transform = 'rotate(180deg)';
           }
         });
+      });
+      
+      // Blog post management
+      const createPostBtn = document.getElementById('create-post-btn');
+      const createPostModal = document.getElementById('create-post-modal');
+      const closeModal = document.getElementById('close-modal');
+      const cancelPost = document.getElementById('cancel-post');
+      const createPostForm = document.getElementById('create-post-form');
+      const postTitle = document.getElementById('post-title');
+      const postSlug = document.getElementById('post-slug');
+      
+      // Auto-generate slug from title
+      postTitle?.addEventListener('input', function() {
+        const slug = this.value
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+        if (postSlug) postSlug.value = slug;
+      });
+      
+      // Modal controls
+      createPostBtn?.addEventListener('click', function() {
+        createPostModal?.classList.remove('hidden');
+      });
+      
+      closeModal?.addEventListener('click', function() {
+        createPostModal?.classList.add('hidden');
+      });
+      
+      cancelPost?.addEventListener('click', function() {
+        createPostModal?.classList.add('hidden');
+      });
+      
+      // Close modal when clicking outside
+      createPostModal?.addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.classList.add('hidden');
+        }
+      });
+      
+      // Handle form submission
+      createPostForm?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        // Add current admin user ID (you might want to get this from session)
+        formData.append('author_id', '00000000-0000-0000-0000-000000000000'); // Replace with actual admin ID
+        
+        try {
+          const response = await fetch('/api/admin/blog', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            alert('Blog post created successfully!');
+            createPostModal?.classList.add('hidden');
+            location.reload(); // Refresh to show the new post
+          } else {
+            alert('Error creating post: ' + result.error);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error creating post. Please try again.');
+        }
       });
     });
   </script>
