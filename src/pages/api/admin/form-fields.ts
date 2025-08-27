@@ -4,6 +4,50 @@ import { supabaseAdmin } from '../../../lib/supabase-admin';
 
 export const prerender = false;
 
+export const GET: APIRoute = async ({ url }) => {
+  try {
+    if (!supabaseAdmin) {
+      return new Response(JSON.stringify({ error: 'Service unavailable' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const form_id = url.searchParams.get('form_id');
+    if (!form_id) {
+      return new Response(JSON.stringify({ error: 'Form ID is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const { data: fields, error } = await supabaseAdmin
+      .from('form_fields')
+      .select('*')
+      .eq('form_id', form_id)
+      .order('order_index', { ascending: true });
+
+    if (error) {
+      console.error('Fields fetch error:', error);
+      return new Response(JSON.stringify({ error: 'Failed to fetch form fields' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true, data: fields }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    console.error('Form fields API error:', error);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+};
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     if (!supabaseAdmin) {

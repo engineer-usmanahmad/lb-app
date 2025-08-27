@@ -4,6 +4,46 @@ import { supabaseAdmin } from '../../../lib/supabase-admin';
 
 export const prerender = false;
 
+export const GET: APIRoute = async ({ url }) => {
+  try {
+    if (!supabaseAdmin) {
+      return new Response(JSON.stringify({ error: 'Service unavailable' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const id = url.searchParams.get('id');
+    
+    let query = supabaseAdmin.from('forms').select('*');
+    
+    if (id) {
+      query = query.eq('id', id);
+    }
+    
+    const { data: forms, error } = await query.order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Forms fetch error:', error);
+      return new Response(JSON.stringify({ error: 'Failed to fetch forms' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true, data: forms }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    console.error('Forms API error:', error);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+};
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     if (!supabaseAdmin) {

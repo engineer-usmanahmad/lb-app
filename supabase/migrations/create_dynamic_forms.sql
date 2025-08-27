@@ -75,17 +75,37 @@ create policy "public_insert_submissions"
 on public.form_submissions for insert
 with check (true);
 
--- Admin (authenticated) full access
+-- Admin operations - allow service role and authenticated users
 create policy "admin_manage_forms"
 on public.forms for all
-using (auth.role() = 'authenticated')
-with check (auth.role() = 'authenticated');
+using (
+  auth.role() = 'service_role' OR 
+  auth.role() = 'authenticated' OR
+  auth.jwt() ->> 'role' = 'service_role'
+)
+with check (
+  auth.role() = 'service_role' OR 
+  auth.role() = 'authenticated' OR
+  auth.jwt() ->> 'role' = 'service_role'
+);
 
 create policy "admin_manage_form_fields"
 on public.form_fields for all
-using (auth.role() = 'authenticated')
-with check (auth.role() = 'authenticated');
+using (
+  auth.role() = 'service_role' OR 
+  auth.role() = 'authenticated' OR
+  auth.jwt() ->> 'role' = 'service_role'
+)
+with check (
+  auth.role() = 'service_role' OR 
+  auth.role() = 'authenticated' OR
+  auth.jwt() ->> 'role' = 'service_role'
+);
 
 create policy "admin_read_submissions"
 on public.form_submissions for select
-using (auth.role() = 'authenticated');
+using (
+  auth.role() = 'service_role' OR 
+  auth.role() = 'authenticated' OR
+  auth.jwt() ->> 'role' = 'service_role'
+);
