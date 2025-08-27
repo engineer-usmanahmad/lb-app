@@ -1,0 +1,270 @@
+
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import { supabase } from '../../lib/supabase';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/404');
+}
+
+// Fetch form and fields
+const { data: form, error: formError } = await supabase
+  .from('forms')
+  .select('*')
+  .eq('slug', slug)
+  .eq('is_active', true)
+  .single();
+
+if (formError || !form) {
+  return Astro.redirect('/404');
+}
+
+const { data: fields, error: fieldsError } = await supabase
+  .from('form_fields')
+  .select('*')
+  .eq('form_id', form.id)
+  .order('order_index');
+
+if (fieldsError) {
+  console.error('Fields fetch error:', fieldsError);
+}
+
+const formFields = fields || [];
+---
+
+<Layout title={`${form.name} - LbisTech`}>
+  <Header />
+  <div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+        <div class="px-6 py-8">
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{form.name}</h1>
+            {form.description && (
+              <p class="text-gray-600">{form.description}</p>
+            )}
+          </div>
+
+          <form id="dynamic-form" class="space-y-6">
+            {formFields.map(field => (
+              <div key={field.id}>
+                <label for={field.field_name} class="block text-sm font-medium text-gray-700 mb-2">
+                  {field.label}
+                  {field.required && <span class="text-red-500">*</span>}
+                </label>
+
+                {field.field_type === 'short_answer' && (
+                  <input
+                    type="text"
+                    id={field.field_name}
+                    name={field.field_name}
+                    required={field.required}
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"
+                  />
+                )}
+
+                {field.field_type === 'paragraph' && (
+                  <textarea
+                    id={field.field_name}
+                    name={field.field_name}
+                    required={field.required}
+                    rows="4"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"
+                  ></textarea>
+                )}
+
+                {field.field_type === 'radio' && field.options && (
+                  <div class="space-y-2">
+                    {field.options.map((option, index) => (
+                      <label key={index} class="flex items-center">
+                        <input
+                          type="radio"
+                          name={field.field_name}
+                          value={option}
+                          required={field.required}
+                          class="h-4 w-4 text-coral-600 focus:ring-coral-500"
+                        />
+                        <span class="ml-2 text-sm text-gray-700">{option}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {field.field_type === 'checkbox' && field.options && (
+                  <div class="space-y-2">
+                    {field.options.map((option, index) => (
+                      <label key={index} class="flex items-center">
+                        <input
+                          type="checkbox"
+                          name={field.field_name}
+                          value={option}
+                          class="h-4 w-4 text-coral-600 focus:ring-coral-500 rounded"
+                        />
+                        <span class="ml-2 text-sm text-gray-700">{option}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {field.field_type === 'select' && field.options && (
+                  <select
+                    id={field.field_name}
+                    name={field.field_name}
+                    required={field.required}
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"
+                  >
+                    <option value="">Select an option</option>
+                    {field.options.map((option, index) => (
+                      <option key={index} value={option}>{option}</option>
+                    ))}
+                  </select>
+                )}
+
+                {field.field_type === 'rating' && (
+                  <select
+                    id={field.field_name}
+                    name={field.field_name}
+                    required={field.required}
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"
+                  >
+                    <option value="">Select rating</option>
+                    <option value="1">1 - Poor</option>
+                    <option value="2">2 - Fair</option>
+                    <option value="3">3 - Good</option>
+                    <option value="4">4 - Very Good</option>
+                    <option value="5">5 - Excellent</option>
+                  </select>
+                )}
+
+                {field.field_type === 'date' && (
+                  <input
+                    type="date"
+                    id={field.field_name}
+                    name={field.field_name}
+                    required={field.required}
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"
+                  />
+                )}
+
+                {field.field_type === 'time' && (
+                  <input
+                    type="time"
+                    id={field.field_name}
+                    name={field.field_name}
+                    required={field.required}
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"
+                  />
+                )}
+              </div>
+            ))}
+
+            <div class="pt-6">
+              <button
+                type="submit"
+                class="w-full bg-coral-500 hover:bg-coral-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              >
+                Submit Form
+              </button>
+            </div>
+          </form>
+
+          <div id="form-message" class="mt-4 hidden">
+            <div id="success-message" class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md hidden">
+              <p class="font-medium">Form submitted successfully!</p>
+              <p class="text-sm">Thank you for your submission.</p>
+            </div>
+            <div id="error-message" class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md hidden">
+              <p class="font-medium">Error submitting form</p>
+              <p id="error-text" class="text-sm"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script define:vars={{ formSlug: form.slug }}>
+    document.getElementById('dynamic-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const data = {};
+      
+      // Collect form data
+      for (const [key, value] of formData.entries()) {
+        if (data[key]) {
+          // Handle multiple values (checkboxes)
+          if (Array.isArray(data[key])) {
+            data[key].push(value);
+          } else {
+            data[key] = [data[key], value];
+          }
+        } else {
+          data[key] = value;
+        }
+      }
+      
+      // Handle checkboxes that might not be selected
+      const checkboxGroups = {};
+      this.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        if (!checkboxGroups[checkbox.name]) {
+          checkboxGroups[checkbox.name] = [];
+        }
+        if (checkbox.checked) {
+          checkboxGroups[checkbox.name].push(checkbox.value);
+        }
+      });
+      
+      // Update data with checkbox arrays
+      for (const [name, values] of Object.entries(checkboxGroups)) {
+        data[name] = values;
+      }
+      
+      try {
+        const response = await fetch('/api/forms/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            formSlug: formSlug,
+            data: data
+          })
+        });
+        
+        const result = await response.json();
+        
+        const messageDiv = document.getElementById('form-message');
+        const successDiv = document.getElementById('success-message');
+        const errorDiv = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        
+        messageDiv.classList.remove('hidden');
+        
+        if (result.ok) {
+          successDiv.classList.remove('hidden');
+          errorDiv.classList.add('hidden');
+          this.reset();
+        } else {
+          errorDiv.classList.remove('hidden');
+          successDiv.classList.add('hidden');
+          errorText.textContent = result.error || 'Please try again.';
+        }
+      } catch (error) {
+        console.error('Form submission error:', error);
+        const messageDiv = document.getElementById('form-message');
+        const errorDiv = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        
+        messageDiv.classList.remove('hidden');
+        errorDiv.classList.remove('hidden');
+        errorText.textContent = 'Network error. Please try again.';
+      }
+    });
+  </script>
+</Layout>
