@@ -28,6 +28,7 @@ Create a `.env` file with:
 SUPABASE_URL=your_supabase_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
 RESEND_API_KEY=your_resend_api_key
+JWT_SECRET=your_strong_random_secret_key_here
 ```
 
 ## Development
