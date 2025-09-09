@@ -19,3 +19,9 @@ logs/
 
 .astro
 .astro/
+
+.replit
+.replit/
+
+vite.config.ts
+vite.config.js

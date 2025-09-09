@@ -28,6 +28,23 @@ const { data: recentEnrollments } = await supabase
   .order('created_at', { ascending: false })
   .limit(5);
 
+const { data: recentPosts } = await supabase
+  .from('blog_posts')
+  .select('*')
+  .order('created_at', { ascending: false })
+  .limit(5);
+
+const { data: blogStats } = await supabase
+  .from('blog_posts')
+  .select('status')
+  .order('created_at', { ascending: false });
+
+// Fetch forms data
+const { data: forms } = await supabase
+  .from('forms')
+  .select('*')
+  .order('created_at', { ascending: false });
+
 // Calculate stats
 const totalContacts = contactStats?.length || 0;
 const newContacts = contactStats?.filter(c => c.status === 'new').length || 0;
@@ -39,6 +56,11 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
   acc[curr.course_id] = (acc[curr.course_id] || 0) + 1;
   return acc;
 }, {} as Record<string, number>) || {};
+
+// Blog stats
+const totalPosts = blogStats?.length || 0;
+const publishedPosts = blogStats?.filter(p => p.status === 'published').length || 0;
+const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
 ---
 
 <Layout title="Admin Dashboard - LbisTech">
@@ -50,7 +72,7 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
         <div class="flex justify-between items-center py-6">
           <div>
             <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p class="text-gray-600">Manage contacts and enrollments</p>
+            <p class="text-gray-600">Manage contacts, enrollments, and forms</p>
           </div>
           <div class="flex items-center space-x-4">
             <span class="text-sm text-gray-500">Last updated: {new Date().toLocaleString()}</span>
@@ -63,7 +85,7 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
         <div class="bg-white overflow-hidden shadow rounded-lg">
           <div class="p-5">
             <div class="flex items-center">
@@ -135,6 +157,141 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
             </div>
           </div>
         </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Total Blog Posts</dt>
+                  <dd class="text-lg font-medium text-gray-900">{totalPosts}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Published Posts</dt>
+                  <dd class="text-lg font-medium text-green-600">{publishedPosts}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blog Management -->
+      <div class="mb-8">
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Blog Management</h3>
+              <button id="create-post-btn" class="bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg transition-colors">
+                Create New Post
+              </button>
+            </div>
+            <div class="space-y-2">
+              {recentPosts?.map(post => (
+                <div class="post-item border border-gray-200 rounded-lg">
+                  <div class="flex items-center justify-between p-4 bg-gray-50">
+                    <div class="flex items-center">
+                      <span class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                        📝
+                      </span>
+                      <div>
+                        <h4 class="font-semibold text-gray-900">{post.title}</h4>
+                        <p class="text-sm text-gray-500">
+                          {new Date(post.created_at).toLocaleDateString()} -
+                          <span class={`ml-1 ${post.status === 'published' ? 'text-green-600' : 'text-yellow-600'}`}>
+                            {post.status}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex space-x-3">
+                      <button class="edit-post-btn text-coral-500 hover:text-coral-600 text-sm font-medium" data-post={JSON.stringify(post)}>Edit</button>
+                      {post.status === 'published' && (
+                        <a href={`/blog/${post.slug}`} target="_blank" class="text-blue-500 hover:text-blue-600 text-sm font-medium">View</a>
+                      )}
+                      <button
+                        class="delete-post-btn text-red-600 hover:text-red-700 text-sm font-medium"
+                        data-id={post.id}
+                        data-title={post.title}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Management -->
+      <div class="mb-8">
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Form Management</h3>
+              <button id="create-form-btn" class="bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg transition-colors">
+                Create New Form
+              </button>
+            </div>
+            <div class="space-y-2">
+              {forms?.map(form => (
+                <div class="form-item border border-gray-200 rounded-lg">
+                  <div class="flex items-center justify-between p-4 bg-gray-50">
+                    <div class="flex items-center">
+                      <span class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                        📄
+                      </span>
+                      <div>
+                        <h4 class="font-semibold text-gray-900">{form.name}</h4>
+                        <p class="text-sm text-gray-500">
+                          {form.description || 'No description'} -
+                          <span class={`ml-1 ${form.is_active ? 'text-green-600' : 'text-red-600'}`}>
+                            {form.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex space-x-3">
+                      <button class="edit-form-btn text-coral-500 hover:text-coral-600 text-sm font-medium" data-form={JSON.stringify(form)}>Edit</button>
+                      <button class="manage-fields-btn text-purple-500 hover:text-purple-600 text-sm font-medium" data-form-id={form.id} data-form-name={form.name}>Fields</button>
+                      <button class="view-submissions-btn text-green-500 hover:text-green-600 text-sm font-medium" data-form-id={form.id} data-form-name={form.name}>Submissions</button>
+                      <button class="copy-link-btn text-blue-500 hover:text-blue-600 text-sm font-medium" data-slug={form.slug}>Copy Link</button>
+                      <button class="whatsapp-share-btn text-green-500 hover:text-green-600 text-sm font-medium" data-slug={form.slug} data-name={form.name}>Share</button>
+                      <button
+                        class="delete-form-btn text-red-600 hover:text-red-700 text-sm font-medium"
+                        data-id={form.id}
+                        data-name={form.name}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Recent Activity -->
@@ -170,7 +327,7 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
                       </svg>
                     </div>
                   </button>
-                  
+
                   <div class="contact-content hidden p-4 bg-white border-t border-gray-200">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
@@ -198,7 +355,7 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
                     </div>
                     <div class="flex space-x-2">
                       <button class="bg-coral-500 hover:bg-coral-600 text-white px-3 py-1 rounded text-sm">Reply</button>
-                      <button class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">Mark Resolved</button>
+                      <button class="mark-resolved-btn bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm" data-id="{contact.id}">Mark Resolved</button>
                     </div>
                   </div>
                 </div>
@@ -238,7 +395,7 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
                       </svg>
                     </div>
                   </button>
-                  
+
                   <div class="enrollment-content hidden p-4 bg-white border-t border-gray-200">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
@@ -278,7 +435,7 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
                     </div>
                     <div class="flex space-x-2">
                       <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">Send Course Details</button>
-                      <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Update Status</button>
+                      <button class="update-enrollment-status-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm" data-id="{enrollment.id}" data-status="{enrollment.status}">Update Status</button>
                     </div>
                   </div>
                 </div>
@@ -305,7 +462,257 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
       </div>
     </div>
   </div>
-  
+
+  <!-- Blog Post Creation Modal -->
+  <div id="create-post-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-90vh overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Create New Blog Post</h3>
+            <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <form id="create-post-form" class="p-6 space-y-4">
+          <div>
+            <label for="post-title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <input type="text" id="post-title" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+          </div>
+
+          <div>
+            <label for="post-slug" class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+            <input type="text" id="post-slug" name="slug" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+            <p class="text-xs text-gray-500 mt-1">URL-friendly version (auto-generated from title)</p>
+          </div>
+
+          <div>
+            <label for="post-excerpt" class="block text-sm font-medium text-gray-700 mb-1">Excerpt (Optional)</label>
+            <textarea id="post-excerpt" name="excerpt" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"></textarea>
+          </div>
+
+          <div>
+            <label for="post-featured-image" class="block text-sm font-medium text-gray-700 mb-1">Featured Image URL (Optional)</label>
+            <input type="url" id="post-featured-image" name="featured_image" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+          </div>
+
+          <div>
+            <label for="post-content" class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+            <textarea id="post-content" name="content" rows="8" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"></textarea>
+          </div>
+
+          <div>
+            <label for="post-status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select id="post-status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
+
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" id="cancel-post" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors">
+              Cancel
+            </button>
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-coral-500 hover:bg-coral-600 rounded-md transition-colors">
+              Create Post
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Creation/Edit Modal -->
+  <div id="create-form-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-90vh overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <h3 id="form-modal-title" class="text-lg font-medium text-gray-900">Create New Form</h3>
+            <button id="close-form-modal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <form id="form-form" class="p-6 space-y-4">
+          <input type="hidden" id="form-id" name="id">
+          <div>
+            <label for="form-name" class="block text-sm font-medium text-gray-700 mb-1">Form Name</label>
+            <input type="text" id="form-name" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+          </div>
+
+          <div>
+            <label for="form-slug" class="block text-sm font-medium text-gray-700 mb-1">Form Slug</label>
+            <input type="text" id="form-slug" name="slug" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+            <p class="text-xs text-gray-500 mt-1">URL-friendly version (auto-generated from name)</p>
+          </div>
+
+          <div>
+            <label for="form-description" class="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
+            <textarea id="form-description" name="description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"></textarea>
+          </div>
+
+          <div class="flex items-center">
+            <input type="checkbox" id="form-is-active" name="is_active" class="h-4 w-4 text-coral-500 focus:ring-coral-500 border-gray-300 rounded">
+            <label for="form-is-active" class="ml-2 block text-sm text-gray-700">Is Active</label>
+          </div>
+
+          <div id="form-success-actions" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Form created!</strong>
+            <span class="block sm:inline"> You can now share it or add fields.</span>
+            <button id="copy-new-form-link" class="mt-2 px-3 py-1 bg-coral-500 text-white rounded text-sm hover:bg-coral-600">Copy Link</button>
+            <button id="manage-new-form-fields" class="mt-2 px-3 py-1 bg-purple-500 text-white rounded text-sm hover:bg-purple-600">Manage Fields</button>
+            <button id="whatsapp-new-form" class="mt-2 px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">Share on WhatsApp</button>
+          </div>
+
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" id="cancel-form" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors">
+              Cancel
+            </button>
+            <button type="submit" id="submit-form-btn" class="px-4 py-2 text-sm font-medium text-white bg-coral-500 hover:bg-coral-600 rounded-md transition-colors">
+              Create Form
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fields Management Modal -->
+  <div id="fields-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-90vh overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <h3 id="fields-modal-title" class="text-lg font-medium text-gray-900">Manage Fields</h3>
+            <button id="close-fields-modal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-4">
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="text-lg font-medium text-gray-900">Form Fields</h4>
+            <button id="add-field-btn" class="bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg transition-colors">
+              Add Field
+            </button>
+          </div>
+          <div id="fields-list" class="space-y-2">
+            {/* Fields will be loaded here by JavaScript */}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Field Creation/Edit Modal -->
+  <div id="field-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-90vh overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <h3 id="field-modal-title" class="text-lg font-medium text-gray-900">Add Field</h3>
+            <button id="close-field-modal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <form id="field-form" class="p-6 space-y-4">
+          <input type="hidden" id="field-id" name="id">
+          <input type="hidden" id="field-form-id" name="form_id">
+          <div>
+            <label for="field-label" class="block text-sm font-medium text-gray-700 mb-1">Field Label</label>
+            <input type="text" id="field-label" name="label" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+          </div>
+
+          <div>
+            <label for="field-name" class="block text-sm font-medium text-gray-700 mb-1">Field Name (internal)</label>
+            <input type="text" id="field-name" name="field_name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+            <p class="text-xs text-gray-500 mt-1">Used for data storage (auto-generated from label)</p>
+          </div>
+
+          <div>
+            <label for="field-type" class="block text-sm font-medium text-gray-700 mb-1">Field Type</label>
+            <select id="field-type" name="field_type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+              <option value="">Select a type</option>
+              <option value="short_answer">Short Answer</option>
+              <option value="paragraph">Paragraph</option>
+              <option value="radio">Multiple Choice (Radio)</option>
+              <option value="checkbox">Checkboxes</option>
+              <option value="select">Dropdown (Select)</option>
+              <option value="rating">Rating (1-5)</option>
+              <option value="date">Date</option>
+              <option value="time">Time</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="field-required" class="block text-sm font-medium text-gray-700 mb-1">Required</label>
+            <input type="checkbox" id="field-required" name="required" class="h-4 w-4 text-coral-500 focus:ring-coral-500 border-gray-300 rounded">
+          </div>
+
+          <div id="field-options-container" class="hidden">
+            <label for="field-options" class="block text-sm font-medium text-gray-700 mb-1">Options (comma-separated)</label>
+            <input type="text" id="field-options" name="options" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+            <p class="text-xs text-gray-500 mt-1">e.g., Yes,No or Option 1,Option 2,Option 3</p>
+          </div>
+
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" id="cancel-field" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors">
+              Cancel
+            </button>
+            <button type="submit" id="submit-field-btn" class="px-4 py-2 text-sm font-medium text-white bg-coral-500 hover:bg-coral-600 rounded-md transition-colors">
+              Add Field
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submissions Modal -->
+  <div id="submissions-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-90vh overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <h3 id="submissions-modal-title" class="text-lg font-medium text-gray-900">Submissions</h3>
+            <button id="close-submissions-modal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-4">
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="text-lg font-medium text-gray-900">Form Submissions</h4>
+            <button id="export-csv-btn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+              Export to CSV
+            </button>
+          </div>
+          <div id="submissions-content">
+            {/* Submissions will be loaded here */}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Contact expandable functionality
@@ -315,11 +722,8 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
           const contactItem = this.closest('.contact-item');
           const content = contactItem.querySelector('.contact-content');
           const arrow = this.querySelector('.contact-arrow');
-          
-          // Toggle content visibility
+
           content.classList.toggle('hidden');
-          
-          // Rotate arrow
           if (content.classList.contains('hidden')) {
             arrow.style.transform = 'rotate(0deg)';
           } else {
@@ -328,6 +732,49 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
         });
       });
       
+      // Contact status update functionality
+      const markResolvedButtons = document.querySelectorAll('.mark-resolved-btn');
+      markResolvedButtons.forEach(button => {
+        button.addEventListener('click', async function(e) {
+          e.stopPropagation(); // Prevent triggering the expandable functionality
+          const contactId = this.getAttribute('data-id');
+          if (!contactId) return alert('Contact ID missing.');
+          
+          try {
+            const contactResponse = await fetch('/api/admin/update-contact-status', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                id: contactId,
+                status: 'resolved'
+              })
+            });
+            
+            const contactResult = await contactResponse.json();
+            if (contactResponse.ok && contactResult.success) {
+              // Update UI to show resolved status
+              const contactItem = this.closest('.contact-item');
+              const statusBadge = contactItem.querySelector('.status-badge');
+              if (statusBadge) {
+                statusBadge.textContent = 'Resolved';
+                statusBadge.classList.remove('bg-yellow-100', 'text-yellow-800', 'bg-blue-100', 'text-blue-800');
+                statusBadge.classList.add('bg-green-100', 'text-green-800');
+              }
+              this.disabled = true;
+              this.classList.add('opacity-50', 'cursor-not-allowed');
+              alert('Contact marked as resolved!');
+            } else {
+              alert('Error: ' + (contactResult?.error || 'Unknown error'));
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error updating contact status. Please try again.');
+          }
+        });
+      });
+
       // Enrollment expandable functionality
       const enrollmentHeaders = document.querySelectorAll('.enrollment-header');
       enrollmentHeaders.forEach(header => {
@@ -335,11 +782,8 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
           const enrollmentItem = this.closest('.enrollment-item');
           const content = enrollmentItem.querySelector('.enrollment-content');
           const arrow = this.querySelector('.enrollment-arrow');
-          
-          // Toggle content visibility
+
           content.classList.toggle('hidden');
-          
-          // Rotate arrow
           if (content.classList.contains('hidden')) {
             arrow.style.transform = 'rotate(0deg)';
           } else {
@@ -347,6 +791,664 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
           }
         });
       });
+      
+      // Enrollment status update functionality
+      const updateEnrollmentStatusButtons = document.querySelectorAll('.update-enrollment-status-btn');
+      updateEnrollmentStatusButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.stopPropagation(); // Prevent triggering the expandable functionality
+          const enrollmentId = this.getAttribute('data-id');
+          const currentStatus = this.getAttribute('data-status');
+          if (!enrollmentId) return alert('Enrollment ID missing.');
+          
+          // Create status options based on current status
+          const statusOptions = ['pending', 'approved', 'rejected', 'completed'];
+          
+          // Create a simple dropdown for status selection
+          const newStatus = prompt(
+            `Current status: ${currentStatus}\nSelect new status:\n- pending\n- approved\n- rejected\n- completed`, 
+            currentStatus
+          );
+          
+          // Validate selection
+          if (!newStatus || !statusOptions.includes(newStatus) || newStatus === currentStatus) {
+            return; // User cancelled or invalid selection
+          }
+          
+          // Update status via API
+          updateEnrollmentStatus(enrollmentId, newStatus, this);
+        });
+      });
+      
+      // Function to update enrollment status
+      async function updateEnrollmentStatus(id, status, buttonElement) {
+        try {
+          const enrollmentResponse = await fetch('/api/admin/update-enrollment-status', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              id: id,
+              status: status
+            })
+          });
+          
+          const enrollmentResult = await enrollmentResponse.json();
+          if (enrollmentResponse.ok && enrollmentResult.success) {
+            // Update UI to show new status
+            const enrollmentItem = buttonElement.closest('.enrollment-item');
+            const statusBadge = enrollmentItem.querySelector('.enrollment-header .rounded-full');
+            if (statusBadge) {
+              statusBadge.textContent = status;
+              
+              // Remove all existing status classes
+              statusBadge.classList.remove(
+                'bg-yellow-100', 'text-yellow-800',
+                'bg-green-100', 'text-green-800',
+                'bg-blue-100', 'text-blue-800',
+                'bg-gray-100', 'text-gray-800'
+              );
+              
+              // Add appropriate status classes
+              if (status === 'pending') {
+                statusBadge.classList.add('bg-yellow-100', 'text-yellow-800');
+              } else if (status === 'approved') {
+                statusBadge.classList.add('bg-green-100', 'text-green-800');
+              } else if (status === 'rejected') {
+                statusBadge.classList.add('bg-red-100', 'text-red-800');
+              } else if (status === 'completed') {
+                statusBadge.classList.add('bg-blue-100', 'text-blue-800');
+              } else {
+                statusBadge.classList.add('bg-gray-100', 'text-gray-800');
+              }
+            }
+            
+            // Update the button's data-status attribute
+            buttonElement.setAttribute('data-status', status);
+            
+            alert(`Enrollment status updated to: ${status}`);
+          } else {
+            alert('Error: ' + (enrollmentResult?.error || 'Unknown error'));
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error updating enrollment status. Please try again.');
+        }
+      }
+
+      // Blog post management
+      const createPostBtn = document.getElementById('create-post-btn');
+      const createPostModal = document.getElementById('create-post-modal');
+      const closeModal = document.getElementById('close-modal');
+      const cancelPost = document.getElementById('cancel-post');
+      const createPostForm = document.getElementById('create-post-form');
+      const postTitle = document.getElementById('post-title');
+      const postSlug = document.getElementById('post-slug');
+      
+      // Edit post buttons
+      document.querySelectorAll('.edit-post-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          try {
+            const post = JSON.parse(this.getAttribute('data-post'));
+            document.getElementById('post-modal-title').textContent = 'Edit Post';
+            document.getElementById('submit-post-btn').textContent = 'Update Post';
+            document.getElementById('post-id').value = post.id;
+            document.getElementById('post-title').value = post.title;
+            document.getElementById('post-slug').value = post.slug;
+            document.getElementById('post-content').value = post.content || '';
+            document.getElementById('post-status').value = post.status || 'draft';
+            createPostModal?.classList.remove('hidden');
+          } catch (error) {
+            console.error('Error parsing post data:', error);
+            alert('Error editing post. Please try again.');
+          }
+        });
+      });
+
+      // Auto-generate slug from title
+      postTitle?.addEventListener('input', function() {
+        const slug = this.value
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+        if (postSlug) postSlug.value = slug;
+      });
+
+      // Modal controls
+      createPostBtn?.addEventListener('click', function() {
+        createPostModal?.classList.remove('hidden');
+      });
+      closeModal?.addEventListener('click', function() {
+        createPostModal?.classList.add('hidden');
+      });
+      cancelPost?.addEventListener('click', function() {
+        createPostModal?.classList.add('hidden');
+      });
+      createPostModal?.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.add('hidden');
+      });
+
+      // Handle create form submission
+      createPostForm?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        // TODO: replace with actual admin ID from your session/auth
+        formData.append('author_id', '00000000-0000-0000-0000-000000000000');
+        try {
+          const response = await fetch('/api/admin/blog', { method: 'POST', body: formData });
+          const result = await response.json();
+          if (response.ok && result.success) {
+            alert('Blog post created successfully!');
+            createPostModal?.classList.add('hidden');
+            location.reload();
+          } else {
+            alert('Error creating post: ' + (result?.error || 'Unknown error'));
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error creating post. Please try again.');
+        }
+      });
+
+      // --- DELETE POST HANDLER ---
+      const deleteButtons = document.querySelectorAll('.delete-post-btn');
+      deleteButtons.forEach(btn => {
+        btn.addEventListener('click', async function () {
+          const id = this.getAttribute('data-id');
+          const title = this.getAttribute('data-title') || 'this post';
+          if (!id) return alert('Post ID missing.');
+
+          const ok = confirm(`Are you sure you want to delete “${title}”? This action cannot be undone.`);
+          if (!ok) return;
+
+          try {
+            const res = await fetch(`/api/admin/blog?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+            const result = await res.json();
+            if (!res.ok) {
+              console.error('Delete failed:', result);
+              return alert(`Failed to delete: ${result?.error || 'Unknown error'}`);
+            }
+            const postItem = this.closest('.post-item');
+            if (postItem) postItem.remove();
+            alert('Post deleted successfully.');
+            // Optionally refresh counters:
+            // location.reload();
+          } catch (err) {
+            console.error('Delete error:', err);
+            alert('Error deleting post. Please try again.');
+          }
+        });
+      });
+
+      // --- FORM MANAGEMENT ---
+      let currentFormId = null;
+      let currentFormSlug = null;
+
+      // Form creation/edit modals
+      const createFormBtn = document.getElementById('create-form-btn');
+      const createFormModal = document.getElementById('create-form-modal');
+      const closeFormModal = document.getElementById('close-form-modal');
+      const cancelForm = document.getElementById('cancel-form');
+      const formForm = document.getElementById('form-form');
+      const formName = document.getElementById('form-name');
+      const formSlug = document.getElementById('form-slug');
+
+      // Auto-generate slug from name
+      formName?.addEventListener('input', function() {
+        const slug = this.value
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+        if (formSlug) formSlug.value = slug;
+      });
+
+      // Modal controls
+      createFormBtn?.addEventListener('click', function() {
+        document.getElementById('form-modal-title').textContent = 'Create New Form';
+        document.getElementById('submit-form-btn').textContent = 'Create Form';
+        formForm?.reset();
+        document.getElementById('form-id').value = '';
+        document.getElementById('form-success-actions').classList.add('hidden');
+        createFormModal?.classList.remove('hidden');
+      });
+
+      [closeFormModal, cancelForm].forEach(btn => {
+        btn?.addEventListener('click', function() {
+          createFormModal?.classList.add('hidden');
+        });
+      });
+
+      createFormModal?.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.add('hidden');
+      });
+
+      // Handle form submission
+      formForm?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const isEdit = !!formData.get('id');
+        const method = isEdit ? 'PUT' : 'POST';
+
+        try {
+          const response = await fetch('/api/admin/forms', { method, body: formData });
+          const result = await response.json();
+
+          if (response.ok && result.success) {
+            alert(`Form ${isEdit ? 'updated' : 'created'} successfully!`);
+            if (!isEdit) {
+              currentFormSlug = result.data.slug;
+              document.getElementById('form-success-actions').classList.remove('hidden');
+            } else {
+              createFormModal?.classList.add('hidden');
+              location.reload();
+            }
+          } else {
+            alert('Error: ' + (result?.error || 'Unknown error'));
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error saving form. Please try again.');
+        }
+      });
+
+      // Success actions
+      document.getElementById('copy-new-form-link')?.addEventListener('click', function() {
+        copyFormLink(currentFormSlug);
+      });
+
+      document.getElementById('whatsapp-new-form')?.addEventListener('click', function() {
+        shareOnWhatsApp(currentFormSlug, formName.value);
+      });
+
+      document.getElementById('manage-new-form-fields')?.addEventListener('click', function() {
+        createFormModal?.classList.add('hidden');
+        // Find the form in the data and open fields modal
+        location.reload(); // Simple approach for now
+      });
+
+      // Edit form buttons
+      document.querySelectorAll('.edit-form-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const form = JSON.parse(this.getAttribute('data-form'));
+          document.getElementById('form-modal-title').textContent = 'Edit Form';
+          document.getElementById('submit-form-btn').textContent = 'Update Form';
+          document.getElementById('form-id').value = form.id;
+          document.getElementById('form-name').value = form.name;
+          document.getElementById('form-slug').value = form.slug;
+          document.getElementById('form-description').value = form.description || '';
+          document.getElementById('form-is-active').checked = form.is_active;
+          document.getElementById('form-success-actions').classList.add('hidden');
+          createFormModal?.classList.remove('hidden');
+        });
+      });
+
+      // Copy link buttons
+      document.querySelectorAll('.copy-link-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const slug = this.getAttribute('data-slug');
+          copyFormLink(slug);
+        });
+      });
+
+      // WhatsApp share buttons
+      document.querySelectorAll('.whatsapp-share-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const slug = this.getAttribute('data-slug');
+          const name = this.getAttribute('data-name');
+          shareOnWhatsApp(slug, name);
+        });
+      });
+
+      // Delete form buttons
+      document.querySelectorAll('.delete-form-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+          const id = this.getAttribute('data-id');
+          const name = this.getAttribute('data-name');
+
+          const ok = confirm(`Are you sure you want to delete form "${name}"? This will also delete all submissions. This action cannot be undone.`);
+          if (!ok) return;
+
+          try {
+            const res = await fetch(`/api/admin/forms?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+            const result = await res.json();
+            if (!res.ok) {
+              return alert(`Failed to delete: ${result?.error || 'Unknown error'}`);
+            }
+            const formItem = this.closest('.form-item');
+            if (formItem) formItem.remove();
+            alert('Form deleted successfully.');
+          } catch (err) {
+            console.error('Delete error:', err);
+            alert('Error deleting form. Please try again.');
+          }
+        });
+      });
+
+      // --- FIELDS MANAGEMENT ---
+      const fieldsModal = document.getElementById('fields-modal');
+      const closeFieldsModal = document.getElementById('close-fields-modal');
+      const addFieldBtn = document.getElementById('add-field-btn');
+      const fieldModal = document.getElementById('field-modal');
+      const closeFieldModal = document.getElementById('close-field-modal');
+      const cancelField = document.getElementById('cancel-field');
+      const fieldForm = document.getElementById('field-form');
+      const fieldLabel = document.getElementById('field-label');
+      const fieldName = document.getElementById('field-name');
+      const fieldType = document.getElementById('field-type');
+      const fieldOptionsContainer = document.getElementById('field-options-container');
+
+      // Auto-generate field name from label
+      fieldLabel?.addEventListener('input', function() {
+        const name = this.value
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '_')
+          .replace(/(^_|_$)/g, '');
+        if (fieldName) fieldName.value = name;
+      });
+
+      // Show/hide options based on field type
+      fieldType?.addEventListener('change', function() {
+        const needsOptions = ['radio', 'checkbox', 'select'].includes(this.value);
+        if (needsOptions) {
+          fieldOptionsContainer?.classList.remove('hidden');
+        } else {
+          fieldOptionsContainer?.classList.add('hidden');
+        }
+      });
+
+      // Manage fields buttons
+      document.querySelectorAll('.manage-fields-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+          currentFormId = this.getAttribute('data-form-id');
+          const formName = this.getAttribute('data-form-name');
+          document.getElementById('fields-modal-title').textContent = `Manage Fields - ${formName}`;
+          await loadFormFields(currentFormId);
+          fieldsModal?.classList.remove('hidden');
+        });
+      });
+
+      // Fields modal controls
+      closeFieldsModal?.addEventListener('click', function() {
+        fieldsModal?.classList.add('hidden');
+      });
+
+      fieldsModal?.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.add('hidden');
+      });
+
+      // Add field button
+      addFieldBtn?.addEventListener('click', function() {
+        document.getElementById('field-modal-title').textContent = 'Add Field';
+        document.getElementById('submit-field-btn').textContent = 'Add Field';
+        fieldForm?.reset();
+        document.getElementById('field-id').value = '';
+        document.getElementById('field-form-id').value = currentFormId;
+        fieldOptionsContainer?.classList.add('hidden');
+        fieldModal?.classList.remove('hidden');
+      });
+
+      // Field modal controls
+      [closeFieldModal, cancelField].forEach(btn => {
+        btn?.addEventListener('click', function() {
+          fieldModal?.classList.add('hidden');
+        });
+      });
+
+      fieldModal?.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.add('hidden');
+      });
+
+      // Handle field submission
+      fieldForm?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const isEdit = !!formData.get('id');
+        const method = isEdit ? 'PUT' : 'POST';
+
+        try {
+          const response = await fetch('/api/admin/form-fields', { method, body: formData });
+          const result = await response.json();
+
+          if (response.ok && result.success) {
+            fieldModal?.classList.add('hidden');
+            await loadFormFields(currentFormId);
+          } else {
+            alert('Error: ' + (result?.error || 'Unknown error'));
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error saving field. Please try again.');
+        }
+      });
+
+      // --- SUBMISSIONS ---
+      document.querySelectorAll('.view-submissions-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+          const formId = this.getAttribute('data-form-id');
+          const formName = this.getAttribute('data-form-name');
+          document.getElementById('submissions-modal-title').textContent = `Submissions - ${formName}`;
+          await loadSubmissions(formId);
+          document.getElementById('submissions-modal').classList.remove('hidden');
+        });
+      });
+
+      document.getElementById('close-submissions-modal')?.addEventListener('click', function() {
+        document.getElementById('submissions-modal').classList.add('hidden');
+      });
+
+      document.getElementById('export-csv-btn')?.addEventListener('click', function() {
+        exportSubmissionsCSV();
+      });
+
+      // --- HELPER FUNCTIONS ---
+      function copyFormLink(slug) {
+        // Create the correct URL format for forms
+        const url = `${window.location.origin}/forms/${slug}`;
+        console.log('Copying form URL:', url); // Debug log
+        navigator.clipboard.writeText(url).then(() => {
+          alert('Form link copied to clipboard!');
+        }).catch(() => {
+          prompt('Copy this link:', url);
+        });
+      }
+
+      function shareOnWhatsApp(slug, formName) {
+        // Create the correct URL format for forms
+        const url = `${window.location.origin}/forms/${slug}`;
+        console.log('Sharing form URL:', url); // Debug log
+        const text = `Fill this form: ${formName}\n${url}`;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+        window.open(whatsappUrl, '_blank');
+      }
+
+      async function loadFormFields(formId) {
+        try {
+          const response = await fetch(`/api/admin/form-fields?form_id=${formId}`);
+          if (!response.ok) {
+            // For now, we'll just show empty state
+            document.getElementById('fields-list').innerHTML = '<p class="text-gray-500">No fields yet. Add your first field!</p>';
+            return;
+          }
+
+          const result = await response.json();
+          const fields = result.data || [];
+
+          const fieldsList = document.getElementById('fields-list');
+          if (fields.length === 0) {
+            fieldsList.innerHTML = '<p class="text-gray-500">No fields yet. Add your first field!</p>';
+            return;
+          }
+
+          fieldsList.innerHTML = fields.map(field => `
+            <div class="field-item border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h5 class="font-medium text-gray-900">${field.label} ${field.required ? '<span class="text-red-500">*</span>' : ''}</h5>
+                  <p class="text-sm text-gray-500">${field.field_type} (${field.field_name})</p>
+                  ${field.options && field.options.length > 0 ? `<p class="text-xs text-gray-400">Options: ${field.options.join(', ')}</p>` : ''}
+                </div>
+                <div class="flex space-x-2">
+                  <button class="edit-field-btn text-coral-500 hover:text-coral-600 text-sm" data-field='${JSON.stringify(field)}'>Edit</button>
+                  <button class="delete-field-btn text-red-600 hover:text-red-700 text-sm" data-id="${field.id}" data-label="${field.label}">Delete</button>
+                </div>
+              </div>
+            </div>
+          `).join('');
+
+          // Add event listeners for edit and delete buttons
+          fieldsList.querySelectorAll('.edit-field-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+              const field = JSON.parse(this.getAttribute('data-field'));
+              document.getElementById('field-modal-title').textContent = 'Edit Field';
+              document.getElementById('submit-field-btn').textContent = 'Update Field';
+              document.getElementById('field-id').value = field.id;
+              document.getElementById('field-form-id').value = field.form_id;
+              document.getElementById('field-label').value = field.label;
+              document.getElementById('field-name').value = field.field_name;
+              document.getElementById('field-type').value = field.field_type;
+              document.getElementById('field-required').checked = field.required;
+
+              if (field.options && field.options.length > 0) {
+                document.getElementById('field-options').value = field.options.join(', ');
+                fieldOptionsContainer?.classList.remove('hidden');
+              } else {
+                fieldOptionsContainer?.classList.add('hidden');
+              }
+
+              fieldModal?.classList.remove('hidden');
+            });
+          });
+
+          fieldsList.querySelectorAll('.delete-field-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+              const id = this.getAttribute('data-id');
+              const label = this.getAttribute('data-label');
+
+              const ok = confirm(`Are you sure you want to delete field "${label}"?`);
+              if (!ok) return;
+
+              try {
+                const res = await fetch(`/api/admin/form-fields?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+                const result = await res.json();
+                if (!res.ok) {
+                  return alert(`Failed to delete: ${result?.error || 'Unknown error'}`);
+                }
+                await loadFormFields(currentFormId);
+              } catch (err) {
+                console.error('Delete error:', err);
+                alert('Error deleting field. Please try again.');
+              }
+            });
+          });
+
+        } catch (error) {
+          console.error('Error loading fields:', error);
+          document.getElementById('fields-list').innerHTML = '<p class="text-red-500">Error loading fields</p>';
+        }
+      }
+
+      let currentSubmissions = [];
+
+      async function loadSubmissions(formId) {
+        try {
+          const response = await fetch(`/api/admin/submissions?form_id=${formId}`);
+          const result = await response.json();
+
+          if (!response.ok) {
+            document.getElementById('submissions-content').innerHTML = '<p class="text-red-500">Error loading submissions</p>';
+            return;
+          }
+
+          currentSubmissions = result.data || [];
+
+          if (currentSubmissions.length === 0) {
+            document.getElementById('submissions-content').innerHTML = '<p class="text-gray-500">No submissions yet.</p>';
+            return;
+          }
+
+          // Get all unique keys from submissions
+          const allKeys = new Set();
+          currentSubmissions.forEach(sub => {
+            Object.keys(sub.data).forEach(key => allKeys.add(key));
+          });
+
+          const keys = Array.from(allKeys);
+
+          const table = `
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted At</th>
+                    ${keys.map(key => `<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${key}</th>`).join('')}
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  ${currentSubmissions.map(sub => `
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${new Date(sub.submitted_at).toLocaleString()}</td>
+                      ${keys.map(key => {
+                        const value = sub.data[key];
+                        const displayValue = Array.isArray(value) ? value.join(', ') : (value || '-');
+                        return `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${displayValue}</td>`;
+                      }).join('')}
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          `;
+
+          document.getElementById('submissions-content').innerHTML = table;
+        } catch (error) {
+          console.error('Error loading submissions:', error);
+          document.getElementById('submissions-content').innerHTML = '<p class="text-red-500">Error loading submissions</p>';
+        }
+      }
+
+      function exportSubmissionsCSV() {
+        if (currentSubmissions.length === 0) {
+          alert('No submissions to export');
+          return;
+        }
+
+        // Get all unique keys
+        const allKeys = new Set();
+        currentSubmissions.forEach(sub => {
+          Object.keys(sub.data).forEach(key => allKeys.add(key));
+        });
+
+        const keys = Array.from(allKeys);
+        const headers = ['Submitted At', ...keys];
+
+        const csvContent = [
+          headers.join(','),
+          ...currentSubmissions.map(sub => {
+            const row = [new Date(sub.submitted_at).toLocaleString()];
+            keys.forEach(key => {
+              const value = sub.data[key];
+              const csvValue = Array.isArray(value) ? value.join('; ') : (value || '');
+              // Escape commas and quotes
+              const escapedValue = csvValue.toString().includes(',') || csvValue.toString().includes('"')
+                ? `"${csvValue.toString().replace(/"/g, '""')}"`
+                : csvValue;
+              row.push(escapedValue);
+            });
+            return row.join(',');
+          })
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `form-submissions-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }
     });
   </script>
 </Layout>
