@@ -259,9 +259,10 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
                 <div class="form-item border border-gray-200 rounded-lg">
                   <div class="flex items-center justify-between p-4 bg-gray-50">
                     <div class="flex items-center">
-                      <span class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
-                        📄
-                      </span>
+                      <div class="w-12 h-12 bg-blue-500 text-white rounded-full flex flex-col items-center justify-center text-sm font-semibold mr-3 submission-count" data-form-id={form.id}>
+                        <span class="text-xs">Total</span>
+                        <span class="count-value">...</span>
+                      </div>
                       <div>
                         <h4 class="font-semibold text-gray-900">{form.name}</h4>
                         <p class="text-sm text-gray-500">
@@ -464,7 +465,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
   </div>
 
   <!-- Blog Post Creation Modal -->
-  <div id="create-post-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+  <div id="create-post-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen p-4">
       <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-90vh overflow-y-auto">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -527,7 +528,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
   </div>
 
   <!-- Form Creation/Edit Modal -->
-  <div id="create-form-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+  <div id="create-form-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen p-4">
       <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-90vh overflow-y-auto">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -586,7 +587,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
   </div>
 
   <!-- Fields Management Modal -->
-  <div id="fields-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+  <div id="fields-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen p-4">
       <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-90vh overflow-y-auto">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -686,7 +687,9 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
   <!-- Submissions Modal -->
   <div id="submissions-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
     <div class="flex items-center justify-center min-h-screen p-4">
-      <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-90vh overflow-y-auto">
+      <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-90vh">
+        <!-- Fixed header -->
+        <div class="sticky top-0 bg-white z-10">
         <div class="px-6 py-4 border-b border-gray-200">
           <div class="flex justify-between items-center">
             <h3 id="submissions-modal-title" class="text-lg font-medium text-gray-900">Submissions</h3>
@@ -697,16 +700,19 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
             </button>
           </div>
         </div>
-
-        <div class="p-6 space-y-4">
-          <div class="flex justify-between items-center mb-4">
-            <h4 class="text-lg font-medium text-gray-900">Form Submissions</h4>
-            <button id="export-csv-btn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
-              Export to CSV
-            </button>
-          </div>
-          <div id="submissions-content">
-            {/* Submissions will be loaded here */}
+        </div>
+        <!-- Scrollable content -->
+        <div class="overflow-y-auto" style="max-height: calc(90vh - 70px); overflow-x: hidden;">
+          <div class="p-6 space-y-4">
+            <div class="flex justify-between items-center mb-4">
+              <h4 class="text-lg font-medium text-gray-900">Form Submissions</h4>
+              <button id="export-csv-btn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                Export to CSV
+              </button>
+            </div>
+            <div id="submissions-content">
+              {/* Submissions will be loaded here */}
+            </div>
           </div>
         </div>
       </div>
@@ -714,7 +720,54 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
   </div>
 
   <script>
+    // Function to load submission counts for all forms
+    async function loadAllSubmissionCounts() {
+      try {
+        const response = await fetch('/api/admin/submissions?count_only=true');
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          // Create a map of form_id to count
+          const countMap = {};
+          result.data.forEach(item => {
+            countMap[item.form_id] = item.count;
+          });
+          
+          // Update all submission count elements
+          const countElements = document.querySelectorAll('.submission-count');
+          countElements.forEach(element => {
+            const formId = element.getAttribute('data-form-id');
+            const countValue = element.querySelector('.count-value');
+            
+            if (formId && countValue) {
+              const count = countMap[formId] || 0;
+              countValue.textContent = count;
+              
+              // Apply color based on count
+              if (count > 10) {
+                element.classList.remove('bg-blue-500');
+                element.classList.add('bg-green-500');
+              } else if (count > 0) {
+                element.classList.remove('bg-blue-500');
+                element.classList.add('bg-yellow-500');
+              } else {
+                element.classList.remove('bg-blue-500');
+                element.classList.add('bg-gray-500');
+              }
+            }
+          });
+        } else {
+          console.error('Failed to load submission counts:', result.error);
+        }
+      } catch (error) {
+        console.error('Error loading submission counts:', error);
+      }
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
+      // Load submission counts for all forms
+      loadAllSubmissionCounts();
+      
       // Contact expandable functionality
       const contactHeaders = document.querySelectorAll('.contact-header');
       contactHeaders.forEach(header => {
@@ -820,6 +873,122 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
         });
       });
       
+      // Function to load all submission counts for forms
+      async function loadAllSubmissionCounts() {
+        console.log('Loading all submission counts...');
+        const submissionCountElements = document.querySelectorAll('.submission-count');
+        console.log(`Found ${submissionCountElements.length} submission count elements`);
+        
+        // First attempt - load all counts
+        const loadPromises = [];
+        
+        for (const element of submissionCountElements) {
+          const formId = element.getAttribute('data-form-id');
+          if (!formId) {
+            console.warn('Found submission count element without form ID');
+            continue;
+          }
+          
+          console.log(`Loading count for form ${formId}`);
+          
+          const loadPromise = (async () => {
+            try {
+              const response = await fetch(`/api/admin/form-submissions-count?formId=${encodeURIComponent(formId)}`);
+              const result = await response.json();
+              
+              if (response.ok && result.success) {
+                const countElement = element.querySelector('.count-value');
+                if (countElement) {
+                  countElement.textContent = result.count || '0';
+                  console.log(`Updated count for form ${formId}: ${result.count || '0'}`);
+                } else {
+                  console.warn(`Count element not found for form ${formId}`);
+                }
+              } else {
+                console.error(`Failed to load submission count for form ${formId}:`, result?.error || 'Unknown error');
+              }
+            } catch (error) {
+              console.error(`Error loading submission count for form ${formId}:`, error);
+            }
+          })();
+          
+          loadPromises.push(loadPromise);
+        }
+        
+        // Wait for all initial loads to complete
+        await Promise.all(loadPromises);
+        
+        // Second attempt - retry for any counts that didn't load
+        console.log('First attempt complete, checking for any missing counts...');
+        setTimeout(() => {
+          const pendingCounts = document.querySelectorAll('.count-value');
+          console.log(`Checking ${pendingCounts.length} count elements for missing values`);
+          
+          for (const element of pendingCounts) {
+            if (element.textContent === '...' || element.textContent === '') {
+              const formElement = element.closest('.submission-count');
+              if (formElement) {
+                const formId = formElement.getAttribute('data-form-id');
+                if (formId) {
+                  console.log(`Retrying count for form ${formId}`);
+                  fetch(`/api/admin/form-submissions-count?formId=${encodeURIComponent(formId)}`, {
+                    // Add cache-busting parameter
+                    headers: {
+                      'Cache-Control': 'no-cache',
+                      'Pragma': 'no-cache'
+                    }
+                  })
+                    .then(response => response.json())
+                    .then(result => {
+                      if (result.success) {
+                        element.textContent = result.count || '0';
+                        console.log(`Retry successful for form ${formId}: ${result.count || '0'}`);
+                      } else {
+                        console.error(`Retry failed for form ${formId}:`, result?.error || 'Unknown error');
+                      }
+                    })
+                    .catch(error => console.error(`Error in retry for form ${formId}:`, error));
+                }
+              }
+            }
+          }
+          
+          // Third attempt after a longer delay
+          setTimeout(() => {
+            console.log('Final attempt to load any remaining missing counts...');
+            const stillPendingCounts = document.querySelectorAll('.count-value');
+            
+            for (const element of stillPendingCounts) {
+              if (element.textContent === '...' || element.textContent === '') {
+                const formElement = element.closest('.submission-count');
+                if (formElement) {
+                  const formId = formElement.getAttribute('data-form-id');
+                  if (formId) {
+                    console.log(`Final retry for form ${formId}`);
+                    // Force a value of 0 if we still can't load it
+                    element.textContent = '0';
+                    
+                    // Still try to load the actual value
+                    fetch(`/api/admin/form-submissions-count?formId=${encodeURIComponent(formId)}?nocache=${Date.now()}`)
+                      .then(response => response.json())
+                      .then(result => {
+                        if (result.success) {
+                          element.textContent = result.count || '0';
+                          console.log(`Final retry successful for form ${formId}: ${result.count || '0'}`);
+                        }
+                      })
+                      .catch(error => console.error(`Error in final retry for form ${formId}:`, error));
+                  }
+                }
+              }
+            }
+          }, 2000);
+        }, 1000);
+      }
+      
+      // Load submission counts when page loads
+      loadAllSubmissionCounts();
+      
       // Function to update enrollment status
       async function updateEnrollmentStatus(id, status, buttonElement) {
         try {
@@ -891,10 +1060,15 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
         btn.addEventListener('click', function() {
           try {
             const post = JSON.parse(this.getAttribute('data-post'));
-            document.getElementById('post-modal-title').textContent = 'Edit Post';
-            document.getElementById('submit-post-btn').textContent = 'Update Post';
-            document.getElementById('post-id').value = post.id;
-            document.getElementById('post-title').value = post.title;
+            const modalTitle = document.getElementById('post-modal-title');
+            const submitBtn = document.getElementById('submit-post-btn');
+            const postIdInput = document.getElementById('post-id');
+            const postTitleInput = document.getElementById('post-title');
+            
+            if (modalTitle) modalTitle.textContent = 'Edit Post';
+            if (submitBtn) submitBtn.textContent = 'Update Post';
+            if (postIdInput) postIdInput.value = post.id;
+            if (postTitleInput) postTitleInput.value = post.title;
             document.getElementById('post-slug').value = post.slug;
             document.getElementById('post-content').value = post.content || '';
             document.getElementById('post-status').value = post.status || 'draft';
@@ -1203,6 +1377,15 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
       fieldForm?.addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
+        
+        // Fix for required checkbox - convert 'on' to 'true'
+        const requiredCheckbox = document.getElementById('field-required');
+        if (requiredCheckbox.checked) {
+          formData.set('required', 'true');
+        } else {
+          formData.set('required', 'false');
+        }
+        
         const isEdit = !!formData.get('id');
         const method = isEdit ? 'PUT' : 'POST';
 

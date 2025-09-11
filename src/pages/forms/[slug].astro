@@ -96,7 +96,7 @@ const formFields = fields || [];
                 )}
 
                 {field.field_type === 'checkbox' && field.options && (
-                  <div class="space-y-2">
+                  <div class="space-y-2" data-required={field.required ? 'true' : 'false'} id={`${field.field_name}-group`}>
                     {field.options.map((option, index) => (
                       <label key={index} class="flex items-center">
                         <input
@@ -104,10 +104,15 @@ const formFields = fields || [];
                           name={field.field_name}
                           value={option}
                           class="h-4 w-4 text-coral-600 focus:ring-coral-500 rounded"
+                          data-checkbox-group={field.field_name}
+                          onChange={field.required ? `validateCheckboxGroup('${field.field_name}')` : ''}
                         />
                         <span class="ml-2 text-sm text-gray-700">{option}</span>
                       </label>
                     ))}
+                    {field.required && (
+                      <div class="text-red-500 text-sm hidden" id={`${field.field_name}-error`}>Please select at least one option</div>
+                    )}
                   </div>
                 )}
 
@@ -189,8 +194,48 @@ const formFields = fields || [];
   </div>
 
   <script define:vars={{ formSlug: form.slug }}>
+    // Function to validate checkbox groups
+    function validateCheckboxGroup(fieldName) {
+      const checkboxes = document.querySelectorAll(`input[data-checkbox-group="${fieldName}"]:checked`);
+      const errorElement = document.getElementById(`${fieldName}-error`);
+      const groupElement = document.getElementById(`${fieldName}-group`);
+      
+      if (groupElement.getAttribute('data-required') === 'true') {
+        if (checkboxes.length === 0) {
+          errorElement.classList.remove('hidden');
+          return false;
+        } else {
+          errorElement.classList.add('hidden');
+          return true;
+        }
+      }
+      return true;
+    }
+    
+    // Validate all checkbox groups
+    function validateAllCheckboxGroups() {
+      const checkboxGroups = document.querySelectorAll('div[data-required="true"]');
+      let isValid = true;
+      
+      checkboxGroups.forEach(group => {
+        const fieldName = group.id.replace('-group', '');
+        if (!validateCheckboxGroup(fieldName)) {
+          isValid = false;
+        }
+      });
+      
+      return isValid;
+    }
+    
     document.getElementById('dynamic-form').addEventListener('submit', async function(e) {
       e.preventDefault();
+      
+      // Check form validity before proceeding
+      if (!this.checkValidity() || !validateAllCheckboxGroups()) {
+        // Trigger browser's native validation UI
+        this.reportValidity();
+        return;
+      }
       
       const formData = new FormData(this);
       const data = {};

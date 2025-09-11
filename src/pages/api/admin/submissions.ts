@@ -14,9 +14,65 @@ export const GET: APIRoute = async ({ url }) => {
     }
 
     const form_id = url.searchParams.get('form_id');
+    const count_only = url.searchParams.get('count_only') === 'true';
+    
+    // If no form_id and count_only is true, return counts for all forms
+    if (count_only && !form_id) {
+      const { data: counts, error: countError } = await supabaseAdmin
+        .from('form_submissions')
+        .select('form_id, count');
+      
+      // Process the data to get counts by form_id
+      const formCounts = [];
+      if (counts) {
+        // Get unique form_ids
+        const uniqueFormIds = [...new Set(counts.map(item => item.form_id))];
+        
+        // Count submissions for each form_id
+        for (const formId of uniqueFormIds) {
+          const count = counts.filter(item => item.form_id === formId).length;
+          formCounts.push({ form_id: formId, count });
+        }
+      }
+      
+      if (countError) {
+        console.error('Submissions count error:', countError);
+        return new Response(JSON.stringify({ error: 'Failed to fetch submission counts' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      
+      return new Response(JSON.stringify({ success: true, data: formCounts }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
     if (!form_id) {
       return new Response(JSON.stringify({ error: 'Form ID is required' }), {
         status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // If count_only is true, return only the count for the specified form
+    if (count_only) {
+      const { count, error: countError } = await supabaseAdmin
+        .from('form_submissions')
+        .select('*', { count: 'exact', head: true })
+        .eq('form_id', form_id);
+      
+      if (countError) {
+        console.error('Submissions count error:', countError);
+        return new Response(JSON.stringify({ error: 'Failed to fetch submission count' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      
+      return new Response(JSON.stringify({ success: true, count }), {
+        status: 200,
         headers: { 'Content-Type': 'application/json' }
       });
     }

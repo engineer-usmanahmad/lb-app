@@ -62,7 +62,11 @@ export const POST: APIRoute = async ({ request }) => {
     const label = formData.get('label') as string;
     const field_name = formData.get('field_name') as string;
     const field_type = formData.get('field_type') as string;
-    const required = formData.get('required') === 'true';
+    
+    // Handle required field - accept 'true', 'on', or any truthy value except 'false'
+    const requiredValue = formData.get('required');
+    const required = requiredValue === 'true' || requiredValue === 'on' || (requiredValue && requiredValue !== 'false');
+    
     const options = formData.get('options') as string;
     const order_index = parseInt(formData.get('order_index') as string) || 0;
 
@@ -124,7 +128,11 @@ export const PUT: APIRoute = async ({ request }) => {
     const label = formData.get('label') as string;
     const field_name = formData.get('field_name') as string;
     const field_type = formData.get('field_type') as string;
-    const required = formData.get('required') === 'true';
+    
+    // Handle required field - accept 'true', 'on', or any truthy value except 'false'
+    const requiredValue = formData.get('required');
+    const required = requiredValue === 'true' || requiredValue === 'on' || (requiredValue && requiredValue !== 'false');
+    
     const options = formData.get('options') as string;
     const order_index = parseInt(formData.get('order_index') as string) || 0;
 
