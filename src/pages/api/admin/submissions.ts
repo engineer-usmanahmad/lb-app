@@ -18,29 +18,37 @@ export const GET: APIRoute = async ({ url }) => {
     
     // If no form_id and count_only is true, return counts for all forms
     if (count_only && !form_id) {
-      const { data: counts, error: countError } = await supabaseAdmin
+      // First get all unique form_ids
+      const { data: formIds, error: formIdsError } = await supabaseAdmin
         .from('form_submissions')
-        .select('form_id, count');
+        .select('form_id')
+        .order('form_id');
       
-      // Process the data to get counts by form_id
-      const formCounts = [];
-      if (counts) {
-        // Get unique form_ids
-        const uniqueFormIds = [...new Set(counts.map(item => item.form_id))];
-        
-        // Count submissions for each form_id
-        for (const formId of uniqueFormIds) {
-          const count = counts.filter(item => item.form_id === formId).length;
-          formCounts.push({ form_id: formId, count });
-        }
-      }
-      
-      if (countError) {
-        console.error('Submissions count error:', countError);
-        return new Response(JSON.stringify({ error: 'Failed to fetch submission counts' }), {
+      if (formIdsError) {
+        console.error('Form IDs fetch error:', formIdsError);
+        return new Response(JSON.stringify({ error: 'Failed to fetch form IDs' }), {
           status: 500,
           headers: { 'Content-Type': 'application/json' }
         });
+      }
+      
+      // Get unique form_ids
+      const uniqueFormIds = [...new Set(formIds?.map(item => item.form_id) || [])];
+      
+      // Count submissions for each form_id
+      const formCounts = [];
+      for (const formId of uniqueFormIds) {
+        const { count, error: countError } = await supabaseAdmin
+          .from('form_submissions')
+          .select('*', { count: 'exact', head: true })
+          .eq('form_id', formId);
+        
+        if (countError) {
+          console.error(`Count error for form ${formId}:`, countError);
+          formCounts.push({ form_id: formId, count: 0 });
+        } else {
+          formCounts.push({ form_id: formId, count: count || 0 });
+        }
       }
       
       return new Response(JSON.stringify({ success: true, data: formCounts }), {

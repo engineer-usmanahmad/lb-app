@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase';
 
 export const prerender = false;
 
-// Fetch dashboard data
+/// Fetch dashboard data
 const { data: contactStats } = await supabase
   .from('contact_submissions')
   .select('status')
@@ -295,80 +295,11 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
         </div>
       </div>
 
-      <!-- Recent Activity -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Recent Contacts -->
+      <!-- Enrollment Management -->
+      <div class="mb-8">
         <div class="bg-white shadow rounded-lg">
           <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Contacts</h3>
-            <div class="space-y-2">
-              {recentContacts?.map(contact => (
-                <div class="contact-item border border-gray-200 rounded-lg">
-                  <button class="contact-header w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left" data-contact={contact.id}>
-                    <div class="flex items-center">
-                      <span class="w-8 h-8 bg-coral-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
-                        📧
-                      </span>
-                      <div>
-                        <h4 class="font-semibold text-gray-900">Contact #{contact.id} - {contact.first_name} {contact.last_name}</h4>
-                        <p class="text-sm text-gray-500">{new Date(contact.created_at).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                      <span class={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        contact.status === 'new' ? 'bg-red-100 text-red-800' :
-                        contact.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
-                        contact.status === 'resolved' ? 'bg-green-100 text-green-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {contact.status}
-                      </span>
-                      <svg class="contact-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </div>
-                  </button>
-
-                  <div class="contact-content hidden p-4 bg-white border-t border-gray-200">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <span class="text-sm font-medium text-gray-700">Full Name:</span>
-                        <span class="text-sm text-gray-900 ml-2">{contact.first_name} {contact.last_name}</span>
-                      </div>
-                      <div>
-                        <span class="text-sm font-medium text-gray-700">Email:</span>
-                        <span class="text-sm text-gray-900 ml-2">{contact.email}</span>
-                      </div>
-                      <div>
-                        <span class="text-sm font-medium text-gray-700">Phone:</span>
-                        <span class="text-sm text-gray-900 ml-2">{contact.phone}</span>
-                      </div>
-                      <div>
-                        <span class="text-sm font-medium text-gray-700">Course Interest:</span>
-                        <span class="text-sm text-gray-900 ml-2">{contact.course_interest}</span>
-                      </div>
-                    </div>
-                    <div class="mb-4">
-                      <span class="text-sm font-medium text-gray-700">Message:</span>
-                      <div class="mt-1 p-3 bg-gray-50 rounded border-l-4 border-coral-500">
-                        <p class="text-sm text-gray-900">{contact.message}</p>
-                      </div>
-                    </div>
-                    <div class="flex space-x-2">
-                      <button class="bg-coral-500 hover:bg-coral-600 text-white px-3 py-1 rounded text-sm">Reply</button>
-                      <button class="mark-resolved-btn bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm" data-id="{contact.id}">Mark Resolved</button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <!-- Recent Enrollments -->
-        <div class="bg-white shadow rounded-lg">
-          <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Enrollments</h3>
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Enrollment Management</h3>
             <div class="space-y-2">
               {recentEnrollments?.map(enrollment => (
                 <div class="enrollment-item border border-gray-200 rounded-lg">
@@ -435,9 +366,99 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
                       </div>
                     </div>
                     <div class="flex space-x-2">
-                      <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">Send Course Details</button>
-                      <button class="update-enrollment-status-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm" data-id="{enrollment.id}" data-status="{enrollment.status}">Update Status</button>
+                      <button class="update-enrollment-status-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm" data-id={enrollment.id} data-status={enrollment.status}>Update Status</button>
                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <!-- View All Enrollments Button -->
+            <div class="mt-4 text-center">
+              <button id="viewAllEnrollmentsBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-coral-600 bg-coral-50 hover:bg-coral-100 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                View All Enrollments
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Recent Contacts -->
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Contacts</h3>
+            <div class="space-y-2">
+              {recentContacts?.map(contact => (
+                <div class="contact-item border border-gray-200 rounded-lg">
+                  <button class="contact-header w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left" data-contact={contact.id}>
+                    <div class="flex items-center">
+                      <span class="w-8 h-8 bg-coral-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                        📧
+                      </span>
+                      <div>
+                        <h4 class="font-semibold text-gray-900">Contact #{contact.id} - {contact.first_name} {contact.last_name}</h4>
+                        <p class="text-sm text-gray-500">{new Date(contact.created_at).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <span class={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        contact.status === 'new' ? 'bg-red-100 text-red-800' :
+                        contact.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
+                        contact.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {contact.status}
+                      </span>
+                      <svg class="contact-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </div>
+                  </button>
+
+                  <div class="contact-content hidden p-4 bg-white border-t border-gray-200">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Full Name:</span>
+                        <span class="text-sm text-gray-900 ml-2">{contact.first_name} {contact.last_name}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Email:</span>
+                        <span class="text-sm text-gray-900 ml-2">{contact.email}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Phone:</span>
+                        <span class="text-sm text-gray-900 ml-2">{contact.phone}</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">Course Interest:</span>
+                        <span class="text-sm text-gray-900 ml-2">{contact.course_interest}</span>
+                      </div>
+                    </div>
+                    <div class="mb-4">
+                      <span class="text-sm font-medium text-gray-700">Message:</span>
+                      <div class="mt-1 p-3 bg-gray-50 rounded border-l-4 border-coral-500">
+                        <p class="text-sm text-gray-900">{contact.message}</p>
+                      </div>
+                    </div>
+                    <div class="flex space-x-2">
+                      {contact.status === 'resolved' ? (
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-medium">Resolved</span>
+                      ) : (
+                        <button class="mark-resolved-btn bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm" data-id={contact.id}>Mark Resolved</button>
+                      )}
+                    </div>
+                    <!-- Comments section for resolved contacts -->
+                    {contact.status === 'resolved' && contact.comments && (
+                      <div class="mt-3 p-3 bg-blue-50 rounded border-l-4 border-blue-500">
+                        <span class="text-sm font-medium text-blue-700">Resolution Comments:</span>
+                        <p class="text-sm text-blue-900 mt-1">{contact.comments}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -480,6 +501,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
         </div>
 
         <form id="create-post-form" class="p-6 space-y-4">
+          <input type="hidden" id="post-id" name="id">
           <div>
             <label for="post-title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
             <input type="text" id="post-title" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
@@ -498,12 +520,96 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
 
           <div>
             <label for="post-featured-image" class="block text-sm font-medium text-gray-700 mb-1">Featured Image URL (Optional)</label>
+            <p class="text-xs text-gray-500 mb-2">Recommended banner image size: 1200x630 pixels (16:9 aspect ratio) for optimal display across all devices</p>
             <input type="url" id="post-featured-image" name="featured_image" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
           </div>
 
           <div>
             <label for="post-content" class="block text-sm font-medium text-gray-700 mb-1">Content</label>
-            <textarea id="post-content" name="content" rows="8" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"></textarea>
+            
+            <!-- Rich Text Editor Toolbar -->
+            <div id="editor-toolbar" class="border border-gray-300 border-b-0 rounded-t-md bg-gray-50 p-2 flex flex-wrap gap-1">
+              <!-- Text Formatting -->
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="bold" title="Bold">
+                <strong>B</strong>
+              </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="italic" title="Italic">
+                <em>I</em>
+              </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="underline" title="Underline">
+                <u>U</u>
+              </button>
+              
+              <div class="border-l border-gray-300 mx-1"></div>
+              
+              <!-- Headings -->
+              <select class="editor-select text-sm border border-gray-300 rounded px-2 py-1" data-command="formatBlock">
+                <option value="">Normal</option>
+                <option value="h1">Heading 1</option>
+                <option value="h2">Heading 2</option>
+                <option value="h3">Heading 3</option>
+                <option value="h4">Heading 4</option>
+                <option value="h5">Heading 5</option>
+                <option value="h6">Heading 6</option>
+              </select>
+              
+              <div class="border-l border-gray-300 mx-1"></div>
+              
+              <!-- Font Size -->
+              <select class="editor-select text-sm border border-gray-300 rounded px-2 py-1" data-command="fontSize">
+                <option value="">Font Size</option>
+                <option value="1">Very Small</option>
+                <option value="2">Small</option>
+                <option value="3">Normal</option>
+                <option value="4">Medium</option>
+                <option value="5">Large</option>
+                <option value="6">Very Large</option>
+                <option value="7">Huge</option>
+              </select>
+              
+              <div class="border-l border-gray-300 mx-1"></div>
+              
+              <!-- Lists -->
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="insertUnorderedList" title="Bullet List">
+                • List
+              </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="insertOrderedList" title="Numbered List">
+                1. List
+              </button>
+              
+              <div class="border-l border-gray-300 mx-1"></div>
+              
+              <!-- Alignment -->
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="justifyLeft" title="Align Left">
+                ⬅
+              </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="justifyCenter" title="Align Center">
+                ↔
+              </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="justifyRight" title="Align Right">
+                ➡
+              </button>
+              
+              <div class="border-l border-gray-300 mx-1"></div>
+              
+              <!-- Links -->
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="createLink" title="Insert Link">
+                🔗
+              </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="unlink" title="Remove Link">
+                🔗❌
+              </button>
+            </div>
+            
+            <!-- Rich Text Editor -->
+            <div id="post-content-editor" 
+                 contenteditable="true" 
+                 class="w-full min-h-48 px-3 py-2 border border-gray-300 border-t-0 rounded-b-md focus:outline-none focus:ring-2 focus:ring-coral-500 bg-white"
+                 style="max-height: 400px; overflow-y: auto;">
+            </div>
+            
+            <!-- Hidden textarea for form submission -->
+            <textarea id="post-content" name="content" class="hidden" required></textarea>
           </div>
 
           <div>
@@ -518,7 +624,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
             <button type="button" id="cancel-post" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors">
               Cancel
             </button>
-            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-coral-500 hover:bg-coral-600 rounded-md transition-colors">
+            <button type="submit" id="submit-post-btn" class="px-4 py-2 text-sm font-medium text-white bg-coral-500 hover:bg-coral-600 rounded-md transition-colors">
               Create Post
             </button>
           </div>
@@ -561,7 +667,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
           </div>
 
           <div class="flex items-center">
-            <input type="checkbox" id="form-is-active" name="is_active" class="h-4 w-4 text-coral-500 focus:ring-coral-500 border-gray-300 rounded">
+            <input type="checkbox" id="form-is-active" name="is_active" class="h-4 w-4 text-coral-500 focus:ring-coral-500 border-gray-300 rounded" checked>
             <label for="form-is-active" class="ml-2 block text-sm text-gray-700">Is Active</label>
           </div>
 
@@ -793,30 +899,58 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
           const contactId = this.getAttribute('data-id');
           if (!contactId) return alert('Contact ID missing.');
           
+          // Prompt for comments
+          const comments = prompt('Add resolution comments (optional):');
+          if (comments === null) return; // User cancelled
+          
           try {
+            const requestBody = {
+              id: contactId,
+              status: 'resolved'
+            };
+            
+            // Add comments if provided
+            if (comments && comments.trim()) {
+              requestBody.comments = comments.trim();
+            }
+            
             const contactResponse = await fetch('/api/admin/update-contact-status', {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'
               },
-              body: JSON.stringify({
-                id: contactId,
-                status: 'resolved'
-              })
+              credentials: 'include',
+              body: JSON.stringify(requestBody)
             });
             
             const contactResult = await contactResponse.json();
             if (contactResponse.ok && contactResult.success) {
               // Update UI to show resolved status
               const contactItem = this.closest('.contact-item');
-              const statusBadge = contactItem.querySelector('.status-badge');
+              const statusBadge = contactItem.querySelector('.contact-header .rounded-full');
               if (statusBadge) {
-                statusBadge.textContent = 'Resolved';
-                statusBadge.classList.remove('bg-yellow-100', 'text-yellow-800', 'bg-blue-100', 'text-blue-800');
+                statusBadge.textContent = 'resolved';
+                statusBadge.classList.remove('bg-yellow-100', 'text-yellow-800', 'bg-red-100', 'text-red-800');
                 statusBadge.classList.add('bg-green-100', 'text-green-800');
               }
-              this.disabled = true;
-              this.classList.add('opacity-50', 'cursor-not-allowed');
+              
+              // Replace button with resolved status
+              const buttonContainer = this.parentElement;
+              buttonContainer.innerHTML = '<span class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-medium">Resolved</span>';
+              
+              // Add comments display if comments were provided
+              if (comments && comments.trim()) {
+                const existingComments = contactItem.querySelector('.resolution-comments');
+                if (!existingComments) {
+                  const commentsDiv = document.createElement('div');
+                  commentsDiv.className = 'resolution-comments mt-3 p-3 bg-blue-50 rounded border-l-4 border-blue-500';
+                  commentsDiv.innerHTML = `
+                    <span class="text-sm font-medium text-blue-700">Resolution Comments:</span>
+                    <p class="text-sm text-blue-900 mt-1">${comments.trim()}</p>
+                  `;
+                  buttonContainer.parentNode.appendChild(commentsDiv);
+                }
+              }
               alert('Contact marked as resolved!');
             } else {
               alert('Error: ' + (contactResult?.error || 'Unknown error'));
@@ -827,51 +961,241 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
           }
         });
       });
-
-      // Enrollment expandable functionality
-      const enrollmentHeaders = document.querySelectorAll('.enrollment-header');
-      enrollmentHeaders.forEach(header => {
-        header.addEventListener('click', function() {
-          const enrollmentItem = this.closest('.enrollment-item');
-          const content = enrollmentItem.querySelector('.enrollment-content');
-          const arrow = this.querySelector('.enrollment-arrow');
-
-          content.classList.toggle('hidden');
-          if (content.classList.contains('hidden')) {
-            arrow.style.transform = 'rotate(0deg)';
-          } else {
-            arrow.style.transform = 'rotate(180deg)';
+      
+      // View All Enrollments functionality
+      const viewAllEnrollmentsBtn = document.getElementById('viewAllEnrollmentsBtn');
+      let showingAllEnrollments = false;
+      
+      viewAllEnrollmentsBtn?.addEventListener('click', async function() {
+        if (showingAllEnrollments) {
+          // Hide all enrollments and show only recent ones
+          location.reload(); // Simple way to reset to original state
+          return;
+        }
+        
+        try {
+          this.innerHTML = '<svg class="animate-spin w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Loading...';
+          
+          const response = await fetch('/api/admin/enrollments', {
+            credentials: 'include'
+          });
+          if (!response.ok) throw new Error('Failed to fetch enrollments');
+          
+          const result = await response.json();
+          const allEnrollments = result.data || [];
+          
+          // Update the enrollments container - target the Enrollment Management section specifically
+          const enrollmentSection = Array.from(document.querySelectorAll('h3')).find(h3 => h3.textContent.includes('Enrollment Management'));
+          const enrollmentsContainer = enrollmentSection?.parentElement.querySelector('.space-y-2');
+          
+          if (!enrollmentsContainer) {
+            console.error('Enrollments container not found');
+            alert('Error: Could not find enrollments container. Please refresh the page.');
+            return;
           }
-        });
+          
+          if (allEnrollments.length === 0) {
+            enrollmentsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No enrollments found.</p>';
+          } else {
+            enrollmentsContainer.innerHTML = allEnrollments.map(enrollment => `
+              <div class="enrollment-item border border-gray-200 rounded-lg">
+                <button class="enrollment-header w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left" data-enrollment="${enrollment.id}">
+                  <div class="flex items-center">
+                    <span class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                      🎓
+                    </span>
+                    <div>
+                      <h4 class="font-semibold text-gray-900">Enrollment #${enrollment.id} - ${enrollment.first_name} ${enrollment.last_name}</h4>
+                      <p class="text-sm text-gray-500">${enrollment.course_id} - ${new Date(enrollment.created_at).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      enrollment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      enrollment.status === 'enrolled' ? 'bg-green-100 text-green-800' :
+                      enrollment.status === 'not_interested' ? 'bg-red-100 text-red-800' :
+                      enrollment.status === 'free_training' ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-800'
+                    }">
+                      ${enrollment.status.replace('_', ' ')}
+                    </span>
+                    <svg class="enrollment-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                </button>
+
+                <div class="enrollment-content hidden p-4 bg-white border-t border-gray-200">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <span class="text-sm font-medium text-gray-700">First Name:</span>
+                      <span class="text-sm text-gray-900 ml-2">${enrollment.first_name}</span>
+                    </div>
+                    <div>
+                      <span class="text-sm font-medium text-gray-700">Last Name:</span>
+                      <span class="text-sm text-gray-900 ml-2">${enrollment.last_name}</span>
+                    </div>
+                    <div>
+                      <span class="text-sm font-medium text-gray-700">Email:</span>
+                      <span class="text-sm text-gray-900 ml-2">${enrollment.email}</span>
+                    </div>
+                    <div>
+                      <span class="text-sm font-medium text-gray-700">Phone:</span>
+                      <span class="text-sm text-gray-900 ml-2">${enrollment.phone}</span>
+                    </div>
+                    <div>
+                      <span class="text-sm font-medium text-gray-700">Experience Level:</span>
+                      <span class="text-sm text-gray-900 ml-2 capitalize">${enrollment.experience_level}</span>
+                    </div>
+                    <div>
+                      <span class="text-sm font-medium text-gray-700">Course Type:</span>
+                      <span class="text-sm text-gray-900 ml-2">${enrollment.is_free ? 'Free' : 'Paid'}</span>
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <span class="text-sm font-medium text-gray-700">Learning Goals:</span>
+                    <div class="mt-1 p-3 bg-gray-50 rounded border-l-4 border-green-500">
+                      <p class="text-sm text-gray-900">${enrollment.learning_goals}</p>
+                    </div>
+                  </div>
+                  ${enrollment.comments ? `
+                    <div class="mb-4">
+                      <span class="text-sm font-medium text-gray-700">Comments:</span>
+                      <div class="mt-1 p-3 bg-blue-50 rounded border-l-4 border-blue-500">
+                        <p class="text-sm text-blue-900">${enrollment.comments}</p>
+                      </div>
+                    </div>
+                  ` : ''}
+                  <div class="flex space-x-2">
+                    <button class="update-enrollment-status-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm" data-id="${enrollment.id}" data-status="${enrollment.status}">Update Status</button>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+            
+            // Re-attach event listeners for new elements
+            attachEnrollmentEventListeners();
+          }
+          
+          showingAllEnrollments = true;
+          this.innerHTML = `
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+            </svg>
+            Show Recent Only
+          `;
+          
+        } catch (error) {
+          console.error('Error loading all enrollments:', error);
+          alert('Error loading enrollments. Please try again.');
+          this.innerHTML = `
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            View All Enrollments
+          `;
+        }
       });
       
-      // Enrollment status update functionality
-      const updateEnrollmentStatusButtons = document.querySelectorAll('.update-enrollment-status-btn');
-      updateEnrollmentStatusButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-          e.stopPropagation(); // Prevent triggering the expandable functionality
-          const enrollmentId = this.getAttribute('data-id');
-          const currentStatus = this.getAttribute('data-status');
-          if (!enrollmentId) return alert('Enrollment ID missing.');
-          
-          // Create status options based on current status
-          const statusOptions = ['pending', 'approved', 'rejected', 'completed'];
-          
-          // Create a simple dropdown for status selection
-          const newStatus = prompt(
-            `Current status: ${currentStatus}\nSelect new status:\n- pending\n- approved\n- rejected\n- completed`, 
-            currentStatus
-          );
-          
-          // Validate selection
-          if (!newStatus || !statusOptions.includes(newStatus) || newStatus === currentStatus) {
-            return; // User cancelled or invalid selection
-          }
-          
-          // Update status via API
-          updateEnrollmentStatus(enrollmentId, newStatus, this);
+      function attachEnrollmentEventListeners() {
+        // Enrollment expandable functionality
+        const enrollmentHeaders = document.querySelectorAll('.enrollment-header');
+        enrollmentHeaders.forEach(header => {
+          header.addEventListener('click', function() {
+            const enrollmentItem = this.closest('.enrollment-item');
+            const content = enrollmentItem.querySelector('.enrollment-content');
+            const arrow = this.querySelector('.enrollment-arrow');
+
+            content.classList.toggle('hidden');
+            if (content.classList.contains('hidden')) {
+              arrow.style.transform = 'rotate(0deg)';
+            } else {
+              arrow.style.transform = 'rotate(180deg)';
+            }
+          });
         });
-      });
+        
+        // Enrollment status update functionality
+        const updateEnrollmentStatusButtons = document.querySelectorAll('.update-enrollment-status-btn');
+        updateEnrollmentStatusButtons.forEach(button => {
+          button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const enrollmentId = this.getAttribute('data-id');
+            const currentStatus = this.getAttribute('data-status');
+            if (!enrollmentId) return alert('Enrollment ID missing.');
+            
+            // Create modal for status update
+            const statusOptions = [
+              { value: 'pending', label: 'Pending' },
+              { value: 'enrolled', label: 'Enrolled' },
+              { value: 'payment_pending', label: 'Payment Pending' },
+              { value: 'cancelled', label: 'Cancelled' }
+            ];
+            
+            // Create modal HTML
+            const modalHTML = `
+              <div id="statusModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                  <div class="mt-3">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Update Enrollment Status</h3>
+                    <p class="text-sm text-gray-600 mb-4">Current Status: <span class="font-semibold">${currentStatus}</span></p>
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Select New Status:</label>
+                      <select id="statusSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        ${statusOptions.map(option => 
+                          `<option value="${option.value}" ${option.value === currentStatus ? 'selected' : ''}>${option.label}</option>`
+                        ).join('')}
+                      </select>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                      <button id="cancelBtn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Cancel</button>
+                      <button id="updateBtn" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Update Status</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Handle modal interactions
+            const modal = document.getElementById('statusModal');
+            const statusSelect = document.getElementById('statusSelect');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const updateBtn = document.getElementById('updateBtn');
+            
+            // Close modal function
+            const closeModal = () => {
+              modal.remove();
+            };
+            
+            // Cancel button
+            cancelBtn.addEventListener('click', closeModal);
+            
+            // Click outside to close
+            modal.addEventListener('click', (e) => {
+              if (e.target === modal) closeModal();
+            });
+            
+            // Update button
+            updateBtn.addEventListener('click', () => {
+              const newStatus = statusSelect.value;
+              if (newStatus === currentStatus) {
+                closeModal();
+                return;
+              }
+              
+              // Update status via API (no comments required)
+              updateEnrollmentStatus(enrollmentId, newStatus, '', this);
+              closeModal();
+            });
+          });
+        });
+      }
+      
+      // Initial attachment of event listeners
+      attachEnrollmentEventListeners();
       
       // Function to load all submission counts for forms
       async function loadAllSubmissionCounts() {
@@ -990,16 +1314,18 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
       loadAllSubmissionCounts();
       
       // Function to update enrollment status
-      async function updateEnrollmentStatus(id, status, buttonElement) {
+      async function updateEnrollmentStatus(id, status, comments, buttonElement) {
         try {
           const enrollmentResponse = await fetch('/api/admin/update-enrollment-status', {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({
-              id: id,
-              status: status
+              enrollment_id: id,
+              status: status,
+              comments: comments
             })
           });
           
@@ -1016,18 +1342,19 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
                 'bg-yellow-100', 'text-yellow-800',
                 'bg-green-100', 'text-green-800',
                 'bg-blue-100', 'text-blue-800',
+                'bg-red-100', 'text-red-800',
                 'bg-gray-100', 'text-gray-800'
               );
               
               // Add appropriate status classes
               if (status === 'pending') {
                 statusBadge.classList.add('bg-yellow-100', 'text-yellow-800');
-              } else if (status === 'approved') {
+              } else if (status === 'enrolled') {
                 statusBadge.classList.add('bg-green-100', 'text-green-800');
-              } else if (status === 'rejected') {
-                statusBadge.classList.add('bg-red-100', 'text-red-800');
-              } else if (status === 'completed') {
+              } else if (status === 'payment_pending') {
                 statusBadge.classList.add('bg-blue-100', 'text-blue-800');
+              } else if (status === 'cancelled') {
+                statusBadge.classList.add('bg-red-100', 'text-red-800');
               } else {
                 statusBadge.classList.add('bg-gray-100', 'text-gray-800');
               }
@@ -1064,14 +1391,23 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
             const submitBtn = document.getElementById('submit-post-btn');
             const postIdInput = document.getElementById('post-id');
             const postTitleInput = document.getElementById('post-title');
+            const editorContent = document.getElementById('post-content-editor');
             
             if (modalTitle) modalTitle.textContent = 'Edit Post';
             if (submitBtn) submitBtn.textContent = 'Update Post';
             if (postIdInput) postIdInput.value = post.id;
             if (postTitleInput) postTitleInput.value = post.title;
             document.getElementById('post-slug').value = post.slug;
+            document.getElementById('post-excerpt').value = post.excerpt || '';
+            document.getElementById('post-featured-image').value = post.featured_image || '';
             document.getElementById('post-content').value = post.content || '';
             document.getElementById('post-status').value = post.status || 'draft';
+            
+            // Set rich text editor content
+            if (editorContent) {
+              editorContent.innerHTML = post.content || '';
+            }
+            
             createPostModal?.classList.remove('hidden');
           } catch (error) {
             console.error('Error parsing post data:', error);
@@ -1091,6 +1427,24 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
 
       // Modal controls
       createPostBtn?.addEventListener('click', function() {
+        // Reset form for new post creation
+        const modalTitle = document.getElementById('post-modal-title');
+        const submitBtn = document.getElementById('submit-post-btn');
+        const postIdInput = document.getElementById('post-id');
+        const editorContent = document.getElementById('post-content-editor');
+        
+        if (modalTitle) modalTitle.textContent = 'Create New Post';
+        if (submitBtn) submitBtn.textContent = 'Create Post';
+        if (postIdInput) postIdInput.value = '';
+        
+        // Reset form fields
+        createPostForm?.reset();
+        
+        // Clear rich text editor
+        if (editorContent) {
+          editorContent.innerHTML = '';
+        }
+        
         createPostModal?.classList.remove('hidden');
       });
       closeModal?.addEventListener('click', function() {
@@ -1103,25 +1457,44 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
         if (e.target === this) this.classList.add('hidden');
       });
 
-      // Handle create form submission
+      // Handle create/edit form submission
       createPostForm?.addEventListener('submit', async function(e) {
         e.preventDefault();
+        
+        // Sync rich text editor content to hidden textarea
+        const editorContent = document.getElementById('post-content-editor');
+        const hiddenTextarea = document.getElementById('post-content');
+        if (editorContent && hiddenTextarea) {
+          hiddenTextarea.value = editorContent.innerHTML;
+        }
+        
         const formData = new FormData(this);
+        const postId = formData.get('id');
+        const isEdit = postId && postId.trim() !== '';
+        
         // TODO: replace with actual admin ID from your session/auth
-        formData.append('author_id', '00000000-0000-0000-0000-000000000000');
+        if (!isEdit) {
+          formData.append('author_id', '00000000-0000-0000-0000-000000000000');
+        }
+        
         try {
-          const response = await fetch('/api/admin/blog', { method: 'POST', body: formData });
+          const method = isEdit ? 'PUT' : 'POST';
+          const response = await fetch('/api/admin/blog', { method, body: formData });
           const result = await response.json();
+          
           if (response.ok && result.success) {
-            alert('Blog post created successfully!');
+            const action = isEdit ? 'updated' : 'created';
+            alert(`Blog post ${action} successfully!`);
             createPostModal?.classList.add('hidden');
             location.reload();
           } else {
-            alert('Error creating post: ' + (result?.error || 'Unknown error'));
+            const action = isEdit ? 'updating' : 'creating';
+            alert(`Error ${action} post: ` + (result?.error || 'Unknown error'));
           }
         } catch (error) {
           console.error('Error:', error);
-          alert('Error creating post. Please try again.');
+          const action = isEdit ? 'updating' : 'creating';
+          alert(`Error ${action} post. Please try again.`);
         }
       });
 
@@ -1181,6 +1554,8 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
       createFormBtn?.addEventListener('click', function() {
         document.getElementById('form-modal-title').textContent = 'Create New Form';
         document.getElementById('submit-form-btn').textContent = 'Create Form';
+        document.getElementById('submit-form-btn').style.display = 'inline-block';
+        document.getElementById('cancel-form').textContent = 'Cancel';
         formForm?.reset();
         document.getElementById('form-id').value = '';
         document.getElementById('form-success-actions').classList.add('hidden');
@@ -1204,6 +1579,14 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
         const isEdit = !!formData.get('id');
         const method = isEdit ? 'PUT' : 'POST';
 
+        // Handle checkbox value properly - if unchecked, it won't be in FormData
+        const isActiveCheckbox = document.getElementById('form-is-active');
+        if (isActiveCheckbox) {
+          // Remove any existing is_active entry and add the correct value
+          formData.delete('is_active');
+          formData.append('is_active', isActiveCheckbox.checked ? 'true' : 'false');
+        }
+
         try {
           const response = await fetch('/api/admin/forms', { method, body: formData });
           const result = await response.json();
@@ -1213,6 +1596,9 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
             if (!isEdit) {
               currentFormSlug = result.data.slug;
               document.getElementById('form-success-actions').classList.remove('hidden');
+              // Hide the Create Form button and show Close button
+              document.getElementById('submit-form-btn').style.display = 'none';
+              document.getElementById('cancel-form').textContent = 'Close';
             } else {
               createFormModal?.classList.add('hidden');
               location.reload();
@@ -1227,15 +1613,18 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
       });
 
       // Success actions
-      document.getElementById('copy-new-form-link')?.addEventListener('click', function() {
+      document.getElementById('copy-new-form-link')?.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent form submission
         copyFormLink(currentFormSlug);
       });
 
-      document.getElementById('whatsapp-new-form')?.addEventListener('click', function() {
+      document.getElementById('whatsapp-new-form')?.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent form submission
         shareOnWhatsApp(currentFormSlug, formName.value);
       });
 
-      document.getElementById('manage-new-form-fields')?.addEventListener('click', function() {
+      document.getElementById('manage-new-form-fields')?.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent form submission
         createFormModal?.classList.add('hidden');
         // Find the form in the data and open fields modal
         location.reload(); // Simple approach for now
@@ -1247,6 +1636,8 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
           const form = JSON.parse(this.getAttribute('data-form'));
           document.getElementById('form-modal-title').textContent = 'Edit Form';
           document.getElementById('submit-form-btn').textContent = 'Update Form';
+          document.getElementById('submit-form-btn').style.display = 'inline-block';
+          document.getElementById('cancel-form').textContent = 'Cancel';
           document.getElementById('form-id').value = form.id;
           document.getElementById('form-name').value = form.name;
           document.getElementById('form-slug').value = form.slug;
@@ -1632,6 +2023,87 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       }
+
+      // Rich Text Editor Functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        const editorToolbar = document.getElementById('editor-toolbar');
+        const editorContent = document.getElementById('post-content-editor');
+        
+        if (!editorToolbar || !editorContent) return;
+        
+        // Handle toolbar button clicks
+        editorToolbar.addEventListener('click', function(e) {
+          e.preventDefault();
+          const button = e.target.closest('.editor-btn');
+          const select = e.target.closest('.editor-select');
+          
+          if (button) {
+            const command = button.getAttribute('data-command');
+            executeCommand(command);
+          } else if (select) {
+            const command = select.getAttribute('data-command');
+            const value = select.value;
+            if (value) {
+              executeCommand(command, value);
+              select.value = ''; // Reset select
+            }
+          }
+        });
+        
+        // Handle select changes
+        editorToolbar.addEventListener('change', function(e) {
+          const select = e.target.closest('.editor-select');
+          if (select) {
+            const command = select.getAttribute('data-command');
+            const value = select.value;
+            if (value) {
+              executeCommand(command, value);
+              select.value = ''; // Reset select
+            }
+          }
+        });
+        
+        function executeCommand(command, value = null) {
+          editorContent.focus();
+          
+          if (command === 'createLink') {
+            const url = prompt('Enter the URL:');
+            if (url) {
+              document.execCommand(command, false, url);
+            }
+          } else if (command === 'formatBlock' && value) {
+            document.execCommand(command, false, `<${value}>`);
+          } else {
+            document.execCommand(command, false, value);
+          }
+        }
+        
+        // Prevent form submission on Enter in editor
+        editorContent.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault();
+            document.getElementById('create-post-form').dispatchEvent(new Event('submit'));
+          }
+        });
+        
+        // Update toolbar button states based on current selection
+        editorContent.addEventListener('mouseup', updateToolbarState);
+        editorContent.addEventListener('keyup', updateToolbarState);
+        
+        function updateToolbarState() {
+          const commands = ['bold', 'italic', 'underline'];
+          commands.forEach(command => {
+            const button = editorToolbar.querySelector(`[data-command="${command}"]`);
+            if (button) {
+              if (document.queryCommandState(command)) {
+                button.classList.add('bg-blue-200');
+              } else {
+                button.classList.remove('bg-blue-200');
+              }
+            }
+          });
+        }
+      });
     });
   </script>
 </Layout>
