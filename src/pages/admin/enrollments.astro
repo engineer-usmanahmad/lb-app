@@ -1,0 +1,305 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { supabase } from '../../lib/supabase.ts';
+
+// Check if user is authenticated and is admin
+const user = Astro.locals.user;
+if (!user || user.role !== 'admin') {
+  return Astro.redirect('/auth/login');
+}
+
+// Fetch all enrollments
+let enrollments = [];
+let error = null;
+
+if (supabase) {
+  try {
+    const { data, error: fetchError } = await supabase
+      .from('enrollments')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (fetchError) {
+      console.error('Error fetching enrollments:', fetchError);
+      error = fetchError.message;
+    } else {
+      enrollments = data || [];
+    }
+  } catch (err) {
+    console.error('Error:', err);
+    error = 'Failed to fetch enrollments';
+  }
+}
+---
+
+<Layout title="Enrollment Management - Admin Dashboard">
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+          <div class="flex items-center">
+            <a href="/admin/dashboard" class="text-coral-600 hover:text-coral-700 mr-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </a>
+            <h1 class="text-3xl font-bold text-gray-900">Enrollment Management</h1>
+          </div>
+          <div class="text-sm text-gray-500">
+            Total Enrollments: <span class="font-semibold text-gray-900">{enrollments.length}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {error && (
+        <div class="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+          <div class="flex">
+            <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="ml-3">
+              <p class="text-sm text-red-800">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <!-- Enrollments List -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-medium text-gray-900">All Enrollments</h2>
+        </div>
+        
+        {enrollments.length === 0 ? (
+          <div class="p-6 text-center text-gray-500">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <p class="mt-2">No enrollments found</p>
+          </div>
+        ) : (
+          <div class="divide-y divide-gray-200">
+            {enrollments.map(enrollment => (
+              <div class="enrollment-item p-6">
+                <div class="flex items-center justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0">
+                        <span class="w-10 h-10 bg-coral-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                          🎓
+                        </span>
+                      </div>
+                      <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900">
+                          {enrollment.first_name} {enrollment.last_name}
+                        </h3>
+                        <p class="text-sm text-gray-500">
+                          Course: <span class="font-medium">{enrollment.course_id}</span> • 
+                          Enrolled: {new Date(enrollment.created_at).toLocaleDateString()}
+                        </p>
+                        <div class="mt-2 flex items-center space-x-4 text-sm text-gray-500">
+                          <span>📧 {enrollment.email}</span>
+                          <span>📱 {enrollment.phone}</span>
+                          <span>📊 {enrollment.experience_level}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center space-x-4">
+                    <!-- Status Badge -->
+                    <span class={`enrollment-status inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                      enrollment.status === 'enrolled' ? 'bg-green-100 text-green-800' :
+                      enrollment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      enrollment.status === 'not_interested' ? 'bg-red-100 text-red-800' :
+                      enrollment.status === 'free_training' ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`} data-enrollment-id={enrollment.id}>
+                      {enrollment.status === 'not_interested' ? 'Not Interested' : 
+                       enrollment.status === 'free_training' ? 'Free Training' :
+                       enrollment.status.charAt(0).toUpperCase() + enrollment.status.slice(1)}
+                    </span>
+                    
+                    <!-- Update Status Button -->
+                    <button class="update-status-btn bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors" data-enrollment-id={enrollment.id}>
+                      Update Status
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Learning Goals -->
+                {enrollment.learning_goals && (
+                  <div class="mt-4 p-3 bg-gray-50 rounded-md">
+                    <p class="text-sm font-medium text-gray-700">Learning Goals:</p>
+                    <p class="text-sm text-gray-600 mt-1">{enrollment.learning_goals}</p>
+                  </div>
+                )}
+                
+                <!-- Comments Section -->
+                <div class="comments-section mt-4" data-enrollment-id={enrollment.id}>
+                  {enrollment.comments && (
+                    <div class="p-3 bg-blue-50 rounded-md">
+                      <p class="text-sm font-medium text-blue-700">Admin Comments:</p>
+                      <p class="text-sm text-blue-600 mt-1">{enrollment.comments}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Status Modal -->
+  <div id="update-status-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Update Enrollment Status</h3>
+            <button id="close-status-modal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <form id="update-status-form" class="p-6">
+          <input type="hidden" id="enrollment-id" name="enrollment_id">
+          
+          <div class="mb-4">
+            <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select id="status" name="status" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
+              <option value="pending">Pending</option>
+              <option value="enrolled">Enrolled</option>
+              <option value="not_interested">Not Interested</option>
+              <option value="free_training">Free Training</option>
+            </select>
+          </div>
+          
+          <div class="mb-6">
+            <label for="comments" class="block text-sm font-medium text-gray-700 mb-2">Comments (Optional)</label>
+            <textarea id="comments" name="comments" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500" placeholder="Add any notes or comments..."></textarea>
+          </div>
+          
+          <div class="flex justify-end space-x-3">
+            <button type="button" id="cancel-status-update" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+              Cancel
+            </button>
+            <button type="submit" class="px-4 py-2 bg-coral-500 hover:bg-coral-600 text-white rounded-md text-sm font-medium">
+              Update Status
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Modal functionality
+    const updateStatusModal = document.getElementById('update-status-modal');
+    const updateStatusForm = document.getElementById('update-status-form');
+    const closeStatusModal = document.getElementById('close-status-modal');
+    const cancelStatusUpdate = document.getElementById('cancel-status-update');
+    
+    // Update status buttons
+    const updateStatusButtons = document.querySelectorAll('.update-status-btn');
+    
+    updateStatusButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const enrollmentId = button.getAttribute('data-enrollment-id');
+        const enrollmentItem = button.closest('.enrollment-item');
+        const currentStatus = enrollmentItem.querySelector('.enrollment-status').textContent.trim().toLowerCase().replace(' ', '_');
+        
+        // Set form values
+        document.getElementById('enrollment-id').value = enrollmentId;
+        document.getElementById('status').value = currentStatus === 'not_interested' ? 'not_interested' : 
+                                                   currentStatus === 'free_training' ? 'free_training' : 
+                                                   currentStatus;
+        
+        // Show modal
+        updateStatusModal.classList.remove('hidden');
+      });
+    });
+    
+    // Close modal handlers
+    closeStatusModal.addEventListener('click', () => {
+      updateStatusModal.classList.add('hidden');
+    });
+    
+    cancelStatusUpdate.addEventListener('click', () => {
+      updateStatusModal.classList.add('hidden');
+    });
+    
+    // Form submission
+    updateStatusForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(updateStatusForm);
+      const enrollmentId = formData.get('enrollment_id');
+      const status = formData.get('status');
+      const comments = formData.get('comments');
+      
+      try {
+        const response = await fetch('/api/admin/update-enrollment-status', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            enrollment_id: enrollmentId,
+            status: status,
+            comments: comments
+          })
+        });
+        
+        if (response.ok) {
+          // Update UI
+          const enrollmentItem = document.querySelector(`[data-enrollment-id="${enrollmentId}"]`).closest('.enrollment-item');
+          const statusBadge = enrollmentItem.querySelector('.enrollment-status');
+          const commentsSection = enrollmentItem.querySelector('.comments-section');
+          
+          // Update status badge
+          statusBadge.className = `enrollment-status inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+            status === 'enrolled' ? 'bg-green-100 text-green-800' :
+            status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+            status === 'not_interested' ? 'bg-red-100 text-red-800' :
+            status === 'free_training' ? 'bg-blue-100 text-blue-800' :
+            'bg-gray-100 text-gray-800'
+          }`;
+          statusBadge.textContent = status === 'not_interested' ? 'Not Interested' : 
+                                   status === 'free_training' ? 'Free Training' :
+                                   status.charAt(0).toUpperCase() + status.slice(1);
+          
+          // Update comments
+          if (comments) {
+            commentsSection.innerHTML = `
+              <div class="p-3 bg-blue-50 rounded-md">
+                <p class="text-sm font-medium text-blue-700">Admin Comments:</p>
+                <p class="text-sm text-blue-600 mt-1">${comments}</p>
+              </div>
+            `;
+          }
+          
+          // Close modal
+          updateStatusModal.classList.add('hidden');
+          
+          // Show success message
+          alert('Enrollment status updated successfully!');
+        } else {
+          throw new Error('Failed to update status');
+        }
+      } catch (error) {
+        console.error('Error updating status:', error);
+        alert('Error updating enrollment status. Please try again.');
+      }
+    });
+  </script>
+</Layout>

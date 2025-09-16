@@ -14,18 +14,19 @@ export const PUT: APIRoute = async ({ request }) => {
 
     // Parse JSON data from request body
     const data = await request.json();
-    const id = data.id as string;
+    const enrollment_id = data.enrollment_id as string;
     const status = data.status as string;
+    const comments = data.comments as string;
 
-    if (!id || !status) {
-      return new Response(JSON.stringify({ error: 'ID and status are required' }), {
+    if (!enrollment_id || !status) {
+      return new Response(JSON.stringify({ error: 'Enrollment ID and status are required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
     // Validate status value
-    const validStatuses = ['pending', 'approved', 'rejected', 'completed'];
+    const validStatuses = ['pending', 'enrolled', 'not_interested', 'free_training'];
     if (!validStatuses.includes(status)) {
       return new Response(JSON.stringify({ error: 'Invalid status value' }), {
         status: 400,
@@ -33,10 +34,20 @@ export const PUT: APIRoute = async ({ request }) => {
       });
     }
 
+    // Prepare update data
+    const updateData: any = {
+      status: status,
+      updated_at: new Date().toISOString()
+    };
+
+    if (comments) {
+      updateData.comments = comments;
+    }
+
     const { data: updatedEnrollment, error } = await supabaseAdmin
       .from('enrollment_submissions')
-      .update({ status })
-      .eq('id', id)
+      .update(updateData)
+      .eq('id', enrollment_id)
       .select()
       .single();
 
@@ -48,12 +59,16 @@ export const PUT: APIRoute = async ({ request }) => {
       });
     }
 
-    return new Response(JSON.stringify({ success: true, data: updatedEnrollment }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      enrollment: updatedEnrollment 
+    }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
+
   } catch (error) {
-    console.error('Enrollment status API error:', error);
+    console.error('Error updating enrollment status:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
