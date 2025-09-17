@@ -1,6 +1,8 @@
 // src/pages/api/admin/blog.ts
 import type { APIRoute } from "astro";
 import { createClient } from "@supabase/supabase-js";
+import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 
 // Prefer service role on the server; fall back to anon if needed.
 const SUPABASE_URL = import.meta.env.SUPABASE_URL as string;
@@ -16,6 +18,33 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+// Initialize DOMPurify for server-side HTML sanitization
+const window = new JSDOM('').window;
+const purify = DOMPurify(window as any);
+
+// Configure DOMPurify to allow rich text formatting
+const sanitizeConfig = {
+  ALLOWED_TAGS: [
+    'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'strike',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li',
+    'a', 'img',
+    'blockquote', 'pre', 'code',
+    'div', 'span'
+  ],
+  ALLOWED_ATTR: [
+    'href', 'target', 'rel',
+    'src', 'alt', 'width', 'height',
+    'style', 'class',
+    'data-*'
+  ],
+  ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i
+};
+
+function sanitizeHTML(html: string): string {
+  return purify.sanitize(html, sanitizeConfig);
+}
 
 export const prerender = false;
 
@@ -69,7 +98,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Your schema uses "content" and "featured_image".
     // Accept alternative keys just in case (content_md / cover_image).
-    const content = (body.content ?? body.content_md ?? "").toString();
+    const rawContent = (body.content ?? body.content_md ?? "").toString();
+    const content = sanitizeHTML(rawContent); // Sanitize HTML content
     const featured_image =
       (body.featured_image ?? body.cover_image ?? "") || null;
 
@@ -182,12 +212,14 @@ export const PUT: APIRoute = async ({ request }) => {
       body.excerpt !== undefined ? String(body.excerpt) : undefined;
 
     // Accept alternative keys as well
-    const content =
+    const rawContent =
       body.content !== undefined
         ? String(body.content)
         : body.content_md !== undefined
           ? String(body.content_md)
           : undefined;
+    
+    const content = rawContent !== undefined ? sanitizeHTML(rawContent) : undefined; // Sanitize HTML content
 
     const featured_image =
       body.featured_image !== undefined

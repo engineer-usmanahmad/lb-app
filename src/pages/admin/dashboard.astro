@@ -539,6 +539,53 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
               <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="underline" title="Underline">
                 <u>U</u>
               </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="strikeThrough" title="Strikethrough">
+                <s>S</s>
+              </button>
+              
+              <div class="border-l border-gray-300 mx-1"></div>
+              
+              <!-- Font Family -->
+              <select class="editor-select text-sm border border-gray-300 rounded px-2 py-1" data-command="fontName">
+                <option value="">Font Family</option>
+                <option value="Arial">Arial</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Impact">Impact</option>
+                <option value="Comic Sans MS">Comic Sans MS</option>
+              </select>
+              
+              <!-- Font Size -->
+              <select class="editor-select text-sm border border-gray-300 rounded px-2 py-1" data-command="fontSize">
+                <option value="">Font Size</option>
+                <option value="1">8pt</option>
+                <option value="2">10pt</option>
+                <option value="3">12pt</option>
+                <option value="4">14pt</option>
+                <option value="5">18pt</option>
+                <option value="6">24pt</option>
+                <option value="7">36pt</option>
+              </select>
+              
+              <div class="border-l border-gray-300 mx-1"></div>
+              
+              <!-- Text Colors -->
+              <div class="relative">
+                <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" id="text-color-btn" title="Text Color">
+                  <span style="color: #000;">A</span>
+                </button>
+                <input type="color" id="text-color-picker" class="absolute opacity-0 w-full h-full cursor-pointer" value="#000000">
+              </div>
+              
+              <div class="relative">
+                <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" id="bg-color-btn" title="Background Color">
+                  <span style="background-color: #ffff00; padding: 0 2px;">H</span>
+                </button>
+                <input type="color" id="bg-color-picker" class="absolute opacity-0 w-full h-full cursor-pointer" value="#ffff00">
+              </div>
               
               <div class="border-l border-gray-300 mx-1"></div>
               
@@ -551,20 +598,8 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
                 <option value="h4">Heading 4</option>
                 <option value="h5">Heading 5</option>
                 <option value="h6">Heading 6</option>
-              </select>
-              
-              <div class="border-l border-gray-300 mx-1"></div>
-              
-              <!-- Font Size -->
-              <select class="editor-select text-sm border border-gray-300 rounded px-2 py-1" data-command="fontSize">
-                <option value="">Font Size</option>
-                <option value="1">Very Small</option>
-                <option value="2">Small</option>
-                <option value="3">Normal</option>
-                <option value="4">Medium</option>
-                <option value="5">Large</option>
-                <option value="6">Very Large</option>
-                <option value="7">Huge</option>
+                <option value="p">Paragraph</option>
+                <option value="blockquote">Quote</option>
               </select>
               
               <div class="border-l border-gray-300 mx-1"></div>
@@ -575,6 +610,12 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
               </button>
               <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="insertOrderedList" title="Numbered List">
                 1. List
+              </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="outdent" title="Decrease Indent">
+                ⬅
+              </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="indent" title="Increase Indent">
+                ➡
               </button>
               
               <div class="border-l border-gray-300 mx-1"></div>
@@ -589,23 +630,70 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
               <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="justifyRight" title="Align Right">
                 ➡
               </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="justifyFull" title="Justify">
+                ⬌
+              </button>
               
               <div class="border-l border-gray-300 mx-1"></div>
               
-              <!-- Links -->
+              <!-- Links and Media -->
               <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="createLink" title="Insert Link">
                 🔗
               </button>
               <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="unlink" title="Remove Link">
                 🔗❌
               </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" id="insert-image-btn" title="Insert Image">
+                🖼️
+              </button>
+              
+              <div class="border-l border-gray-300 mx-1"></div>
+              
+              <!-- Utility -->
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="removeFormat" title="Clear Formatting">
+                🧹
+              </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="undo" title="Undo">
+                ↶
+              </button>
+              <button type="button" class="editor-btn px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-200" data-command="redo" title="Redo">
+                ↷
+              </button>
+            </div>
+            
+            <!-- Image Upload Modal -->
+            <div id="image-upload-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+              <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="mt-3">
+                  <h3 class="text-lg font-medium text-gray-900 mb-4">Insert Image</h3>
+                  <div class="space-y-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                      <input type="url" id="image-url-input" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Alt Text</label>
+                      <input type="text" id="image-alt-input" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500" placeholder="Image description">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Width (optional)</label>
+                      <input type="number" id="image-width-input" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500" placeholder="300" min="50" max="800">
+                    </div>
+                    <div class="flex justify-end space-x-2 pt-4">
+                      <button type="button" id="cancel-image-btn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Cancel</button>
+                      <button type="button" id="insert-image-confirm-btn" class="px-4 py-2 bg-coral-500 text-white rounded-md hover:bg-coral-600">Insert Image</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             
             <!-- Rich Text Editor -->
             <div id="post-content-editor" 
                  contenteditable="true" 
                  class="w-full min-h-48 px-3 py-2 border border-gray-300 border-t-0 rounded-b-md focus:outline-none focus:ring-2 focus:ring-coral-500 bg-white"
-                 style="max-height: 400px; overflow-y: auto;">
+                 style="max-height: 400px; overflow-y: auto;"
+                 spellcheck="false">
             </div>
             
             <!-- Hidden textarea for form submission -->
@@ -1374,8 +1462,11 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
       }
 
       // Blog post management
+      console.log('Setting up blog post management...');
       const createPostBtn = document.getElementById('create-post-btn');
       const createPostModal = document.getElementById('create-post-modal');
+      console.log('Create Post Button:', createPostBtn);
+      console.log('Create Post Modal:', createPostModal);
       const closeModal = document.getElementById('close-modal');
       const cancelPost = document.getElementById('cancel-post');
       const createPostForm = document.getElementById('create-post-form');
@@ -1385,6 +1476,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
       // Edit post buttons
       document.querySelectorAll('.edit-post-btn').forEach(btn => {
         btn.addEventListener('click', function() {
+          console.log('Edit Post button clicked!');
           try {
             const post = JSON.parse(this.getAttribute('data-post'));
             const modalTitle = document.getElementById('post-modal-title');
@@ -1427,6 +1519,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
 
       // Modal controls
       createPostBtn?.addEventListener('click', function() {
+        console.log('Create Post button clicked!');
         // Reset form for new post creation
         const modalTitle = document.getElementById('post-modal-title');
         const submitBtn = document.getElementById('submit-post-btn');
@@ -2024,22 +2117,160 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
         window.URL.revokeObjectURL(url);
       }
 
-      // Rich Text Editor Functionality
-      document.addEventListener('DOMContentLoaded', function() {
-        const editorToolbar = document.getElementById('editor-toolbar');
-        const editorContent = document.getElementById('post-content-editor');
+      // Rich Text Editor Functionality (moved inside main DOMContentLoaded)
+      const editorToolbar = document.getElementById('editor-toolbar');
+      const editorContent = document.getElementById('post-content-editor');
         
         if (!editorToolbar || !editorContent) return;
+        
+        // Auto-save functionality
+        let autoSaveTimer;
+        const autoSaveDelay = 3000; // 3 seconds
+        
+        function autoSave() {
+          const content = editorContent.innerHTML;
+          const title = document.getElementById('post-title')?.value;
+          if (content && title) {
+            localStorage.setItem('blog-draft', JSON.stringify({
+              title: title,
+              content: content,
+              timestamp: Date.now()
+            }));
+            console.log('Auto-saved draft');
+          }
+        }
+        
+        function scheduleAutoSave() {
+          clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(autoSave, autoSaveDelay);
+        }
+        
+        // Load draft on page load
+        function loadDraft() {
+          const draft = localStorage.getItem('blog-draft');
+          if (draft) {
+            try {
+              const parsed = JSON.parse(draft);
+              const titleInput = document.getElementById('post-title');
+              if (titleInput && !titleInput.value && parsed.title) {
+                titleInput.value = parsed.title;
+              }
+              if (editorContent && !editorContent.innerHTML.trim() && parsed.content) {
+                editorContent.innerHTML = parsed.content;
+              }
+            } catch (e) {
+              console.error('Error loading draft:', e);
+            }
+          }
+        }
+        
+        // Clear draft when post is successfully submitted
+        function clearDraft() {
+          localStorage.removeItem('blog-draft');
+        }
+        
+        // Color picker functionality
+        const textColorPicker = document.getElementById('text-color-picker');
+        const bgColorPicker = document.getElementById('bg-color-picker');
+        const textColorBtn = document.getElementById('text-color-btn');
+        const bgColorBtn = document.getElementById('bg-color-btn');
+        
+        if (textColorPicker && textColorBtn) {
+          textColorPicker.addEventListener('change', function() {
+            const color = this.value;
+            executeCommand('foreColor', color);
+            textColorBtn.querySelector('span').style.color = color;
+          });
+        }
+        
+        if (bgColorPicker && bgColorBtn) {
+          bgColorPicker.addEventListener('change', function() {
+            const color = this.value;
+            executeCommand('backColor', color);
+            bgColorBtn.querySelector('span').style.backgroundColor = color;
+          });
+        }
+        
+        // Image insertion functionality
+        const insertImageBtn = document.getElementById('insert-image-btn');
+        const imageModal = document.getElementById('image-upload-modal');
+        const cancelImageBtn = document.getElementById('cancel-image-btn');
+        const insertImageConfirmBtn = document.getElementById('insert-image-confirm-btn');
+        const imageUrlInput = document.getElementById('image-url-input');
+        const imageAltInput = document.getElementById('image-alt-input');
+        const imageWidthInput = document.getElementById('image-width-input');
+        
+        if (insertImageBtn && imageModal) {
+          insertImageBtn.addEventListener('click', function() {
+            imageModal.classList.remove('hidden');
+            imageUrlInput.focus();
+          });
+        }
+        
+        if (cancelImageBtn && imageModal) {
+          cancelImageBtn.addEventListener('click', function() {
+            imageModal.classList.add('hidden');
+            clearImageInputs();
+          });
+        }
+        
+        if (insertImageConfirmBtn) {
+          insertImageConfirmBtn.addEventListener('click', function() {
+            const url = imageUrlInput.value.trim();
+            const alt = imageAltInput.value.trim();
+            const width = imageWidthInput.value.trim();
+            
+            if (url) {
+              let imgHtml = `<img src="${url}" alt="${alt || 'Image'}"`;
+              if (width) {
+                imgHtml += ` style="width: ${width}px; max-width: 100%;"`;
+              } else {
+                imgHtml += ` style="max-width: 100%; height: auto;"`;
+              }
+              imgHtml += ` />`;
+              
+              editorContent.focus();
+              document.execCommand('insertHTML', false, imgHtml);
+              imageModal.classList.add('hidden');
+              clearImageInputs();
+              scheduleAutoSave();
+            }
+          });
+        }
+        
+        function clearImageInputs() {
+          if (imageUrlInput) imageUrlInput.value = '';
+          if (imageAltInput) imageAltInput.value = '';
+          if (imageWidthInput) imageWidthInput.value = '';
+        }
+        
+        // Close modal on outside click
+        if (imageModal) {
+          imageModal.addEventListener('click', function(e) {
+            if (e.target === imageModal) {
+              imageModal.classList.add('hidden');
+              clearImageInputs();
+            }
+          });
+        }
         
         // Handle toolbar button clicks
         editorToolbar.addEventListener('click', function(e) {
           e.preventDefault();
+          e.stopPropagation();
+          
           const button = e.target.closest('.editor-btn');
           const select = e.target.closest('.editor-select');
           
           if (button) {
             const command = button.getAttribute('data-command');
-            executeCommand(command);
+            if (command) {
+              // Store current selection before executing command
+              const selection = window.getSelection();
+              const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+              
+              executeCommand(command);
+            }
           } else if (select) {
             const command = select.getAttribute('data-command');
             const value = select.value;
@@ -2064,18 +2295,68 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
         });
         
         function executeCommand(command, value = null) {
+          // Ensure editor is focused and selection is maintained
           editorContent.focus();
           
-          if (command === 'createLink') {
-            const url = prompt('Enter the URL:');
-            if (url) {
-              document.execCommand(command, false, url);
+          // Small delay to ensure focus is properly set
+          setTimeout(() => {
+            if (command === 'createLink') {
+              const selection = window.getSelection();
+              const selectedText = selection.toString();
+              const url = prompt('Enter the URL:', 'https://');
+              if (url && url !== 'https://') {
+                if (selectedText) {
+                  document.execCommand(command, false, url);
+                } else {
+                  const linkText = prompt('Enter link text:', url);
+                  if (linkText) {
+                    const linkHtml = `<a href="${url}" target="_blank">${linkText}</a>`;
+                    document.execCommand('insertHTML', false, linkHtml);
+                  }
+                }
+              }
+            } else if (command === 'formatBlock' && value) {
+              document.execCommand(command, false, `<${value}>`);
+            } else {
+              document.execCommand(command, false, value);
             }
-          } else if (command === 'formatBlock' && value) {
-            document.execCommand(command, false, `<${value}>`);
-          } else {
-            document.execCommand(command, false, value);
-          }
+            
+            // Ensure editor stays focused after command
+            editorContent.focus();
+            scheduleAutoSave();
+          }, 10);
+        }
+        
+        // Color picker handlers (removed duplicate declarations)
+        if (textColorPicker) {
+          textColorPicker.addEventListener('change', function() {
+            editorContent.focus();
+            setTimeout(() => {
+              document.execCommand('foreColor', false, this.value);
+              editorContent.focus();
+              scheduleAutoSave();
+            }, 10);
+          });
+        }
+        
+        if (bgColorPicker) {
+          bgColorPicker.addEventListener('change', function() {
+            editorContent.focus();
+            setTimeout(() => {
+              document.execCommand('backColor', false, this.value);
+              editorContent.focus();
+              scheduleAutoSave();
+            }, 10);
+          });
+        }
+         
+         // Auto-save on content change
+         editorContent.addEventListener('input', scheduleAutoSave);
+         
+         // Auto-save on title change
+        const titleInput = document.getElementById('post-title');
+        if (titleInput) {
+          titleInput.addEventListener('input', scheduleAutoSave);
         }
         
         // Prevent form submission on Enter in editor
@@ -2091,7 +2372,7 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
         editorContent.addEventListener('keyup', updateToolbarState);
         
         function updateToolbarState() {
-          const commands = ['bold', 'italic', 'underline'];
+          const commands = ['bold', 'italic', 'underline', 'strikeThrough'];
           commands.forEach(command => {
             const button = editorToolbar.querySelector(`[data-command="${command}"]`);
             if (button) {
@@ -2102,8 +2383,42 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
               }
             }
           });
+          
+          // Update alignment buttons
+          const alignCommands = ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'];
+          alignCommands.forEach(command => {
+            const button = editorToolbar.querySelector(`[data-command="${command}"]`);
+            if (button) {
+              if (document.queryCommandState(command)) {
+                button.classList.add('bg-blue-200');
+              } else {
+                button.classList.remove('bg-blue-200');
+              }
+            }
+          });
         }
+        
+        // Load draft on initialization
+        loadDraft();
+        
+        // Clear draft on successful form submission (using existing createPostForm reference)
+        if (createPostForm) {
+          createPostForm.addEventListener('submit', function() {
+            setTimeout(clearDraft, 1000); // Clear after successful submission
+          });
+        }
+        
+        // Mobile responsiveness - collapse toolbar on small screens
+        function handleMobileToolbar() {
+          if (window.innerWidth < 768) {
+            editorToolbar.classList.add('flex-col', 'items-start');
+          } else {
+            editorToolbar.classList.remove('flex-col', 'items-start');
+          }
+        }
+        
+        window.addEventListener('resize', handleMobileToolbar);
+        handleMobileToolbar(); // Initial check
       });
-    });
   </script>
 </Layout>
