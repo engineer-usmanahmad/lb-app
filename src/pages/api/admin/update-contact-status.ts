@@ -5,21 +5,18 @@ export const prerender = false;
 
 export const PUT: APIRoute = async ({ request }) => {
   try {
-    if (!supabaseAdmin) {
-      return new Response(JSON.stringify({ error: 'Service unavailable' }), {
-        status: 500,
+    const { id, status, comments } = await request.json();
+    
+    if (!id || !status) {
+      return new Response(JSON.stringify({ error: 'ID and status are required' }), {
+        status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Parse JSON data from request body
-    const data = await request.json();
-    const id = data.id as string;
-    const status = data.status as string;
-
-    if (!id || !status) {
-      return new Response(JSON.stringify({ error: 'ID and status are required' }), {
-        status: 400,
+    if (!supabaseAdmin) {
+      return new Response(JSON.stringify({ error: 'Service unavailable' }), {
+        status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
     }
@@ -33,9 +30,15 @@ export const PUT: APIRoute = async ({ request }) => {
       });
     }
 
+    // Prepare update data
+    const updateData: any = { status };
+    if (comments !== undefined) {
+      updateData.comments = comments;
+    }
+
     const { data: updatedContact, error } = await supabaseAdmin
       .from('contact_submissions')
-      .update({ status })
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
