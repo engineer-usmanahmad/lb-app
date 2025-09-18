@@ -26,7 +26,7 @@ export const PUT: APIRoute = async ({ request }) => {
     }
 
     // Validate status value
-    const validStatuses = ['pending', 'enrolled', 'not_interested', 'free_training'];
+    const validStatuses = ['pending', 'enrolled', 'payment_pending', 'cancelled'];
     if (!validStatuses.includes(status)) {
       return new Response(JSON.stringify({ error: 'Invalid status value' }), {
         status: 400,
