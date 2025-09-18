@@ -45,6 +45,25 @@ const { data: forms } = await supabase
   .select('*')
   .order('created_at', { ascending: false });
 
+// Fetch success stories data
+const { data: successStories } = await supabase
+  .from('success_stories')
+  .select('*')
+  .order('created_at', { ascending: false });
+
+// Fetch events data
+const { data: events } = await supabase
+  .from('events')
+  .select(`
+    *,
+    event_images (
+      id,
+      image_url,
+      is_cover
+    )
+  `)
+  .order('created_at', { ascending: false });
+
 // Calculate stats
 const totalContacts = contactStats?.length || 0;
 const newContacts = contactStats?.filter(c => c.status === 'new').length || 0;
@@ -61,6 +80,16 @@ const courseEnrollments = enrollmentStats?.reduce((acc, curr) => {
 const totalPosts = blogStats?.length || 0;
 const publishedPosts = blogStats?.filter(p => p.status === 'published').length || 0;
 const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
+
+// Success stories stats
+const successStoriesCount = successStories?.length || 0;
+const featuredStoriesCount = successStories?.filter(s => s.is_featured).length || 0;
+const uniqueProvidersCount = [...new Set(successStories?.map(s => s.provider) || [])].length;
+
+// Events stats
+const eventsCount = events?.length || 0;
+const totalEventImages = events?.reduce((acc, event) => acc + (event.event_images?.length || 0), 0) || 0;
+const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].length;
 ---
 
 <Layout title="Admin Dashboard - LbisTech">
@@ -239,6 +268,138 @@ const draftPosts = blogStats?.filter(p => p.status === 'draft').length || 0;
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Our Success Management -->
+      <div class="mb-8">
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Our Success Management</h3>
+              <a href="/admin/success-stories" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors">
+                Manage Success Stories
+              </a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div class="bg-purple-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <svg class="h-8 w-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                  </svg>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-purple-900">Total Stories</p>
+                    <p class="text-2xl font-bold text-purple-600">{successStoriesCount || 0}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-green-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <svg class="h-8 w-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                  </svg>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-green-900">Featured</p>
+                    <p class="text-2xl font-bold text-green-600">{featuredStoriesCount || 0}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <svg class="h-8 w-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-blue-900">Providers</p>
+                    <p class="text-2xl font-bold text-blue-600">{uniqueProvidersCount || 0}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-sm text-gray-600">
+              <p>Manage student certifications and success stories. Add new achievements, edit existing ones, and showcase your students' accomplishments.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Gallery Management -->
+      <div class="mb-8">
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Event Gallery Management</h3>
+              <a href="/admin/events" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                Manage Events
+              </a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <svg class="h-8 w-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-blue-900">Total Events</p>
+                    <p class="text-2xl font-bold text-blue-600">{eventsCount || 0}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-green-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <svg class="h-8 w-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-green-900">Total Images</p>
+                    <p class="text-2xl font-bold text-green-600">{totalEventImages || 0}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-purple-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <svg class="h-8 w-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                  </svg>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-purple-900">Categories</p>
+                    <p class="text-2xl font-bold text-purple-600">{uniqueEventCategories || 0}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-sm text-gray-600">
+              <p>Manage event galleries with drag-and-drop image uploads. Create events, organize images, and showcase your activities.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AWS S3 Configuration -->
+      <div class="mb-8">
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">AWS S3 Configuration</h3>
+              <a href="/admin/aws-config" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
+                Configure S3
+              </a>
+            </div>
+            <div class="bg-orange-50 p-4 rounded-lg">
+              <div class="flex items-center">
+                <svg class="h-8 w-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+                <div class="ml-3">
+                  <p class="text-sm font-medium text-orange-900">Cloud Storage</p>
+                  <p class="text-sm text-orange-700">Configure AWS S3 for secure image storage</p>
+                </div>
+              </div>
+            </div>
+            <div class="text-sm text-gray-600 mt-4">
+              <p>Set up AWS S3 integration for storing success story certifications and event gallery images in the cloud.</p>
             </div>
           </div>
         </div>

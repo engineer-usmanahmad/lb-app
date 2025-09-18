@@ -1,0 +1,289 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { supabase } from '../lib/supabase';
+
+// Fetch success stories from database
+const { data: successStories, error } = await supabase
+  .from('success_stories')
+  .select('*')
+  .order('is_featured', { ascending: false })
+  .order('date_achieved', { ascending: false });
+
+if (error) {
+  console.error('Error fetching success stories:', error);
+}
+
+// Get unique certification types and providers for filters
+const certificationTypes = [...new Set(successStories?.map(story => story.certification_type) || [])];
+const certificationProviders = [...new Set(successStories?.map(story => story.certification_provider) || [])];
+---
+
+<Layout title="Our Success - LbisTech">
+  <main class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 text-white">
+      <div class="absolute inset-0 bg-black/20"></div>
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div class="text-center">
+          <h1 class="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+            Our Success Stories
+          </h1>
+          <p class="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+            Celebrating the achievements of our students who have earned prestigious certifications in Cloud and DevOps technologies
+          </p>
+        </div>
+      </div>
+      <!-- Decorative elements -->
+      <div class="absolute top-0 left-0 w-full h-full overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300/20 rounded-full blur-3xl"></div>
+      </div>
+    </section>
+
+    <!-- Filters and Search Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
+        <div class="flex flex-col lg:flex-row gap-6 items-center justify-between">
+          <!-- Search Bar -->
+          <div class="flex-1 max-w-md">
+            <div class="relative">
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Search by student name or certification..."
+                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+              />
+              <svg class="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Filter Buttons -->
+          <div class="flex flex-wrap gap-3">
+            <button class="filter-btn active px-6 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300" data-filter="all">
+              All Certifications
+            </button>
+            {certificationTypes.map(type => (
+              <button class="filter-btn px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-blue-600 hover:text-white transition-all duration-300" data-filter={type}>
+                {type}
+              </button>
+            ))}
+          </div>
+
+          <!-- Provider Filter -->
+          <select id="providerFilter" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300">
+            <option value="">All Providers</option>
+            {certificationProviders.map(provider => (
+              <option value={provider}>{provider}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <!-- Success Stories Grid -->
+      <div id="successGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {successStories?.map((story) => (
+          <div class="success-card group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden"
+               data-type={story.certification_type}
+               data-provider={story.certification_provider}
+               data-student={story.student_name.toLowerCase()}
+               data-title={story.certification_title.toLowerCase()}>
+            
+            <!-- Image Container -->
+            <div class="relative overflow-hidden h-64 bg-gradient-to-br from-blue-100 to-indigo-100">
+              {story.image_url ? (
+                <img 
+                  src={story.image_url} 
+                  alt={story.image_alt || `${story.student_name} - ${story.certification_title}`}
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center">
+                  <div class="text-center">
+                    <svg class="w-16 h-16 text-blue-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                    </svg>
+                    <p class="text-blue-600 font-semibold">Certificate</p>
+                  </div>
+                </div>
+              )}
+              
+              <!-- Featured Badge -->
+              {story.is_featured && (
+                <div class="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                  ⭐ Featured
+                </div>
+              )}
+              
+              <!-- Provider Badge -->
+              <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-gray-800 shadow-lg">
+                {story.certification_provider}
+              </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300">
+                {story.student_name}
+              </h3>
+              
+              <p class="text-lg font-semibold text-blue-600 mb-3">
+                {story.certification_title}
+              </p>
+              
+              <div class="flex items-center justify-between mb-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                  {story.certification_type}
+                </span>
+                <span class="text-sm text-gray-500">
+                  {new Date(story.date_achieved).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short' 
+                  })}
+                </span>
+              </div>
+              
+              {story.description && (
+                <p class="text-gray-600 text-sm leading-relaxed">
+                  {story.description}
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- No Results Message -->
+      <div id="noResults" class="hidden text-center py-16">
+        <div class="max-w-md mx-auto">
+          <svg class="w-24 h-24 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.824-2.562M15 6.306a7.962 7.962 0 00-6 0m6 0a7.962 7.962 0 016 2.562M9 6.306v.568a7.875 7.875 0 006 0v-.568m0 0a7.962 7.962 0 00-6 0"></path>
+          </svg>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">No success stories found</h3>
+          <p class="text-gray-600">Try adjusting your search or filter criteria.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
+      <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Join Our Success Stories?</h2>
+        <p class="text-xl text-blue-100 mb-8">Start your journey towards cloud and DevOps certification today</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/courses" class="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-blue-50 transition-colors duration-300 shadow-lg">
+            View Our Courses
+          </a>
+          <a href="/contact" class="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-blue-600 transition-colors duration-300">
+            Get Started Today
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('searchInput');
+      const providerFilter = document.getElementById('providerFilter');
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const successCards = document.querySelectorAll('.success-card');
+      const noResults = document.getElementById('noResults');
+      const successGrid = document.getElementById('successGrid');
+
+      let currentTypeFilter = 'all';
+      let currentProviderFilter = '';
+      let currentSearchTerm = '';
+
+      // Filter functionality
+      function filterCards() {
+        let visibleCount = 0;
+
+        successCards.forEach(card => {
+          const cardType = card.dataset.type;
+          const cardProvider = card.dataset.provider;
+          const cardStudent = card.dataset.student;
+          const cardTitle = card.dataset.title;
+
+          const matchesType = currentTypeFilter === 'all' || cardType === currentTypeFilter;
+          const matchesProvider = !currentProviderFilter || cardProvider === currentProviderFilter;
+          const matchesSearch = !currentSearchTerm || 
+            cardStudent.includes(currentSearchTerm.toLowerCase()) || 
+            cardTitle.includes(currentSearchTerm.toLowerCase());
+
+          if (matchesType && matchesProvider && matchesSearch) {
+            card.style.display = 'block';
+            card.style.animation = 'fadeInUp 0.5s ease-out';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        // Show/hide no results message
+        if (visibleCount === 0) {
+          noResults.classList.remove('hidden');
+          successGrid.classList.add('hidden');
+        } else {
+          noResults.classList.add('hidden');
+          successGrid.classList.remove('hidden');
+        }
+      }
+
+      // Search functionality
+      searchInput.addEventListener('input', function() {
+        currentSearchTerm = this.value.trim();
+        filterCards();
+      });
+
+      // Provider filter
+      providerFilter.addEventListener('change', function() {
+        currentProviderFilter = this.value;
+        filterCards();
+      });
+
+      // Type filter buttons
+      filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Update active state
+          filterButtons.forEach(btn => {
+            btn.classList.remove('active', 'bg-blue-600', 'text-white');
+            btn.classList.add('bg-gray-200', 'text-gray-700');
+          });
+          
+          this.classList.add('active', 'bg-blue-600', 'text-white');
+          this.classList.remove('bg-gray-200', 'text-gray-700');
+
+          currentTypeFilter = this.dataset.filter;
+          filterCards();
+        });
+      });
+
+      // Add CSS animations
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .success-card {
+          animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .success-card:hover {
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+      `;
+      document.head.appendChild(style);
+    });
+  </script>
+</Layout>
