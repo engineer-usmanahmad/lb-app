@@ -1,0 +1,300 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { supabase } from '../lib/supabase';
+
+export const prerender = false;
+
+// Fetch only active events with their images
+const { data: events, error } = await supabase
+  .from('events')
+  .select(`
+    *,
+    event_images (
+      id,
+      image_url,
+      image_alt,
+      caption,
+      is_cover,
+      display_order
+    )
+  `)
+  .eq('active', true)
+  .order('event_date', { ascending: false });
+
+if (error) {
+  console.error('Error fetching events:', error);
+}
+
+// Group events by category for better organization
+const eventsByCategory = events?.reduce((acc, event) => {
+  if (!acc[event.category]) {
+    acc[event.category] = [];
+  }
+  acc[event.category].push(event);
+  return acc;
+}, {} as Record<string, typeof events>) || {};
+
+const categories = Object.keys(eventsByCategory);
+---
+
+<Layout title="Events - LbisTech">
+  <Header />
+  
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-br from-primary-900 via-primary-800 to-coral-600 text-white py-20 overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100" height="100" fill="url(#grid)" />
+      </svg>
+    </div>
+    
+    <!-- Floating Elements -->
+    <div class="absolute top-20 left-10 w-20 h-20 bg-coral-400 rounded-full opacity-20 animate-pulse"></div>
+    <div class="absolute bottom-20 right-20 w-32 h-32 bg-primary-300 rounded-full opacity-15 animate-bounce"></div>
+    <div class="absolute top-1/2 right-10 w-16 h-16 bg-yellow-400 rounded-full opacity-25 animate-pulse delay-1000"></div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="mb-8">
+        <div class="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium mb-6">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          Discover Our Events
+        </div>
+      </div>
+      
+      <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+        Join Our <span class="text-coral-300">Amazing</span> Events
+      </h1>
+      
+      <p class="text-xl md:text-2xl text-primary-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+        Explore workshops, seminars, and training sessions designed to enhance your skills and connect with industry professionals.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div class="flex items-center text-primary-200">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          Multiple Locations
+        </div>
+        <div class="hidden sm:block w-1 h-1 bg-primary-300 rounded-full"></div>
+        <div class="flex items-center text-primary-200">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+          </svg>
+          Expert Speakers
+        </div>
+        <div class="hidden sm:block w-1 h-1 bg-primary-300 rounded-full"></div>
+        <div class="flex items-center text-primary-200">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Networking Opportunities
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 gap-8">
+        <div class="text-center">
+          <div class="bg-gradient-to-br from-blue-500 to-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <div class="text-3xl font-bold text-gray-900 mb-2">{events?.length || 0}</div>
+          <div class="text-gray-600 font-medium">Active Events</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {events && events.length > 0 ? (
+        <div class="space-y-8">
+          <!-- Section Header -->
+          <div class="text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Events</h2>
+            <div class="w-24 h-1 bg-gradient-to-r from-primary-500 to-coral-500 mx-auto rounded-full"></div>
+          </div>
+
+          <!-- Events Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {events.map((event) => (
+              <a 
+                href={`/events/${event.id}`} 
+                key={event.id} 
+                class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-primary-200 block transform hover:scale-105 cursor-pointer"
+              >
+                <!-- Event Image -->
+                <div class="relative h-64 bg-gradient-to-br from-primary-100 to-coral-100 overflow-hidden">
+                  {event.event_images && event.event_images.length > 0 ? (
+                    <div class="relative w-full h-full">
+                      <img 
+                        src={event.event_images.find(img => img.is_cover)?.image_url || event.event_images[0]?.image_url} 
+                        alt={event.title}
+                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      {event.event_images.length > 1 && (
+                        <div class="absolute bottom-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-semibold backdrop-blur-sm">
+                          <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                          </svg>
+                          {event.event_images.length}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center">
+                      <div class="text-center">
+                        <svg class="w-20 h-20 text-primary-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p class="text-primary-600 font-medium">Event</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <!-- Date Badge -->
+                  <div class="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-xl px-3 py-2 shadow-lg">
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-primary-900">
+                        {new Date(event.event_date).getDate()}
+                      </div>
+                      <div class="text-xs font-semibold text-primary-600 uppercase">
+                        {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Event Content -->
+                <div class="p-6">
+                  <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-700 transition-colors">
+                    {event.title}
+                  </h3>
+                  
+                  {event.short_description && (
+                    <div class="text-gray-600 mb-4 line-clamp-3 leading-relaxed" set:html={event.short_description}>
+                    </div>
+                  )}
+                  
+                  <!-- Event Meta -->
+                  <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div class="flex items-center text-sm text-gray-500">
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      {new Date(event.event_date).toLocaleDateString('en-US', { 
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </div>
+                    
+                    <span class="inline-flex items-center text-primary-600 hover:text-primary-700 font-semibold text-sm group-hover:translate-x-1 transition-transform">
+                      Learn More
+                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <!-- No Events State -->
+        <div class="text-center py-20">
+          <div class="max-w-md mx-auto">
+            <div class="bg-gradient-to-br from-primary-100 to-coral-100 w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-8">
+              <svg class="w-16 h-16 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">No Events Available</h3>
+            <p class="text-gray-600 mb-8">
+              We're currently planning exciting events for you. Check back soon for updates!
+            </p>
+            <a href="/contact" class="inline-flex items-center bg-gradient-to-r from-primary-600 to-coral-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-primary-700 hover:to-coral-700 transition-all">
+              Get Notified
+              <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-br from-primary-900 via-primary-800 to-coral-600 text-white relative overflow-hidden">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-10 left-10 w-40 h-40 bg-coral-400 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-10 right-10 w-60 h-60 bg-primary-300 rounded-full blur-3xl"></div>
+    </div>
+    
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold mb-6">
+        Ready to Join Our Next Event?
+      </h2>
+      <p class="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
+        Don't miss out on our upcoming workshops, seminars, and networking opportunities. Stay connected with the LbisTech community.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/contact" class="bg-white text-primary-900 px-8 py-4 rounded-lg font-semibold hover:bg-primary-50 transition-colors inline-flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+          Get Event Updates
+        </a>
+        <a href="/courses" class="border-2 border-white text-white hover:bg-white hover:text-primary-900 px-8 py-4 rounded-lg font-semibold transition-colors inline-flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+          Explore Courses
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Layout>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+</style>

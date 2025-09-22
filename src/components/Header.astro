@@ -21,6 +21,9 @@ const currentPath = Astro.url.pathname;
         <a href="/courses" class={`hover:text-coral-500 transition-colors ${currentPath === '/courses' ? 'text-coral-500 font-semibold' : 'text-gray-700'}`}>
           Courses
         </a>
+        <a href="/events" class={`hover:text-coral-500 transition-colors ${currentPath === '/events' ? 'text-coral-500 font-semibold' : 'text-gray-700'}`}>
+          Events
+        </a>
         <a href="/blog" class={`hover:text-coral-500 transition-colors ${currentPath.startsWith('/blog') ? 'text-coral-500 font-semibold' : 'text-gray-700'}`}>
           Blog
         </a>
@@ -70,6 +73,7 @@ const currentPath = Astro.url.pathname;
       <div class="flex flex-col space-y-3 pt-4">
         <a href="/" class="text-gray-700 hover:text-coral-500 py-2">Home</a>
         <a href="/courses" class="text-gray-700 hover:text-coral-500 py-2">Courses</a>
+        <a href="/events" class="text-gray-700 hover:text-coral-500 py-2">Events</a>
         <a href="/blog" class="text-gray-700 hover:text-coral-500 py-2">Blog</a>
         <a href="/trainers" class="text-gray-700 hover:text-coral-500 py-2">Trainers</a>
         <a href="/about" class="text-gray-700 hover:text-coral-500 py-2">About</a>
