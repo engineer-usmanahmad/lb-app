@@ -180,9 +180,8 @@ const categories = [...new Set(events?.map(event => event.category) || [])];
               )}
               
               {event.short_description && (
-                <p class="text-gray-600 text-sm leading-relaxed">
-                  {event.short_description}
-                </p>
+                <div class="text-gray-600 text-sm leading-relaxed" set:html={event.short_description}>
+                </div>
               )}
             </div>
           </div>

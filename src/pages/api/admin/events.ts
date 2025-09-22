@@ -28,6 +28,8 @@ export const POST: APIRoute = async ({ request, url }) => {
       return await createEvent(request);
     } else if (action === 'update') {
       return await updateEvent(request);
+    } else if (action === 'toggle-status') {
+      return await toggleEventStatus(request);
     } else if (action === 'delete') {
       return await deleteEvent(request);
     } else if (action === 'upload-images') {
@@ -82,8 +84,9 @@ async function createEvent(request: Request) {
     const category = formData.get('category') as string;
     const location = formData.get('location') as string;
     const description = formData.get('description') as string;
+    const active = formData.get('active') === 'on' || formData.get('active') === 'true';
 
-    console.log('Form data received:', { title, eventDate, category, location, description });
+    console.log('Form data received:', { title, eventDate, category, location, description, active });
 
     if (!title || !eventDate || !category) {
       console.log('Missing required fields:', { title: !!title, eventDate: !!eventDate, category: !!category });
@@ -188,6 +191,7 @@ async function updateEvent(request: Request) {
     const category = formData.get('category') as string;
     const location = formData.get('location') as string;
     const description = formData.get('description') as string;
+    const active = formData.get('active') === 'on' || formData.get('active') === 'true';
 
     if (!id || !title || !eventDate || !category) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
@@ -204,7 +208,7 @@ async function updateEvent(request: Request) {
         event_date: eventDate,
         category,
         location: location || null,
-        description: description || null,
+        short_description: description || null,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
@@ -234,7 +238,8 @@ async function updateEvent(request: Request) {
 
 async function deleteEvent(request: Request) {
   try {
-    const { id } = await request.json();
+    const formData = await request.formData();
+    const id = formData.get('id') as string;
 
     if (!id) {
       return new Response(JSON.stringify({ error: 'Missing event ID' }), {
@@ -243,22 +248,47 @@ async function deleteEvent(request: Request) {
       });
     }
 
-    // Get event images to delete from storage
+    // Get AWS configuration from database
+    const { data: awsConfig, error: configError } = await supabase
+      .from('aws_config')
+      .select('*')
+      .single();
+
+    if (configError || !awsConfig) {
+      console.error('AWS config error:', configError);
+      // Continue with database deletion even if S3 deletion fails
+    }
+
+    // Get event images to delete from S3
     const { data: images } = await supabase
       .from('event_images')
       .select('image_url')
       .eq('event_id', id);
 
-    // Delete images from storage
-    if (images && images.length > 0) {
-      const imagePaths = images
-        .map(img => img.image_url.split('/').pop())
-        .filter(Boolean);
+    // Delete images from S3
+    if (images && images.length > 0 && awsConfig) {
+      const s3 = new AWS.S3({
+        accessKeyId: awsConfig.access_key_id,
+        secretAccessKey: awsConfig.secret_access_key,
+        region: awsConfig.region
+      });
 
-      if (imagePaths.length > 0) {
-        await supabase.storage
-          .from('events')
-          .remove(imagePaths);
+      for (const image of images) {
+        try {
+          // Extract S3 key from the image URL
+          const url = new URL(image.image_url);
+          const s3Key = url.pathname.substring(1); // Remove leading slash
+
+          await s3.deleteObject({
+            Bucket: 'lbistech-website-img',
+            Key: s3Key
+          }).promise();
+
+          console.log(`Successfully deleted S3 object: ${s3Key}`);
+        } catch (s3Error) {
+          console.error('S3 delete error:', s3Error);
+          // Continue with other deletions even if one fails
+        }
       }
     }
 
@@ -315,6 +345,37 @@ async function uploadEventImages(request: Request) {
       });
     }
 
+    // Get AWS configuration from database
+    const { data: awsConfig, error: configError } = await supabase
+      .from('aws_config')
+      .select('*')
+      .single();
+
+    if (configError || !awsConfig) {
+      console.error('AWS config error:', configError);
+      return new Response(JSON.stringify({ error: 'AWS configuration not found' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Initialize AWS S3
+    const s3 = new AWS.S3({
+      accessKeyId: awsConfig.access_key_id,
+      secretAccessKey: awsConfig.secret_access_key,
+      region: awsConfig.region
+    });
+
+    // Get event title for folder structure
+    const { data: eventData } = await supabase
+      .from('events')
+      .select('title')
+      .eq('id', eventId)
+      .single();
+
+    const eventTitle = eventData?.title || 'unknown-event';
+    const sanitizedEventTitle = eventTitle.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+
     const uploadedImages = [];
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     const maxSize = 10 * 1024 * 1024; // 10MB
@@ -341,38 +402,42 @@ async function uploadEventImages(request: Request) {
       }
 
       const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${eventId}-${Date.now()}-${i}.${fileExt}`;
-      
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('events')
-        .upload(fileName, imageFile, {
-          cacheControl: '3600',
-          upsert: false
-        });
+      const fileName = `${Date.now()}-${i}.${fileExt}`;
+      const s3Key = `events/${sanitizedEventTitle}/${fileName}`;
 
-      if (uploadError) {
-        console.error('Image upload error:', uploadError);
+      try {
+        // Convert File to Buffer
+        const buffer = Buffer.from(await imageFile.arrayBuffer());
+
+        // Upload to S3
+        const uploadParams = {
+          Bucket: 'lbistech-website-img',
+          Key: s3Key,
+          Body: buffer,
+          ContentType: imageFile.type
+        };
+
+        const uploadResult = await s3.upload(uploadParams).promise();
+        const imageUrl = uploadResult.Location;
+
+        // Insert image record
+        const { data: imageData, error: insertError } = await supabase
+          .from('event_images')
+          .insert({
+            event_id: eventId,
+            image_url: imageUrl,
+            image_alt: `${imageFile.name}`,
+            is_cover: isFirstImage && i === 0 // Set first image as cover if no images exist
+          })
+          .select()
+          .single();
+
+        if (!insertError && imageData) {
+          uploadedImages.push(imageData);
+        }
+      } catch (uploadError) {
+        console.error('S3 upload error:', uploadError);
         continue; // Skip failed uploads
-      }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('events')
-        .getPublicUrl(uploadData.path);
-
-      // Insert image record
-      const { data: imageData, error: insertError } = await supabase
-        .from('event_images')
-        .insert({
-          event_id: eventId,
-          image_url: publicUrl,
-          image_alt: `${imageFile.name}`,
-          is_cover: isFirstImage && i === 0 // Set first image as cover if no images exist
-        })
-        .select()
-        .single();
-
-      if (!insertError && imageData) {
-        uploadedImages.push(imageData);
       }
     }
 
@@ -395,7 +460,8 @@ async function uploadEventImages(request: Request) {
 
 async function deleteEventImage(request: Request) {
   try {
-    const { image_id } = await request.json();
+    const formData = await request.formData();
+    const image_id = formData.get('image_id') as string;
 
     if (!image_id) {
       return new Response(JSON.stringify({ error: 'Missing image ID' }), {
@@ -471,7 +537,9 @@ async function deleteEventImage(request: Request) {
 
 async function setPrimaryImage(request: Request) {
   try {
-    const { image_id, event_id } = await request.json();
+    const formData = await request.formData();
+    const image_id = formData.get('image_id') as string;
+    const event_id = formData.get('event_id') as string;
 
     if (!image_id || !event_id) {
       return new Response(JSON.stringify({ error: 'Missing image ID or event ID' }), {
@@ -574,6 +642,51 @@ async function getAllEvents() {
       error: 'Failed to fetch events',
       details: error instanceof Error ? error.message : 'Unknown error'
     }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+async function toggleEventStatus(request: Request) {
+  try {
+    const formData = await request.formData();
+    const id = formData.get('id') as string;
+    const active = formData.get('active') === 'true';
+
+    if (!id) {
+      return new Response(JSON.stringify({ error: 'Missing event ID' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Update only the active status
+    const { data, error } = await supabase
+      .from('events')
+      .update({
+        active: active,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database update error:', error);
+      return new Response(JSON.stringify({ error: 'Failed to update event status' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true, data }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    console.error('Toggle event status error:', error);
+    return new Response(JSON.stringify({ error: 'Failed to update event status' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
