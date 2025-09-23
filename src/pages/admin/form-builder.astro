@@ -1,0 +1,1117 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+
+export const prerender = false;
+
+// Check admin authentication
+if (!Astro.locals.admin) {
+  return Astro.redirect('/admin/login');
+}
+---
+
+<Layout title="Review Form Builder - Admin">
+  <Header />
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Review Form Builder</h1>
+            <p class="text-gray-600">Create and manage dynamic review forms with drag-and-drop interface</p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <a href="/admin/dashboard" class="text-coral-500 hover:text-coral-600">← Back to Dashboard</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Form List Sidebar -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow-sm border">
+            <div class="p-6 border-b border-gray-200">
+              <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-900">Forms</h2>
+                <button id="new-form-btn" class="bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                  New Form
+                </button>
+              </div>
+            </div>
+            <div id="forms-list" class="p-4 space-y-3 max-h-96 overflow-y-auto">
+              <!-- Forms will be loaded here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Builder Main Area -->
+        <div class="lg:col-span-2">
+          <!-- Form Configuration Panel -->
+          <div id="form-config-panel" class="bg-white rounded-lg shadow-sm border mb-6 hidden">
+            <div class="p-6 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900">Form Configuration</h2>
+            </div>
+            <div class="p-6">
+              <form id="form-config-form" class="space-y-6">
+                <input type="hidden" id="form-id" name="form_id">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label for="form-name" class="block text-sm font-medium text-gray-700 mb-2">Form Name *</label>
+                    <input type="text" id="form-name" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500" placeholder="Course Review Form">
+                  </div>
+                  
+                  <div>
+                    <label for="form-category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <select id="form-category" name="category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                      <option value="general">General</option>
+                      <option value="course_review">Course Review</option>
+                      <option value="trainer_feedback">Trainer Feedback</option>
+                      <option value="event_feedback">Event Feedback</option>
+                      <option value="survey">Survey</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="form-description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <textarea id="form-description" name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500" placeholder="Describe the purpose of this form..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label for="form-template" class="block text-sm font-medium text-gray-700 mb-2">Template</label>
+                    <select id="form-template" name="template_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                      <option value="blank">Blank Form</option>
+                      <option value="course_review">Course Review Template</option>
+                      <option value="trainer_feedback">Trainer Feedback Template</option>
+                      <option value="event_feedback">Event Feedback Template</option>
+                    </select>
+                  </div>
+                  
+                  <div class="flex items-center">
+                    <label class="flex items-center">
+                      <input type="checkbox" id="form-active" name="is_active" class="rounded border-gray-300 text-coral-600 focus:ring-coral-500">
+                      <span class="ml-2 text-sm font-medium text-gray-700">Active</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                  <button type="button" id="cancel-form-btn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+                  <button type="submit" class="px-4 py-2 bg-coral-500 text-white rounded-lg hover:bg-coral-600 transition-colors">Save Form</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Field Types Palette -->
+          <div id="field-palette" class="bg-white rounded-lg shadow-sm border mb-6 hidden">
+            <div class="p-6 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900">Field Types</h2>
+              <p class="text-sm text-gray-600 mt-1">Drag fields to the form builder below</p>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Text Input -->
+                <div class="field-type-item cursor-move bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg p-4 hover:bg-blue-100 transition-colors" data-field-type="text">
+                  <div class="text-center">
+                    <svg class="w-8 h-8 text-blue-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-blue-700">Text Input</span>
+                  </div>
+                </div>
+
+                <!-- Dropdown -->
+                <div class="field-type-item cursor-move bg-green-50 border-2 border-dashed border-green-200 rounded-lg p-4 hover:bg-green-100 transition-colors" data-field-type="dropdown">
+                  <div class="text-center">
+                    <svg class="w-8 h-8 text-green-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-green-700">Dropdown</span>
+                  </div>
+                </div>
+
+                <!-- Rating -->
+                <div class="field-type-item cursor-move bg-yellow-50 border-2 border-dashed border-yellow-200 rounded-lg p-4 hover:bg-yellow-100 transition-colors" data-field-type="rating">
+                  <div class="text-center">
+                    <svg class="w-8 h-8 text-yellow-500 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-yellow-700">Rating</span>
+                  </div>
+                </div>
+
+                <!-- Multiple Choice -->
+                <div class="field-type-item cursor-move bg-purple-50 border-2 border-dashed border-purple-200 rounded-lg p-4 hover:bg-purple-100 transition-colors" data-field-type="multiple_choice">
+                  <div class="text-center">
+                    <svg class="w-8 h-8 text-purple-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-purple-700">Multiple Choice</span>
+                  </div>
+                </div>
+
+                <!-- Textarea -->
+                <div class="field-type-item cursor-move bg-indigo-50 border-2 border-dashed border-indigo-200 rounded-lg p-4 hover:bg-indigo-100 transition-colors" data-field-type="textarea">
+                  <div class="text-center">
+                    <svg class="w-8 h-8 text-indigo-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-indigo-700">Text Area</span>
+                  </div>
+                </div>
+
+                <!-- Date -->
+                <div class="field-type-item cursor-move bg-pink-50 border-2 border-dashed border-pink-200 rounded-lg p-4 hover:bg-pink-100 transition-colors" data-field-type="date">
+                  <div class="text-center">
+                    <svg class="w-8 h-8 text-pink-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-pink-700">Date</span>
+                  </div>
+                </div>
+
+                <!-- Number -->
+                <div class="field-type-item cursor-move bg-red-50 border-2 border-dashed border-red-200 rounded-lg p-4 hover:bg-red-100 transition-colors" data-field-type="number">
+                  <div class="text-center">
+                    <svg class="w-8 h-8 text-red-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-red-700">Number</span>
+                  </div>
+                </div>
+
+                <!-- Checkbox -->
+                <div class="field-type-item cursor-move bg-teal-50 border-2 border-dashed border-teal-200 rounded-lg p-4 hover:bg-teal-100 transition-colors" data-field-type="checkbox">
+                  <div class="text-center">
+                    <svg class="w-8 h-8 text-teal-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-teal-700">Checkbox</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Builder Canvas -->
+          <div id="form-builder-canvas" class="bg-white rounded-lg shadow-sm border hidden">
+            <div class="p-6 border-b border-gray-200">
+              <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-900">Form Builder</h2>
+                <div class="flex space-x-3">
+                  <button id="preview-form-btn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Preview</button>
+                  <button id="save-form-btn" class="px-4 py-2 bg-coral-500 text-white rounded-lg hover:bg-coral-600 transition-colors">Save Changes</button>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <div id="form-fields-container" class="min-h-96 border-2 border-dashed border-gray-300 rounded-lg p-6">
+                <div id="empty-state" class="text-center py-16">
+                  <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  <h3 class="text-lg font-medium text-gray-900 mb-2">Start Building Your Form</h3>
+                  <p class="text-gray-600">Drag field types from the palette above to start building your form</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Welcome State -->
+          <div id="welcome-state" class="bg-white rounded-lg shadow-sm border">
+            <div class="p-12 text-center">
+              <svg class="w-20 h-20 text-coral-500 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <h2 class="text-2xl font-bold text-gray-900 mb-4">Welcome to Form Builder</h2>
+              <p class="text-gray-600 mb-8 max-w-md mx-auto">Create dynamic review forms with our drag-and-drop interface. Start by creating a new form or selecting an existing one.</p>
+              <button id="welcome-new-form-btn" class="bg-coral-500 hover:bg-coral-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                Create Your First Form
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Field Configuration Modal -->
+  <div id="field-config-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900">Configure Field</h3>
+            <button id="close-field-modal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <form id="field-config-form">
+            <input type="hidden" id="field-index" name="field_index">
+            <input type="hidden" id="field-type-hidden" name="field_type">
+            
+            <div class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="field-label" class="block text-sm font-medium text-gray-700 mb-2">Field Label *</label>
+                  <input type="text" id="field-label" name="field_label" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                </div>
+                <div>
+                  <label for="field-name" class="block text-sm font-medium text-gray-700 mb-2">Field Name *</label>
+                  <input type="text" id="field-name" name="field_name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                </div>
+              </div>
+
+              <div>
+                <label for="placeholder-text" class="block text-sm font-medium text-gray-700 mb-2">Placeholder Text</label>
+                <input type="text" id="placeholder-text" name="placeholder_text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+              </div>
+
+              <div>
+                <label for="help-text" class="block text-sm font-medium text-gray-700 mb-2">Help Text</label>
+                <textarea id="help-text" name="help_text" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500"></textarea>
+              </div>
+
+              <div class="flex items-center">
+                <label class="flex items-center">
+                  <input type="checkbox" id="field-required" name="is_required" class="rounded border-gray-300 text-coral-600 focus:ring-coral-500">
+                  <span class="ml-2 text-sm font-medium text-gray-700">Required Field</span>
+                </label>
+              </div>
+
+              <!-- Options for dropdown/multiple choice -->
+              <div id="field-options-section" class="hidden">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Options</label>
+                <div id="field-options-container" class="space-y-2">
+                  <!-- Options will be added dynamically -->
+                </div>
+                <button type="button" id="add-option-btn" class="mt-2 text-coral-500 hover:text-coral-600 text-sm font-medium">+ Add Option</button>
+              </div>
+
+              <!-- Validation rules -->
+              <div id="validation-section" class="hidden">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Validation</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div id="min-length-section" class="hidden">
+                    <label for="min-length" class="block text-xs font-medium text-gray-600 mb-1">Min Length</label>
+                    <input type="number" id="min-length" name="min_length" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                  </div>
+                  <div id="max-length-section" class="hidden">
+                    <label for="max-length" class="block text-xs font-medium text-gray-600 mb-1">Max Length</label>
+                    <input type="number" id="max-length" name="max_length" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                  </div>
+                  <div id="min-value-section" class="hidden">
+                    <label for="min-value" class="block text-xs font-medium text-gray-600 mb-1">Min Value</label>
+                    <input type="number" id="min-value" name="min_value" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                  </div>
+                  <div id="max-value-section" class="hidden">
+                    <label for="max-value" class="block text-xs font-medium text-gray-600 mb-1">Max Value</label>
+                    <input type="number" id="max-value" name="max_value" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-8">
+              <button type="button" id="cancel-field-config" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+              <button type="submit" class="px-4 py-2 bg-coral-500 text-white rounded-lg hover:bg-coral-600 transition-colors">Save Field</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Preview Modal -->
+  <div id="form-preview-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900">Form Preview</h3>
+            <button id="close-preview-modal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <div id="form-preview-content">
+            <!-- Preview content will be generated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Form Builder JavaScript
+    let currentForm = null;
+    let formFields = [];
+    let draggedFieldType = null;
+
+    // Initialize the form builder
+    document.addEventListener('DOMContentLoaded', function() {
+      loadForms();
+      initializeDragAndDrop();
+      initializeEventListeners();
+    });
+
+    // Load existing forms
+    async function loadForms() {
+      try {
+        const response = await fetch('/api/admin/form-builder');
+        const result = await response.json();
+        
+        if (result.success) {
+          displayForms(result.data);
+        }
+      } catch (error) {
+        console.error('Error loading forms:', error);
+      }
+    }
+
+    // Display forms in the sidebar
+    function displayForms(forms) {
+      const formsList = document.getElementById('forms-list');
+      
+      if (forms.length === 0) {
+        formsList.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No forms created yet</p>';
+        return;
+      }
+
+      formsList.innerHTML = forms.map(form => `
+        <div class="form-item p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" data-form-id="${form.id}">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h4 class="font-medium text-gray-900 text-sm">${form.name}</h4>
+              <p class="text-xs text-gray-500 mt-1">${form.category}</p>
+              <div class="flex items-center mt-2">
+                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${form.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                  ${form.is_active ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+            </div>
+            <div class="flex space-x-1">
+              <button class="edit-form-btn text-coral-500 hover:text-coral-600 text-xs" data-form-id="${form.id}">Edit</button>
+              <button class="delete-form-btn text-red-500 hover:text-red-600 text-xs" data-form-id="${form.id}">Delete</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Add event listeners to form items
+      document.querySelectorAll('.form-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (!e.target.classList.contains('edit-form-btn') && !e.target.classList.contains('delete-form-btn')) {
+            const formId = item.dataset.formId;
+            loadFormForEditing(formId);
+          }
+        });
+      });
+
+      // Add event listeners to edit buttons
+      document.querySelectorAll('.edit-form-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const formId = btn.dataset.formId;
+          loadFormForEditing(formId);
+        });
+      });
+
+      // Add event listeners to delete buttons
+      document.querySelectorAll('.delete-form-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const formId = btn.dataset.formId;
+          deleteForm(formId);
+        });
+      });
+    }
+
+    // Load form for editing
+    async function loadFormForEditing(formId) {
+      try {
+        const response = await fetch(`/api/admin/form-builder?id=${formId}&includeFields=true`);
+        const result = await response.json();
+        
+        if (result.success) {
+          currentForm = result.data;
+          formFields = result.data.fields || [];
+          
+          // Show form builder interface
+          showFormBuilder();
+          
+          // Populate form configuration
+          populateFormConfig(result.data);
+          
+          // Render form fields
+          renderFormFields();
+        }
+      } catch (error) {
+        console.error('Error loading form:', error);
+      }
+    }
+
+    // Show form builder interface
+    function showFormBuilder() {
+      document.getElementById('welcome-state').classList.add('hidden');
+      document.getElementById('form-config-panel').classList.remove('hidden');
+      document.getElementById('field-palette').classList.remove('hidden');
+      document.getElementById('form-builder-canvas').classList.remove('hidden');
+    }
+
+    // Hide form builder interface
+    function hideFormBuilder() {
+      document.getElementById('welcome-state').classList.remove('hidden');
+      document.getElementById('form-config-panel').classList.add('hidden');
+      document.getElementById('field-palette').classList.add('hidden');
+      document.getElementById('form-builder-canvas').classList.add('hidden');
+      currentForm = null;
+      formFields = [];
+    }
+
+    // Populate form configuration
+    function populateFormConfig(form) {
+      document.getElementById('form-id').value = form.id || '';
+      document.getElementById('form-name').value = form.name || '';
+      document.getElementById('form-description').value = form.description || '';
+      document.getElementById('form-category').value = form.category || 'general';
+      document.getElementById('form-template').value = form.template_type || 'blank';
+      document.getElementById('form-active').checked = form.is_active !== false;
+    }
+
+    // Initialize drag and drop
+    function initializeDragAndDrop() {
+      // Make field types draggable
+      document.querySelectorAll('.field-type-item').forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+          draggedFieldType = item.dataset.fieldType;
+          e.dataTransfer.effectAllowed = 'copy';
+        });
+        item.setAttribute('draggable', 'true');
+      });
+
+      // Make form container droppable
+      const container = document.getElementById('form-fields-container');
+      
+      container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        container.classList.add('border-coral-300', 'bg-coral-50');
+      });
+
+      container.addEventListener('dragleave', (e) => {
+        if (!container.contains(e.relatedTarget)) {
+          container.classList.remove('border-coral-300', 'bg-coral-50');
+        }
+      });
+
+      container.addEventListener('drop', (e) => {
+        e.preventDefault();
+        container.classList.remove('border-coral-300', 'bg-coral-50');
+        
+        if (draggedFieldType) {
+          addFieldToForm(draggedFieldType);
+          draggedFieldType = null;
+        }
+      });
+    }
+
+    // Add field to form
+    function addFieldToForm(fieldType) {
+      const newField = {
+        field_type: fieldType,
+        field_name: `${fieldType}_${Date.now()}`,
+        field_label: getDefaultLabel(fieldType),
+        placeholder_text: '',
+        help_text: '',
+        is_required: false,
+        field_order: formFields.length,
+        field_options: fieldType === 'dropdown' || fieldType === 'multiple_choice' ? ['Option 1', 'Option 2'] : null,
+        validation_rules: {},
+        conditional_logic: null
+      };
+
+      formFields.push(newField);
+      renderFormFields();
+      
+      // Open field configuration modal
+      openFieldConfigModal(formFields.length - 1);
+    }
+
+    // Get default label for field type
+    function getDefaultLabel(fieldType) {
+      const labels = {
+        text: 'Text Input',
+        dropdown: 'Dropdown Selection',
+        rating: 'Rating',
+        multiple_choice: 'Multiple Choice',
+        textarea: 'Text Area',
+        date: 'Date',
+        number: 'Number',
+        checkbox: 'Checkbox'
+      };
+      return labels[fieldType] || 'Field';
+    }
+
+    // Render form fields
+    function renderFormFields() {
+      const container = document.getElementById('form-fields-container');
+      const emptyState = document.getElementById('empty-state');
+      
+      if (formFields.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      
+      container.innerHTML = formFields.map((field, index) => `
+        <div class="form-field-item bg-white border border-gray-200 rounded-lg p-4 mb-4" data-field-index="${index}">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <div class="flex items-center mb-2">
+                <span class="field-type-badge inline-flex px-2 py-1 text-xs font-medium rounded-full ${getFieldTypeBadgeClass(field.field_type)}">
+                  ${field.field_type}
+                </span>
+                ${field.is_required ? '<span class="ml-2 text-red-500 text-xs">*</span>' : ''}
+              </div>
+              <h4 class="font-medium text-gray-900">${field.field_label}</h4>
+              <p class="text-sm text-gray-500 mt-1">${field.field_name}</p>
+              ${field.help_text ? `<p class="text-xs text-gray-400 mt-1">${field.help_text}</p>` : ''}
+            </div>
+            <div class="flex space-x-2">
+              <button class="configure-field-btn text-coral-500 hover:text-coral-600 text-sm" data-field-index="${index}">Configure</button>
+              <button class="move-field-up-btn text-gray-500 hover:text-gray-600 text-sm" data-field-index="${index}" ${index === 0 ? 'disabled' : ''}>↑</button>
+              <button class="move-field-down-btn text-gray-500 hover:text-gray-600 text-sm" data-field-index="${index}" ${index === formFields.length - 1 ? 'disabled' : ''}>↓</button>
+              <button class="delete-field-btn text-red-500 hover:text-red-600 text-sm" data-field-index="${index}">Delete</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Add event listeners to field buttons
+      addFieldEventListeners();
+    }
+
+    // Get field type badge class
+    function getFieldTypeBadgeClass(fieldType) {
+      const classes = {
+        text: 'bg-blue-100 text-blue-800',
+        dropdown: 'bg-green-100 text-green-800',
+        rating: 'bg-yellow-100 text-yellow-800',
+        multiple_choice: 'bg-purple-100 text-purple-800',
+        textarea: 'bg-indigo-100 text-indigo-800',
+        date: 'bg-pink-100 text-pink-800',
+        number: 'bg-red-100 text-red-800',
+        checkbox: 'bg-teal-100 text-teal-800'
+      };
+      return classes[fieldType] || 'bg-gray-100 text-gray-800';
+    }
+
+    // Add event listeners to field buttons
+    function addFieldEventListeners() {
+      document.querySelectorAll('.configure-field-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const index = parseInt(btn.dataset.fieldIndex);
+          openFieldConfigModal(index);
+        });
+      });
+
+      document.querySelectorAll('.move-field-up-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const index = parseInt(btn.dataset.fieldIndex);
+          moveField(index, index - 1);
+        });
+      });
+
+      document.querySelectorAll('.move-field-down-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const index = parseInt(btn.dataset.fieldIndex);
+          moveField(index, index + 1);
+        });
+      });
+
+      document.querySelectorAll('.delete-field-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const index = parseInt(btn.dataset.fieldIndex);
+          deleteField(index);
+        });
+      });
+    }
+
+    // Move field
+    function moveField(fromIndex, toIndex) {
+      if (toIndex < 0 || toIndex >= formFields.length) return;
+      
+      const field = formFields.splice(fromIndex, 1)[0];
+      formFields.splice(toIndex, 0, field);
+      
+      // Update field orders
+      formFields.forEach((field, index) => {
+        field.field_order = index;
+      });
+      
+      renderFormFields();
+    }
+
+    // Delete field
+    function deleteField(index) {
+      if (confirm('Are you sure you want to delete this field?')) {
+        formFields.splice(index, 1);
+        
+        // Update field orders
+        formFields.forEach((field, index) => {
+          field.field_order = index;
+        });
+        
+        renderFormFields();
+      }
+    }
+
+    // Open field configuration modal
+    function openFieldConfigModal(fieldIndex) {
+      const field = formFields[fieldIndex];
+      const modal = document.getElementById('field-config-modal');
+      
+      // Populate form
+      document.getElementById('field-index').value = fieldIndex;
+      document.getElementById('field-type-hidden').value = field.field_type;
+      document.getElementById('field-label').value = field.field_label;
+      document.getElementById('field-name').value = field.field_name;
+      document.getElementById('placeholder-text').value = field.placeholder_text || '';
+      document.getElementById('help-text').value = field.help_text || '';
+      document.getElementById('field-required').checked = field.is_required;
+      
+      // Show/hide relevant sections based on field type
+      showRelevantFieldConfigSections(field.field_type);
+      
+      // Populate options if applicable
+      if (field.field_options) {
+        populateFieldOptions(field.field_options);
+      }
+      
+      // Populate validation rules
+      populateValidationRules(field.validation_rules || {});
+      
+      modal.classList.remove('hidden');
+    }
+
+    // Show relevant field configuration sections
+    function showRelevantFieldConfigSections(fieldType) {
+      const optionsSection = document.getElementById('field-options-section');
+      const validationSection = document.getElementById('validation-section');
+      const minLengthSection = document.getElementById('min-length-section');
+      const maxLengthSection = document.getElementById('max-length-section');
+      const minValueSection = document.getElementById('min-value-section');
+      const maxValueSection = document.getElementById('max-value-section');
+      
+      // Hide all sections first
+      optionsSection.classList.add('hidden');
+      validationSection.classList.add('hidden');
+      minLengthSection.classList.add('hidden');
+      maxLengthSection.classList.add('hidden');
+      minValueSection.classList.add('hidden');
+      maxValueSection.classList.add('hidden');
+      
+      // Show options for dropdown and multiple choice
+      if (fieldType === 'dropdown' || fieldType === 'multiple_choice') {
+        optionsSection.classList.remove('hidden');
+      }
+      
+      // Show validation for applicable field types
+      if (['text', 'textarea', 'number'].includes(fieldType)) {
+        validationSection.classList.remove('hidden');
+        
+        if (fieldType === 'text' || fieldType === 'textarea') {
+          minLengthSection.classList.remove('hidden');
+          maxLengthSection.classList.remove('hidden');
+        }
+        
+        if (fieldType === 'number') {
+          minValueSection.classList.remove('hidden');
+          maxValueSection.classList.remove('hidden');
+        }
+      }
+    }
+
+    // Populate field options
+    function populateFieldOptions(options) {
+      const container = document.getElementById('field-options-container');
+      container.innerHTML = options.map((option, index) => `
+        <div class="flex items-center space-x-2">
+          <input type="text" class="field-option-input flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500" value="${option}" data-option-index="${index}">
+          <button type="button" class="remove-option-btn text-red-500 hover:text-red-600" data-option-index="${index}">Remove</button>
+        </div>
+      `).join('');
+      
+      // Add event listeners
+      document.querySelectorAll('.remove-option-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const index = parseInt(btn.dataset.optionIndex);
+          removeFieldOption(index);
+        });
+      });
+    }
+
+    // Add field option
+    function addFieldOption() {
+      const container = document.getElementById('field-options-container');
+      const index = container.children.length;
+      
+      const optionDiv = document.createElement('div');
+      optionDiv.className = 'flex items-center space-x-2';
+      optionDiv.innerHTML = `
+        <input type="text" class="field-option-input flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500" value="Option ${index + 1}" data-option-index="${index}">
+        <button type="button" class="remove-option-btn text-red-500 hover:text-red-600" data-option-index="${index}">Remove</button>
+      `;
+      
+      container.appendChild(optionDiv);
+      
+      // Add event listener to remove button
+      optionDiv.querySelector('.remove-option-btn').addEventListener('click', () => {
+        removeFieldOption(index);
+      });
+    }
+
+    // Remove field option
+    function removeFieldOption(index) {
+      const container = document.getElementById('field-options-container');
+      const optionDiv = container.children[index];
+      if (optionDiv) {
+        optionDiv.remove();
+        
+        // Update indices
+        Array.from(container.children).forEach((child, newIndex) => {
+          const input = child.querySelector('.field-option-input');
+          const button = child.querySelector('.remove-option-btn');
+          input.dataset.optionIndex = newIndex;
+          button.dataset.optionIndex = newIndex;
+        });
+      }
+    }
+
+    // Populate validation rules
+    function populateValidationRules(rules) {
+      document.getElementById('min-length').value = rules.min_length || '';
+      document.getElementById('max-length').value = rules.max_length || '';
+      document.getElementById('min-value').value = rules.min_value || '';
+      document.getElementById('max-value').value = rules.max_value || '';
+    }
+
+    // Initialize event listeners
+    function initializeEventListeners() {
+      // New form buttons
+      document.getElementById('new-form-btn').addEventListener('click', createNewForm);
+      document.getElementById('welcome-new-form-btn').addEventListener('click', createNewForm);
+      
+      // Form configuration
+      document.getElementById('form-config-form').addEventListener('submit', saveFormConfig);
+      document.getElementById('cancel-form-btn').addEventListener('click', hideFormBuilder);
+      
+      // Field configuration modal
+      document.getElementById('close-field-modal').addEventListener('click', closeFieldConfigModal);
+      document.getElementById('cancel-field-config').addEventListener('click', closeFieldConfigModal);
+      document.getElementById('field-config-form').addEventListener('submit', saveFieldConfig);
+      document.getElementById('add-option-btn').addEventListener('click', addFieldOption);
+      
+      // Form builder actions
+      document.getElementById('save-form-btn').addEventListener('click', saveFormWithFields);
+      document.getElementById('preview-form-btn').addEventListener('click', previewForm);
+      
+      // Preview modal
+      document.getElementById('close-preview-modal').addEventListener('click', closePreviewModal);
+    }
+
+    // Create new form
+    function createNewForm() {
+      currentForm = {
+        name: '',
+        description: '',
+        category: 'general',
+        template_type: 'blank',
+        is_active: true
+      };
+      formFields = [];
+      
+      showFormBuilder();
+      populateFormConfig(currentForm);
+      renderFormFields();
+    }
+
+    // Save form configuration
+    async function saveFormConfig(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const formConfig = {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        category: formData.get('category'),
+        template_type: formData.get('template_type'),
+        is_active: formData.get('is_active') === 'on'
+      };
+      
+      if (currentForm.id) {
+        formConfig.id = currentForm.id;
+      }
+      
+      try {
+        const method = currentForm.id ? 'PUT' : 'POST';
+        const response = await fetch('/api/admin/form-builder', {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formConfig)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          currentForm = result.data;
+          loadForms(); // Refresh forms list
+          alert('Form configuration saved successfully!');
+        } else {
+          alert('Error saving form: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error saving form:', error);
+        alert('Error saving form');
+      }
+    }
+
+    // Save field configuration
+    function saveFieldConfig(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const fieldIndex = parseInt(formData.get('field_index'));
+      
+      // Get field options if applicable
+      let fieldOptions = null;
+      const optionInputs = document.querySelectorAll('.field-option-input');
+      if (optionInputs.length > 0) {
+        fieldOptions = Array.from(optionInputs).map(input => input.value).filter(value => value.trim());
+      }
+      
+      // Get validation rules
+      const validationRules = {};
+      if (formData.get('min_length')) validationRules.min_length = parseInt(formData.get('min_length'));
+      if (formData.get('max_length')) validationRules.max_length = parseInt(formData.get('max_length'));
+      if (formData.get('min_value')) validationRules.min_value = parseInt(formData.get('min_value'));
+      if (formData.get('max_value')) validationRules.max_value = parseInt(formData.get('max_value'));
+      
+      // Update field
+      formFields[fieldIndex] = {
+        ...formFields[fieldIndex],
+        field_label: formData.get('field_label'),
+        field_name: formData.get('field_name'),
+        placeholder_text: formData.get('placeholder_text'),
+        help_text: formData.get('help_text'),
+        is_required: formData.get('is_required') === 'on',
+        field_options: fieldOptions,
+        validation_rules: validationRules
+      };
+      
+      renderFormFields();
+      closeFieldConfigModal();
+    }
+
+    // Close field configuration modal
+    function closeFieldConfigModal() {
+      document.getElementById('field-config-modal').classList.add('hidden');
+    }
+
+    // Save form with fields
+    async function saveFormWithFields() {
+      if (!currentForm || !currentForm.id) {
+        alert('Please save the form configuration first');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/admin/form-builder', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            id: currentForm.id,
+            ...currentForm,
+            fields: formFields
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          alert('Form saved successfully!');
+          loadForms(); // Refresh forms list
+        } else {
+          alert('Error saving form: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error saving form:', error);
+        alert('Error saving form');
+      }
+    }
+
+    // Preview form
+    function previewForm() {
+      if (!currentForm) return;
+      
+      const previewContent = document.getElementById('form-preview-content');
+      
+      let html = `
+        <div class="max-w-2xl mx-auto">
+          <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">${currentForm.name}</h2>
+            ${currentForm.description ? `<p class="text-gray-600 mt-2">${currentForm.description}</p>` : ''}
+          </div>
+          <form class="space-y-6">
+      `;
+      
+      formFields.forEach(field => {
+        html += generateFieldPreview(field);
+      });
+      
+      html += `
+            <div class="flex justify-end">
+              <button type="submit" class="bg-coral-500 text-white px-6 py-2 rounded-lg hover:bg-coral-600 transition-colors">Submit</button>
+            </div>
+          </form>
+        </div>
+      `;
+      
+      previewContent.innerHTML = html;
+      document.getElementById('form-preview-modal').classList.remove('hidden');
+    }
+
+    // Generate field preview HTML
+    function generateFieldPreview(field) {
+      let html = `
+        <div class="form-field">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            ${field.field_label}
+            ${field.is_required ? '<span class="text-red-500">*</span>' : ''}
+          </label>
+      `;
+      
+      switch (field.field_type) {
+        case 'text':
+          html += `<input type="text" name="${field.field_name}" placeholder="${field.placeholder_text || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500" ${field.is_required ? 'required' : ''}>`;
+          break;
+        case 'textarea':
+          html += `<textarea name="${field.field_name}" rows="4" placeholder="${field.placeholder_text || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500" ${field.is_required ? 'required' : ''}></textarea>`;
+          break;
+        case 'dropdown':
+          html += `<select name="${field.field_name}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500" ${field.is_required ? 'required' : ''}>`;
+          html += `<option value="">Select an option</option>`;
+          if (field.field_options) {
+            field.field_options.forEach(option => {
+              html += `<option value="${option}">${option}</option>`;
+            });
+          }
+          html += `</select>`;
+          break;
+        case 'multiple_choice':
+          if (field.field_options) {
+            field.field_options.forEach((option, index) => {
+              html += `
+                <label class="flex items-center mb-2">
+                  <input type="radio" name="${field.field_name}" value="${option}" class="mr-2" ${field.is_required ? 'required' : ''}>
+                  ${option}
+                </label>
+              `;
+            });
+          }
+          break;
+        case 'checkbox':
+          html += `
+            <label class="flex items-center">
+              <input type="checkbox" name="${field.field_name}" value="1" class="mr-2" ${field.is_required ? 'required' : ''}>
+              ${field.field_label}
+            </label>
+          `;
+          break;
+        case 'date':
+          html += `<input type="date" name="${field.field_name}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500" ${field.is_required ? 'required' : ''}>`;
+          break;
+        case 'number':
+          html += `<input type="number" name="${field.field_name}" placeholder="${field.placeholder_text || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500" ${field.is_required ? 'required' : ''}>`;
+          break;
+        case 'rating':
+          html += `
+            <div class="flex space-x-1">
+              ${[1,2,3,4,5].map(rating => `
+                <label class="cursor-pointer">
+                  <input type="radio" name="${field.field_name}" value="${rating}" class="sr-only" ${field.is_required ? 'required' : ''}>
+                  <svg class="w-8 h-8 text-gray-300 hover:text-yellow-400 rating-star" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                  </svg>
+                </label>
+              `).join('')}
+            </div>
+          `;
+          break;
+      }
+      
+      if (field.help_text) {
+        html += `<p class="text-sm text-gray-500 mt-1">${field.help_text}</p>`;
+      }
+      
+      html += `</div>`;
+      return html;
+    }
+
+    // Close preview modal
+    function closePreviewModal() {
+      document.getElementById('form-preview-modal').classList.remove('hidden');
+    }
+
+    // Delete form
+    async function deleteForm(formId) {
+      if (!confirm('Are you sure you want to delete this form? This action cannot be undone.')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/admin/form-builder?id=${formId}`, {
+          method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          alert('Form deleted successfully');
+          loadForms(); // Refresh forms list
+          
+          // If the deleted form was currently being edited, hide the builder
+          if (currentForm && currentForm.id === formId) {
+            hideFormBuilder();
+          }
+        } else {
+          alert('Error deleting form: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error deleting form:', error);
+        alert('Error deleting form');
+      }
+    }
+  </script>
+</Layout>
