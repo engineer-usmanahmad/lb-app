@@ -151,12 +151,6 @@ const types = [...new Set(successStories?.map(story => story.certification_type)
 
           <!-- Action Buttons -->
           <div class="flex gap-3">
-            <button id="bulkUploadBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-              </svg>
-              Bulk Upload
-            </button>
             <button id="addSuccessStoryBtn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -178,9 +172,9 @@ const types = [...new Set(successStories?.map(story => story.certification_type)
             
             <!-- Image -->
             <div class="relative h-48 bg-gradient-to-br from-purple-100 to-pink-100">
-              {story.certification_image ? (
+              {story.image_url ? (
                 <img 
-                  src={story.certification_image} 
+                  src={story.image_url} 
                   alt={`${story.student_name} - ${story.certification_title}`}
                   class="w-full h-full object-cover"
                   loading="lazy"
@@ -366,7 +360,7 @@ const types = [...new Set(successStories?.map(story => story.certification_type)
               <div class="flex text-sm text-gray-600">
                 <label for="certificationImage" class="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-purple-500">
                   <span>Upload a file</span>
-                  <input id="certificationImage" name="certification_image" type="file" accept="image/*" class="sr-only">
+                  <input id="certificationImage" name="image" type="file" accept="image/*" class="sr-only">
                 </label>
                 <p class="pl-1">or drag and drop</p>
               </div>
@@ -416,55 +410,6 @@ const types = [...new Set(successStories?.map(story => story.certification_type)
     </div>
   </div>
 
-  <!-- Bulk Upload Modal -->
-  <div id="bulkUploadModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full">
-      <div class="p-6 border-b border-gray-200">
-        <div class="flex justify-between items-center">
-          <h3 class="text-xl font-bold text-gray-900">Bulk Upload Success Stories</h3>
-          <button id="closeBulkModal" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="p-6">
-        <div class="text-center">
-          <svg class="mx-auto h-12 w-12 text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-          </svg>
-          <h4 class="text-lg font-semibold text-gray-900 mb-2">Upload Multiple Images</h4>
-          <p class="text-gray-600 mb-6">Select multiple certification images to upload at once. You can add details for each image after upload.</p>
-          
-          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
-            <input type="file" id="bulkImageUpload" multiple accept="image/*" class="hidden">
-            <label for="bulkImageUpload" class="cursor-pointer">
-              <div class="text-center">
-                <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                <p class="text-sm text-gray-600">Click to select images or drag and drop</p>
-              </div>
-            </label>
-          </div>
-          
-          <div id="bulkPreview" class="hidden mt-4 grid grid-cols-3 gap-2"></div>
-          
-          <div class="flex justify-end space-x-3 mt-6">
-            <button id="cancelBulkBtn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-              Cancel
-            </button>
-            <button id="uploadBulkBtn" class="px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-transparent rounded-lg hover:bg-blue-600 disabled:opacity-50" disabled>
-              Upload Images
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script define:vars={{ successStories }}>
     document.addEventListener('DOMContentLoaded', function() {
       // Elements
@@ -474,7 +419,6 @@ const types = [...new Set(successStories?.map(story => story.certification_type)
       const successStoriesGrid = document.getElementById('successStoriesGrid');
       const noResults = document.getElementById('noResults');
       const addSuccessStoryBtn = document.getElementById('addSuccessStoryBtn');
-      const bulkUploadBtn = document.getElementById('bulkUploadBtn');
       
       // Modal elements
       const successStoryModal = document.getElementById('successStoryModal');
@@ -564,14 +508,14 @@ const types = [...new Set(successStories?.map(story => story.certification_type)
           storyId.value = editData.id;
           studentName.value = editData.student_name;
           certificationTitle.value = editData.certification_title;
-          provider.value = editData.provider;
+          provider.value = editData.certification_provider;
           certificationType.value = editData.certification_type;
-          achievementDate.value = editData.achievement_date;
+          achievementDate.value = editData.date_achieved;
           description.value = editData.description || '';
           isFeatured.checked = editData.is_featured;
           
-          if (editData.certification_image) {
-            previewImg.src = editData.certification_image;
+          if (editData.image_url) {
+            previewImg.src = editData.image_url;
             imagePreview.classList.remove('hidden');
           }
         } else {
@@ -619,7 +563,8 @@ const types = [...new Set(successStories?.map(story => story.certification_type)
 
         try {
           const formData = new FormData(this);
-          const url = isEditMode ? '/api/admin/success-stories/update' : '/api/admin/success-stories/create';
+          const action = isEditMode ? 'update' : 'create';
+          const url = `/api/admin/success-stories?action=${action}`;
           
           const response = await fetch(url, {
             method: 'POST',
@@ -676,7 +621,7 @@ const types = [...new Set(successStories?.map(story => story.certification_type)
           const studentName = e.target.dataset.name;
           
           if (confirm(`Are you sure you want to delete the success story for ${studentName}?`)) {
-            fetch('/api/admin/success-stories/delete', {
+            fetch('/api/admin/success-stories?action=delete', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ id: storyId })
@@ -693,96 +638,9 @@ const types = [...new Set(successStories?.map(story => story.certification_type)
         }
       });
 
-      // Bulk upload functionality
-      bulkUploadBtn.addEventListener('click', function() {
-        bulkUploadModal.classList.remove('hidden');
-        bulkUploadModal.classList.add('flex');
-      });
-
-      closeBulkModal.addEventListener('click', function() {
-        bulkUploadModal.classList.add('hidden');
-        bulkUploadModal.classList.remove('flex');
-      });
-
-      document.getElementById('cancelBulkBtn').addEventListener('click', function() {
-        bulkUploadModal.classList.add('hidden');
-        bulkUploadModal.classList.remove('flex');
-      });
-
-      // Bulk image preview
-      document.getElementById('bulkImageUpload').addEventListener('change', function(e) {
-        const files = Array.from(e.target.files);
-        const preview = document.getElementById('bulkPreview');
-        const uploadBtn = document.getElementById('uploadBulkBtn');
-        
-        if (files.length > 0) {
-          preview.innerHTML = '';
-          files.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-              const img = document.createElement('img');
-              img.src = e.target.result;
-              img.className = 'w-full h-20 object-cover rounded';
-              preview.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-          });
-          
-          preview.classList.remove('hidden');
-          uploadBtn.disabled = false;
-        } else {
-          preview.classList.add('hidden');
-          uploadBtn.disabled = true;
-        }
-      });
-
-      // Bulk upload submission
-      document.getElementById('uploadBulkBtn').addEventListener('click', async function() {
-        const files = document.getElementById('bulkImageUpload').files;
-        if (files.length === 0) return;
-
-        this.disabled = true;
-        this.textContent = 'Uploading...';
-
-        try {
-          const formData = new FormData();
-          Array.from(files).forEach((file, index) => {
-            formData.append(`images`, file);
-          });
-
-          const response = await fetch('/api/admin/success-stories/bulk-upload', {
-            method: 'POST',
-            body: formData
-          });
-
-          const result = await response.json();
-
-          if (result.success) {
-            bulkUploadModal.classList.add('hidden');
-            bulkUploadModal.classList.remove('flex');
-            window.location.reload();
-          } else {
-            alert('Error uploading images: ' + (result.error || 'Unknown error'));
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          alert('An error occurred during bulk upload');
-        } finally {
-          this.disabled = false;
-          this.textContent = 'Upload Images';
-        }
-      });
-
       // Close modals on outside click
       successStoryModal.addEventListener('click', function(e) {
         if (e.target === this) closeModalFunc();
-      });
-
-      bulkUploadModal.addEventListener('click', function(e) {
-        if (e.target === this) {
-          this.classList.add('hidden');
-          this.classList.remove('flex');
-        }
       });
     });
   </script>

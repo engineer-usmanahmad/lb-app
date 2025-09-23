@@ -21,18 +21,36 @@ const currentPath = Astro.url.pathname;
         <a href="/courses" class={`hover:text-coral-500 transition-colors ${currentPath === '/courses' ? 'text-coral-500 font-semibold' : 'text-gray-700'}`}>
           Courses
         </a>
-        <a href="/events" class={`hover:text-coral-500 transition-colors ${currentPath === '/events' ? 'text-coral-500 font-semibold' : 'text-gray-700'}`}>
-          Events
-        </a>
         <a href="/blog" class={`hover:text-coral-500 transition-colors ${currentPath.startsWith('/blog') ? 'text-coral-500 font-semibold' : 'text-gray-700'}`}>
           Blog
         </a>
         <a href="/trainers" class={`hover:text-coral-500 transition-colors ${currentPath === '/trainers' ? 'text-coral-500 font-semibold' : 'text-gray-700'}`}>
           Trainers
         </a>
-        <a href="/about" class={`hover:text-coral-500 transition-colors ${currentPath === '/about' ? 'text-coral-500 font-semibold' : 'text-gray-700'}`}>
-          About
-        </a>
+        
+        <!-- About Dropdown -->
+        <div class="relative group">
+          <button class={`hover:text-coral-500 transition-colors flex items-center ${currentPath === '/about' || currentPath === '/events' || currentPath === '/our-success' ? 'text-coral-500 font-semibold' : 'text-gray-700'}`}>
+            About
+            <svg class="w-4 h-4 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+            <div class="py-2">
+              <a href="/about" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-coral-500 transition-colors">
+                About Us
+              </a>
+              <a href="/events" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-coral-500 transition-colors">
+                Events
+              </a>
+              <a href="/our-success" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-coral-500 transition-colors">
+                Our Success
+              </a>
+            </div>
+          </div>
+        </div>
+        
         <a href="/contact" class={`hover:text-coral-500 transition-colors ${currentPath === '/contact' ? 'text-coral-500 font-semibold' : 'text-gray-700'}`}>
           Contact
         </a>
@@ -73,10 +91,19 @@ const currentPath = Astro.url.pathname;
       <div class="flex flex-col space-y-3 pt-4">
         <a href="/" class="text-gray-700 hover:text-coral-500 py-2">Home</a>
         <a href="/courses" class="text-gray-700 hover:text-coral-500 py-2">Courses</a>
-        <a href="/events" class="text-gray-700 hover:text-coral-500 py-2">Events</a>
         <a href="/blog" class="text-gray-700 hover:text-coral-500 py-2">Blog</a>
         <a href="/trainers" class="text-gray-700 hover:text-coral-500 py-2">Trainers</a>
-        <a href="/about" class="text-gray-700 hover:text-coral-500 py-2">About</a>
+        
+        <!-- About Section -->
+        <div class="py-2">
+          <div class="text-gray-700 font-semibold mb-2">About</div>
+          <div class="pl-4 space-y-2">
+            <a href="/about" class="block text-gray-600 hover:text-coral-500 py-1">About Us</a>
+            <a href="/events" class="block text-gray-600 hover:text-coral-500 py-1">Events</a>
+            <a href="/our-success" class="block text-gray-600 hover:text-coral-500 py-1">Our Success</a>
+          </div>
+        </div>
+        
         <a href="/contact" class="text-gray-700 hover:text-coral-500 py-2">Contact</a>
         
         {Astro.locals.user ? (

@@ -2,6 +2,7 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@supabase/supabase-js";
 import AWS from 'aws-sdk';
+import { s3Uploader } from '../../../utils/s3-upload';
 
 // Prefer service role on the server; fall back to anon if needed.
 const SUPABASE_URL = import.meta.env.SUPABASE_URL as string;
@@ -59,6 +60,11 @@ async function createSuccessStory(request: Request) {
     const isFeatured = formData.get('is_featured') === 'true';
     const imageFile = formData.get('image') as File;
 
+    console.log('=== SUCCESS STORY CREATION DEBUG ===');
+    console.log('Student Name:', studentName);
+    console.log('Image File:', imageFile ? `${imageFile.name} (${imageFile.size} bytes)` : 'No image file');
+    console.log('Image File Type:', imageFile?.type);
+
     if (!studentName || !certificationTitle || !provider || !achievementDate) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
@@ -70,55 +76,38 @@ async function createSuccessStory(request: Request) {
     
     // Handle image upload to S3 if provided
     if (imageFile && imageFile.size > 0) {
+      console.log('🔄 Starting S3 upload process...');
       try {
-        // Get AWS configuration from database
-        const { data: awsConfig, error: configError } = await supabase
-          .from('aws_config')
-          .select('*')
-          .single();
-
-        if (configError || !awsConfig) {
-          console.error('AWS configuration not found:', configError);
+        // Initialize S3 uploader
+        console.log('🔧 Initializing S3 uploader...');
+        const initialized = await s3Uploader.initialize();
+        console.log('✅ S3 uploader initialized:', initialized);
+        
+        if (!initialized) {
+          console.log('❌ S3 uploader not initialized');
           return new Response(JSON.stringify({ error: 'AWS S3 not configured. Please configure S3 settings in admin panel.' }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
           });
         }
 
-        // Configure AWS S3
-        AWS.config.update({
-          accessKeyId: awsConfig.access_key_id,
-          secretAccessKey: awsConfig.secret_access_key,
-          region: awsConfig.region
-        });
-
-        const s3 = new AWS.S3();
-
-        // Compress and prepare image
-        const imageBuffer = await imageFile.arrayBuffer();
-        const buffer = Buffer.from(imageBuffer);
+        // Upload image to S3
+        console.log('📤 Uploading image to S3...');
+        const uploadResult = await s3Uploader.uploadSuccessStoryImage(imageFile, studentName);
+        console.log('📤 Upload result:', uploadResult);
         
-        // Generate filename with proper naming convention
-        const fileExt = imageFile.name.split('.').pop()?.toLowerCase() || 'jpg';
-        const sanitizedStudentName = studentName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-        const timestamp = Date.now();
-        const fileName = `${awsConfig.success_stories_folder || 'success-stories'}/${sanitizedStudentName}_${timestamp}.${fileExt}`;
+        if (!uploadResult.success) {
+          console.log('❌ S3 upload failed:', uploadResult.error);
+          return new Response(JSON.stringify({ error: `Image upload failed: ${uploadResult.error}` }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
 
-        // Upload to S3
-        const uploadParams = {
-          Bucket: awsConfig.bucket_name,
-          Key: fileName,
-          Body: buffer,
-          ContentType: imageFile.type || 'image/jpeg',
-          ACL: 'public-read'
-        };
-
-        const uploadResult = await s3.upload(uploadParams).promise();
-        imageUrl = uploadResult.Location;
-
-        console.log('Image uploaded to S3:', imageUrl);
+        imageUrl = uploadResult.url!;
+        console.log('✅ Image uploaded to S3:', imageUrl);
       } catch (s3Error) {
-        console.error('S3 upload error:', s3Error);
+        console.error('❌ S3 upload error:', s3Error);
         return new Response(JSON.stringify({ 
           error: 'Failed to upload image to S3',
           details: s3Error instanceof Error ? s3Error.message : 'Unknown S3 error'
@@ -127,6 +116,8 @@ async function createSuccessStory(request: Request) {
           headers: { 'Content-Type': 'application/json' }
         });
       }
+    } else {
+      console.log('ℹ️ No image file provided or file is empty');
     }
 
     // Insert success story using service role (bypasses RLS)
@@ -204,37 +195,29 @@ async function updateSuccessStory(request: Request) {
     if (imageFile && imageFile.size > 0) {
       // Delete old image if exists
       if (currentStory?.image_url) {
-        const oldPath = currentStory.image_url.split('/').pop();
-        if (oldPath) {
-          await supabase.storage
-            .from('success-stories')
-            .remove([oldPath]);
-        }
+        await s3Uploader.deleteImage(currentStory.image_url);
       }
 
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('success-stories')
-        .upload(fileName, imageFile, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) {
-        console.error('Image upload error:', uploadError);
-        return new Response(JSON.stringify({ error: 'Failed to upload image' }), {
+      // Initialize S3 uploader
+      const initialized = await s3Uploader.initialize();
+      if (!initialized) {
+        return new Response(JSON.stringify({ error: 'AWS S3 not configured. Please configure S3 settings in admin panel.' }), {
           status: 500,
           headers: { 'Content-Type': 'application/json' }
         });
       }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('success-stories')
-        .getPublicUrl(uploadData.path);
+      // Upload new image to S3
+      const uploadResult = await s3Uploader.uploadSuccessStoryImage(imageFile, studentName);
       
-      imageUrl = publicUrl;
+      if (!uploadResult.success) {
+        return new Response(JSON.stringify({ error: `Image upload failed: ${uploadResult.error}` }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      imageUrl = uploadResult.url!;
     }
 
     // Update success story
@@ -335,6 +318,7 @@ async function uploadImage(request: Request) {
   try {
     const formData = await request.formData();
     const imageFile = formData.get('image') as File;
+    const studentName = formData.get('student_name') as string || 'unknown';
 
     if (!imageFile || imageFile.size === 0) {
       return new Response(JSON.stringify({ error: 'No image file provided' }), {
@@ -361,32 +345,29 @@ async function uploadImage(request: Request) {
       });
     }
 
-    const fileExt = imageFile.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-    
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('success-stories')
-      .upload(fileName, imageFile, {
-        cacheControl: '3600',
-        upsert: false
-      });
-
-    if (uploadError) {
-      console.error('Image upload error:', uploadError);
-      return new Response(JSON.stringify({ error: 'Failed to upload image' }), {
+    // Initialize S3 uploader
+    const initialized = await s3Uploader.initialize();
+    if (!initialized) {
+      return new Response(JSON.stringify({ error: 'AWS S3 not configured. Please configure S3 settings in admin panel.' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    const { data: { publicUrl } } = supabase.storage
-      .from('success-stories')
-      .getPublicUrl(uploadData.path);
+    // Upload image to S3
+    const uploadResult = await s3Uploader.uploadSuccessStoryImage(imageFile, studentName);
+    
+    if (!uploadResult.success) {
+      return new Response(JSON.stringify({ error: `Image upload failed: ${uploadResult.error}` }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     return new Response(JSON.stringify({ 
       success: true, 
-      imageUrl: publicUrl,
-      fileName: uploadData.path
+      imageUrl: uploadResult.url,
+      fileName: uploadResult.url?.split('/').pop() || ''
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }

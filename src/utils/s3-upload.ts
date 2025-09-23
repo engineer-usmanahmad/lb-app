@@ -69,8 +69,9 @@ export class S3Uploader {
     }
 
     try {
-      // Compress and process image
-      const processedFile = await this.compressImage(file);
+      // Skip compression on server-side (document is not available)
+      // Use the original file directly
+      const processedFile = file;
       
       // Generate unique filename
       const timestamp = Date.now();
@@ -79,13 +80,17 @@ export class S3Uploader {
       const fileName = `${sanitizedName}_${timestamp}.${fileExtension}`;
       const key = `${this.config.successStoriesFolder}/${fileName}`;
 
+      // Convert File to Buffer for server-side upload
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
       // Upload to S3
       const uploadParams = {
         Bucket: this.config.bucketName,
         Key: key,
-        Body: processedFile,
-        ContentType: file.type,
-        ACL: 'public-read'
+        Body: buffer,
+        ContentType: file.type
+        // Removed ACL: 'public-read' as it's not supported by this bucket
       };
 
       const result = await this.s3.upload(uploadParams).promise();
@@ -116,8 +121,8 @@ export class S3Uploader {
       const file = files[i];
       
       try {
-        // Compress and process image
-        const processedFile = await this.compressImage(file);
+        // Skip compression on server-side (document is not available)
+        // Use the original file directly
         
         // Generate unique filename
         const timestamp = Date.now();
@@ -125,13 +130,17 @@ export class S3Uploader {
         const fileName = `image_${i + 1}_${timestamp}.${fileExtension}`;
         const key = `${eventFolder}/${fileName}`;
 
+        // Convert File to Buffer for server-side upload
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
         // Upload to S3
         const uploadParams = {
           Bucket: this.config.bucketName,
           Key: key,
-          Body: processedFile,
-          ContentType: file.type,
-          ACL: 'public-read'
+          Body: buffer,
+          ContentType: file.type
+          // Removed ACL: 'public-read' as it's not supported by this bucket
         };
 
         const result = await this.s3.upload(uploadParams).promise();

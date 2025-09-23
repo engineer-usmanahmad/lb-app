@@ -105,23 +105,6 @@ const categories = Object.keys(eventsByCategory);
     </div>
   </section>
 
-  <!-- Stats Section -->
-  <section class="py-16 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 gap-8">
-        <div class="text-center">
-          <div class="bg-gradient-to-br from-blue-500 to-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-          </div>
-          <div class="text-3xl font-bold text-gray-900 mb-2">{events?.length || 0}</div>
-          <div class="text-gray-600 font-medium">Active Events</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Events Section -->
   <section class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -191,7 +174,7 @@ const categories = Object.keys(eventsByCategory);
                   </h3>
                   
                   {event.short_description && (
-                    <div class="text-gray-600 mb-4 line-clamp-3 leading-relaxed" set:html={event.short_description}>
+                    <div class="text-gray-600 mb-4 line-clamp-3 leading-relaxed event-description" set:html={event.short_description}>
                     </div>
                   )}
                   
@@ -287,6 +270,36 @@ const categories = Object.keys(eventsByCategory);
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+  
+  /* Fix for event description HTML content */
+  .event-description {
+    /* Reset any inline styles that might break layout */
+  }
+  
+  .event-description * {
+    /* Override inline font styles to maintain consistency */
+    font-family: inherit !important;
+    font-size: inherit !important;
+    color: inherit !important;
+    line-height: inherit !important;
+  }
+  
+  .event-description div {
+    margin-bottom: 0.5rem;
+  }
+  
+  .event-description div:last-child {
+    margin-bottom: 0;
+  }
+  
+  .event-description a {
+    color: #2563eb !important;
+    text-decoration: underline;
+  }
+  
+  .event-description a:hover {
+    color: #1d4ed8 !important;
   }
   
   @keyframes float {
