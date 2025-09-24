@@ -39,9 +39,9 @@ const { data: blogStats } = await supabase
   .select('status')
   .order('created_at', { ascending: false });
 
-// Fetch forms data
+// Fetch forms data from Form Builder
 const { data: forms } = await supabase
-  .from('forms')
+  .from('form_templates')
   .select('*')
   .order('created_at', { ascending: false });
 
@@ -224,6 +224,22 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
         </div>
       </div>
 
+      <!-- Course Enrollment Statistics -->
+      <div class="mb-8 bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Course Enrollment Statistics</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Object.entries(courseEnrollments).map(([courseId, count]) => (
+              <div class="p-4 bg-gray-50 rounded-lg">
+                <p class="text-sm font-medium text-gray-900 capitalize">{courseId.replace('-', ' ')}</p>
+                <p class="text-2xl font-bold text-coral-500">{count}</p>
+                <p class="text-xs text-gray-500">Total Enrollments</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <!-- Blog Management -->
       <div class="mb-8">
         <div class="bg-white shadow rounded-lg">
@@ -377,92 +393,63 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
         </div>
       </div>
 
-      <!-- AWS S3 Configuration -->
-      <div class="mb-8">
-        <div class="bg-white shadow rounded-lg">
-          <div class="px-4 py-5 sm:p-6">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg leading-6 font-medium text-gray-900">AWS S3 Configuration</h3>
-              <a href="/admin/aws-config" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
-                Configure S3
-              </a>
-            </div>
-            <div class="bg-orange-50 p-4 rounded-lg">
-              <div class="flex items-center">
-                <svg class="h-8 w-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                </svg>
-                <div class="ml-3">
-                  <p class="text-sm font-medium text-orange-900">Cloud Storage</p>
-                  <p class="text-sm text-orange-700">Configure AWS S3 for secure image storage</p>
-                </div>
-              </div>
-            </div>
-            <div class="text-sm text-gray-600 mt-4">
-              <p>Set up AWS S3 integration for storing success story certifications and event gallery images in the cloud.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       <!-- Form Management -->
       <div class="mb-8">
         <div class="bg-white shadow rounded-lg">
-          <div class="px-4 py-5 sm:p-6">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg leading-6 font-medium text-gray-900">Form Management</h3>
-              <div class="flex space-x-3">
-                <a href="/admin/form-builder" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
-                  Form Builder
-                </a>
-                <button id="create-form-btn" class="bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg transition-colors">
-                  Create New Form
-                </button>
+          <div class="px-4 py-4 sm:p-5">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-3">Form Management</h3>
+            <!-- Form Builder Call-to-Action -->
+            <div class="text-center py-6">
+              <div class="form-builder-animation mb-4">
+                <svg class="mx-auto h-16 w-16 text-purple-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
               </div>
-            </div>
-            <div class="space-y-2">
-              {forms?.map(form => (
-                <div class="form-item border border-gray-200 rounded-lg">
-                  <div class="flex items-center justify-between p-4 bg-gray-50">
-                    <div class="flex items-center">
-                      <div class="w-12 h-12 bg-blue-500 text-white rounded-full flex flex-col items-center justify-center text-sm font-semibold mr-3 submission-count" data-form-id={form.id}>
-                        <span class="text-xs">Total</span>
-                        <span class="count-value">...</span>
-                      </div>
-                      <div>
-                        <h4 class="font-semibold text-gray-900">{form.name}</h4>
-                        <p class="text-sm text-gray-500">
-                          {form.description || 'No description'} -
-                          <span class={`ml-1 ${form.is_active ? 'text-green-600' : 'text-red-600'}`}>
-                            {form.is_active ? 'Active' : 'Inactive'}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                    <div class="flex space-x-3">
-                      <button class="edit-form-btn text-coral-500 hover:text-coral-600 text-sm font-medium" data-form={JSON.stringify(form)}>Edit</button>
-                      <button class="manage-fields-btn text-purple-500 hover:text-purple-600 text-sm font-medium" data-form-id={form.id} data-form-name={form.name}>Fields</button>
-                      <button class="view-submissions-btn text-green-500 hover:text-green-600 text-sm font-medium" data-form-id={form.id} data-form-name={form.name}>Submissions</button>
-                      <button class="copy-link-btn text-blue-500 hover:text-blue-600 text-sm font-medium" data-slug={form.slug}>Copy Link</button>
-                      <button class="whatsapp-share-btn text-green-500 hover:text-green-600 text-sm font-medium" data-slug={form.slug} data-name={form.name}>Share</button>
-                      <button
-                        class="delete-form-btn text-red-600 hover:text-red-700 text-sm font-medium"
-                        data-id={form.id}
-                        data-name={form.name}
-                      >
-                        Delete
-                      </button>
-                    </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-3">Manage Your Forms</h3>
+              <p class="text-base text-gray-600 mb-5 max-w-xl mx-auto">
+                Create, edit, and manage all your forms in one place. Build custom forms with drag-and-drop functionality.
+              </p>
+              <div class="space-y-3">
+                <a href="/admin/form-builder" 
+                   class="form-builder-btn inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  Open Form Builder
+                </a>
+                <div class="flex justify-center space-x-6 text-xs text-gray-500">
+                  <div class="flex items-center">
+                    <svg class="w-3 h-3 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Create Forms
+                  </div>
+                  <div class="flex items-center">
+                    <svg class="w-3 h-3 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    View Submissions
+                  </div>
+                  <div class="flex items-center">
+                    <svg class="w-3 h-3 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Manage Fields
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Enrollment Management -->
-      <div class="mb-8">
+
+
+      <!-- Enrollment Management and Recent Contacts Side by Side -->
+      <div class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Enrollment Management -->
         <div class="bg-white shadow rounded-lg">
           <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Enrollment Management</h3>
@@ -550,10 +537,7 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Recent Activity -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Recent Contacts -->
         <div class="bg-white shadow rounded-lg">
           <div class="px-4 py-5 sm:p-6">
@@ -633,19 +617,33 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
         </div>
       </div>
 
-      <!-- Course Enrollment Stats -->
-      <div class="mt-8 bg-white shadow rounded-lg">
-        <div class="px-4 py-5 sm:p-6">
-          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Course Enrollment Statistics</h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {Object.entries(courseEnrollments).map(([courseId, count]) => (
-              <div class="p-4 bg-gray-50 rounded-lg">
-                <p class="text-sm font-medium text-gray-900 capitalize">{courseId.replace('-', ' ')}</p>
-                <p class="text-2xl font-bold text-coral-500">{count}</p>
-                <p class="text-xs text-gray-500">Total Enrollments</p>
-              </div>
-            ))}
+      <!-- Blog Management -->
+    </div>
+  </div>
+
+  <!-- AWS S3 Configuration -->
+  <div class="mb-8">
+    <div class="bg-white shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">AWS S3 Configuration</h3>
+          <a href="/admin/aws-config" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
+            Configure S3
+          </a>
+        </div>
+        <div class="bg-orange-50 p-4 rounded-lg">
+          <div class="flex items-center">
+            <svg class="h-8 w-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+            </svg>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-orange-900">Cloud Storage</p>
+              <p class="text-sm text-orange-700">Configure AWS S3 for secure image storage</p>
+            </div>
           </div>
+        </div>
+        <div class="text-sm text-gray-600 mt-4">
+          <p>Set up AWS S3 integration for storing success story certifications and event gallery images in the cloud.</p>
         </div>
       </div>
     </div>
@@ -880,65 +878,6 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
             </button>
             <button type="submit" id="submit-post-btn" class="px-4 py-2 text-sm font-medium text-white bg-coral-500 hover:bg-coral-600 rounded-md transition-colors">
               Create Post
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Form Creation/Edit Modal -->
-  <div id="create-form-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50 overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen p-4">
-      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-90vh overflow-y-auto">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <div class="flex justify-between items-center">
-            <h3 id="form-modal-title" class="text-lg font-medium text-gray-900">Create New Form</h3>
-            <button id="close-form-modal" class="text-gray-400 hover:text-gray-600">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <form id="form-form" class="p-6 space-y-4">
-          <input type="hidden" id="form-id" name="id">
-          <div>
-            <label for="form-name" class="block text-sm font-medium text-gray-700 mb-1">Form Name</label>
-            <input type="text" id="form-name" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
-          </div>
-
-          <div>
-            <label for="form-slug" class="block text-sm font-medium text-gray-700 mb-1">Form Slug</label>
-            <input type="text" id="form-slug" name="slug" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500">
-            <p class="text-xs text-gray-500 mt-1">URL-friendly version (auto-generated from name)</p>
-          </div>
-
-          <div>
-            <label for="form-description" class="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
-            <textarea id="form-description" name="description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500"></textarea>
-          </div>
-
-          <div class="flex items-center">
-            <input type="checkbox" id="form-is-active" name="is_active" class="h-4 w-4 text-coral-500 focus:ring-coral-500 border-gray-300 rounded" checked>
-            <label for="form-is-active" class="ml-2 block text-sm text-gray-700">Is Active</label>
-          </div>
-
-          <div id="form-success-actions" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-            <strong class="font-bold">Form created!</strong>
-            <span class="block sm:inline"> You can now share it or add fields.</span>
-            <button id="copy-new-form-link" class="mt-2 px-3 py-1 bg-coral-500 text-white rounded text-sm hover:bg-coral-600">Copy Link</button>
-            <button id="manage-new-form-fields" class="mt-2 px-3 py-1 bg-purple-500 text-white rounded text-sm hover:bg-purple-600">Manage Fields</button>
-            <button id="whatsapp-new-form" class="mt-2 px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">Share on WhatsApp</button>
-          </div>
-
-          <div class="flex justify-end space-x-3 pt-4">
-            <button type="button" id="cancel-form" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors">
-              Cancel
-            </button>
-            <button type="submit" id="submit-form-btn" class="px-4 py-2 text-sm font-medium text-white bg-coral-500 hover:bg-coral-600 rounded-md transition-colors">
-              Create Form
             </button>
           </div>
         </form>
@@ -1788,139 +1727,22 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
       });
 
       // --- FORM MANAGEMENT ---
-      let currentFormId = null;
-      let currentFormSlug = null;
-
-      // Form creation/edit modals
-      const createFormBtn = document.getElementById('create-form-btn');
-      const createFormModal = document.getElementById('create-form-modal');
-      const closeFormModal = document.getElementById('close-form-modal');
-      const cancelForm = document.getElementById('cancel-form');
-      const formForm = document.getElementById('form-form');
-      const formName = document.getElementById('form-name');
-      const formSlug = document.getElementById('form-slug');
-
-      // Auto-generate slug from name
-      formName?.addEventListener('input', function() {
-        const slug = this.value
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)/g, '');
-        if (formSlug) formSlug.value = slug;
-      });
-
-      // Modal controls
-      createFormBtn?.addEventListener('click', function() {
-        document.getElementById('form-modal-title').textContent = 'Create New Form';
-        document.getElementById('submit-form-btn').textContent = 'Create Form';
-        document.getElementById('submit-form-btn').style.display = 'inline-block';
-        document.getElementById('cancel-form').textContent = 'Cancel';
-        formForm?.reset();
-        document.getElementById('form-id').value = '';
-        document.getElementById('form-success-actions').classList.add('hidden');
-        createFormModal?.classList.remove('hidden');
-      });
-
-      [closeFormModal, cancelForm].forEach(btn => {
-        btn?.addEventListener('click', function() {
-          createFormModal?.classList.add('hidden');
-        });
-      });
-
-      createFormModal?.addEventListener('click', function(e) {
-        if (e.target === this) this.classList.add('hidden');
-      });
-
-      // Handle form submission
-      formForm?.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const isEdit = !!formData.get('id');
-        const method = isEdit ? 'PUT' : 'POST';
-
-        // Handle checkbox value properly - if unchecked, it won't be in FormData
-        const isActiveCheckbox = document.getElementById('form-is-active');
-        if (isActiveCheckbox) {
-          // Remove any existing is_active entry and add the correct value
-          formData.delete('is_active');
-          formData.append('is_active', isActiveCheckbox.checked ? 'true' : 'false');
-        }
-
-        try {
-          const response = await fetch('/api/admin/forms', { method, body: formData });
-          const result = await response.json();
-
-          if (response.ok && result.success) {
-            alert(`Form ${isEdit ? 'updated' : 'created'} successfully!`);
-            if (!isEdit) {
-              currentFormSlug = result.data.slug;
-              document.getElementById('form-success-actions').classList.remove('hidden');
-              // Hide the Create Form button and show Close button
-              document.getElementById('submit-form-btn').style.display = 'none';
-              document.getElementById('cancel-form').textContent = 'Close';
-            } else {
-              createFormModal?.classList.add('hidden');
-              location.reload();
-            }
-          } else {
-            alert('Error: ' + (result?.error || 'Unknown error'));
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          alert('Error saving form. Please try again.');
-        }
-      });
-
-      // Success actions
-      document.getElementById('copy-new-form-link')?.addEventListener('click', function(e) {
-        e.preventDefault(); // Prevent form submission
-        copyFormLink(currentFormSlug);
-      });
-
-      document.getElementById('whatsapp-new-form')?.addEventListener('click', function(e) {
-        e.preventDefault(); // Prevent form submission
-        shareOnWhatsApp(currentFormSlug, formName.value);
-      });
-
-      document.getElementById('manage-new-form-fields')?.addEventListener('click', function(e) {
-        e.preventDefault(); // Prevent form submission
-        createFormModal?.classList.add('hidden');
-        // Find the form in the data and open fields modal
-        location.reload(); // Simple approach for now
-      });
-
-      // Edit form buttons
-      document.querySelectorAll('.edit-form-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const form = JSON.parse(this.getAttribute('data-form'));
-          document.getElementById('form-modal-title').textContent = 'Edit Form';
-          document.getElementById('submit-form-btn').textContent = 'Update Form';
-          document.getElementById('submit-form-btn').style.display = 'inline-block';
-          document.getElementById('cancel-form').textContent = 'Cancel';
-          document.getElementById('form-id').value = form.id;
-          document.getElementById('form-name').value = form.name;
-          document.getElementById('form-slug').value = form.slug;
-          document.getElementById('form-description').value = form.description || '';
-          document.getElementById('form-is-active').checked = form.is_active;
-          document.getElementById('form-success-actions').classList.add('hidden');
-          createFormModal?.classList.remove('hidden');
-        });
-      });
+      // Form creation and editing is now handled by the Form Builder
 
       // Copy link buttons
       document.querySelectorAll('.copy-link-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-          const slug = this.getAttribute('data-slug');
-          copyFormLink(slug);
+          const formId = this.getAttribute('data-slug'); // Using data-slug for consistency but it's actually the form ID
+          copyFormLink(formId);
         });
       });
 
       // WhatsApp share buttons
       document.querySelectorAll('.whatsapp-share-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-          const slug = this.getAttribute('data-slug');
+          const formId = this.getAttribute('data-slug'); // Using data-slug for consistency but it's actually the form ID
           const name = this.getAttribute('data-name');
-          shareOnWhatsApp(slug, name);
+          shareOnWhatsApp(formId, name);
         });
       });
 
@@ -1934,7 +1756,7 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
           if (!ok) return;
 
           try {
-            const res = await fetch(`/api/admin/forms?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+            const res = await fetch(`/api/admin/form-builder?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
             const result = await res.json();
             if (!res.ok) {
               return alert(`Failed to delete: ${result?.error || 'Unknown error'}`);
@@ -2075,9 +1897,9 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
       });
 
       // --- HELPER FUNCTIONS ---
-      function copyFormLink(slug) {
-        // Create the correct URL format for forms
-        const url = `${window.location.origin}/forms/${slug}`;
+      function copyFormLink(formId) {
+        // Create the correct URL format for forms using form ID
+        const url = `${window.location.origin}/forms/${formId}`;
         console.log('Copying form URL:', url); // Debug log
         navigator.clipboard.writeText(url).then(() => {
           alert('Form link copied to clipboard!');
@@ -2086,9 +1908,9 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
         });
       }
 
-      function shareOnWhatsApp(slug, formName) {
-        // Create the correct URL format for forms
-        const url = `${window.location.origin}/forms/${slug}`;
+      function shareOnWhatsApp(formId, formName) {
+        // Create the correct URL format for forms using form ID
+        const url = `${window.location.origin}/forms/${formId}`;
         console.log('Sharing form URL:', url); // Debug log
         const text = `Fill this form: ${formName}\n${url}`;
         const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
