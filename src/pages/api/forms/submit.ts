@@ -27,8 +27,55 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }
 
     const body = await request.json();
-    const { formSlug, data } = body;
+    const { formSlug, data, form_id, submission_data } = body;
 
+    // Handle new form builder submissions
+    if (form_id && submission_data) {
+      // Verify form exists and is active
+      const { data: form, error: formError } = await supabase
+        .from('form_templates')
+        .select('id, name')
+        .eq('id', form_id)
+        .eq('is_active', true)
+        .single();
+
+      if (formError || !form) {
+        return new Response(JSON.stringify({ ok: false, error: 'Form not found or inactive' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Insert form submission
+      const { data: submission, error: submissionError } = await supabase
+        .from('form_submissions')
+        .insert({
+          form_id,
+          submission_data,
+          submitted_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (submissionError) {
+        console.error('Error creating submission:', submissionError);
+        return new Response(JSON.stringify({ ok: false, error: 'Failed to submit form' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      submissionThrottle.set(clientAddress || 'unknown', now);
+      return new Response(JSON.stringify({ 
+        ok: true, 
+        submission_id: submission.id 
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Handle legacy form submissions
     if (!formSlug || !data) {
       return new Response(JSON.stringify({ ok: false, error: 'Form slug and data are required' }), {
         status: 400,

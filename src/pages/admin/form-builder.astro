@@ -1,0 +1,828 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+
+export const prerender = false;
+---
+
+<Layout title="Review Form Builder - Admin Dashboard">
+  <Header />
+  
+  <div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="mb-8">
+        <!-- Top Navigation Bar -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <!-- Left Section - Title and Back Button -->
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <a href="/admin/dashboard" class="inline-flex items-center text-gray-600 hover:text-gray-800 transition-colors">
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                  </svg>
+                  Back to Dashboard
+                </a>
+              </div>
+              <h1 class="text-2xl font-bold text-gray-900 mb-2">Form Builder</h1>
+              <p class="text-gray-600">Create and customize forms with drag-and-drop functionality</p>
+            </div>
+            
+            <!-- Form Actions Container (Only shown when a form is selected) -->
+            <div id="form-actions-container" class="flex flex-col gap-3" style="display: none;">
+              <!-- Primary Actions Row -->
+              <div class="flex flex-wrap items-center justify-end gap-2">
+                <div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
+                  <button id="load-form-btn" class="inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                    </svg>
+                    Load Form
+                  </button>
+                  <button id="save-form-btn" class="inline-flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:-translate-y-0.5 ml-1">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    Save Form
+                  </button>
+                  <button id="preview-form-btn" class="inline-flex items-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:-translate-y-0.5 ml-1">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    Preview
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Secondary Actions Row (Form-specific actions) -->
+              <div class="flex flex-wrap items-center justify-end gap-2">
+                <div class="flex items-center bg-gradient-to-r from-orange-50 to-indigo-50 rounded-lg p-1 border border-orange-200">
+                  <button id="copy-link-btn" class="inline-flex items-center px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-md transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    Copy Link
+                  </button>
+                  <button id="view-submissions-btn" class="inline-flex items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:-translate-y-0.5 ml-1">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    View Submissions
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Left Sidebar - Form List -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Existing Forms</h2>
+            <div id="forms-list" class="space-y-2">
+              <!-- Forms will be loaded here -->
+            </div>
+            <button id="new-form-btn" class="w-full mt-4 bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg transition-colors">
+              + New Form
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="lg:col-span-3">
+          <!-- Form Configuration Panel -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Form Configuration</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="form-name" class="block text-sm font-medium text-gray-700 mb-2">Form Name</label>
+                <input type="text" id="form-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500" placeholder="Enter form name">
+              </div>
+              <div>
+                <label for="form-category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select id="form-category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                  <option value="general">General</option>
+                  <option value="feedback">Feedback</option>
+                  <option value="review">Review</option>
+                  <option value="survey">Survey</option>
+                  <option value="contact">Contact</option>
+                </select>
+              </div>
+              <div class="md:col-span-2">
+                <label for="form-description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea id="form-description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500" placeholder="Enter form description"></textarea>
+              </div>
+              <div>
+                <label for="form-template" class="block text-sm font-medium text-gray-700 mb-2">Template</label>
+                <select id="form-template" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                  <option value="standard">Standard</option>
+                  <option value="modern">Modern</option>
+                  <option value="minimal">Minimal</option>
+                </select>
+              </div>
+              <div class="flex items-center">
+                <input type="checkbox" id="form-active" class="h-4 w-4 text-coral-600 focus:ring-coral-500 border-gray-300 rounded">
+                <label for="form-active" class="ml-2 block text-sm text-gray-900">Active</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Field Types Palette -->
+            <div class="lg:col-span-1">
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Field Types</h3>
+                <div class="space-y-3">
+                  <div class="field-type-item bg-gray-50 p-3 rounded-lg cursor-move hover:bg-gray-100 transition-colors" data-field-type="text">
+                    <div class="flex items-center">
+                      <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                      </svg>
+                      <span class="text-sm font-medium text-gray-900">Text Input</span>
+                    </div>
+                  </div>
+                  
+                  <div class="field-type-item bg-gray-50 p-3 rounded-lg cursor-move hover:bg-gray-100 transition-colors" data-field-type="dropdown">
+                    <div class="flex items-center">
+                      <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                      <span class="text-sm font-medium text-gray-900">Dropdown</span>
+                    </div>
+                  </div>
+                  
+                  <div class="field-type-item bg-gray-50 p-3 rounded-lg cursor-move hover:bg-gray-100 transition-colors" data-field-type="rating">
+                    <div class="flex items-center">
+                      <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                      </svg>
+                      <span class="text-sm font-medium text-gray-900">Rating</span>
+                    </div>
+                  </div>
+                  
+                  <div class="field-type-item bg-gray-50 p-3 rounded-lg cursor-move hover:bg-gray-100 transition-colors" data-field-type="multiple_choice">
+                    <div class="flex items-center">
+                      <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span class="text-sm font-medium text-gray-900">Multiple Choice</span>
+                    </div>
+                  </div>
+                  
+                  <div class="field-type-item bg-gray-50 p-3 rounded-lg cursor-move hover:bg-gray-100 transition-colors" data-field-type="textarea">
+                    <div class="flex items-center">
+                      <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                      </svg>
+                      <span class="text-sm font-medium text-gray-900">Textarea</span>
+                    </div>
+                  </div>
+                  
+                  <div class="field-type-item bg-gray-50 p-3 rounded-lg cursor-move hover:bg-gray-100 transition-colors" data-field-type="date">
+                    <div class="flex items-center">
+                      <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      <span class="text-sm font-medium text-gray-900">Date</span>
+                    </div>
+                  </div>
+                  
+                  <div class="field-type-item bg-gray-50 p-3 rounded-lg cursor-move hover:bg-gray-100 transition-colors" data-field-type="number">
+                    <div class="flex items-center">
+                      <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+                      </svg>
+                      <span class="text-sm font-medium text-gray-900">Number</span>
+                    </div>
+                  </div>
+                  
+                  <div class="field-type-item bg-gray-50 p-3 rounded-lg cursor-move hover:bg-gray-100 transition-colors" data-field-type="checkbox">
+                    <div class="flex items-center">
+                      <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      <span class="text-sm font-medium text-gray-900">Checkbox</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Builder Canvas -->
+            <div class="lg:col-span-2">
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Form Builder</h3>
+                <div id="form-canvas" class="min-h-96 border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <div id="empty-state" class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No fields added</h3>
+                    <p class="mt-1 text-sm text-gray-500">Drag field types from the left panel to start building your form.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Field Configuration Modal -->
+  <div id="field-config-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Configure Field</h3>
+        </div>
+        <div class="px-6 py-4">
+          <div class="space-y-4">
+            <div>
+              <label for="field-label" class="block text-sm font-medium text-gray-700 mb-2">Label</label>
+              <input type="text" id="field-label" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+            </div>
+            <div>
+              <label for="field-placeholder" class="block text-sm font-medium text-gray-700 mb-2">Placeholder</label>
+              <input type="text" id="field-placeholder" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+            </div>
+            <div class="flex items-center">
+              <input type="checkbox" id="field-required" class="h-4 w-4 text-coral-600 focus:ring-coral-500 border-gray-300 rounded">
+              <label for="field-required" class="ml-2 block text-sm text-gray-900">Required</label>
+            </div>
+            <div id="field-options-container" class="hidden">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Options</label>
+              <div id="field-options" class="space-y-2">
+                <!-- Options will be added here -->
+              </div>
+              <button id="add-option-btn" class="mt-2 text-sm text-coral-600 hover:text-coral-700">+ Add Option</button>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+          <button id="cancel-field-config" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+          <button id="save-field-config" class="px-4 py-2 text-sm font-medium text-white bg-coral-500 hover:bg-coral-600 rounded-lg transition-colors">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Preview Modal -->
+  <div id="form-preview-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Form Preview</h3>
+            <button id="close-preview" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="px-6 py-4">
+          <div id="form-preview-content">
+            <!-- Preview content will be generated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global variables
+    let currentForm = null;
+    let formFields = [];
+    let currentFieldIndex = null;
+
+    // Initialize the form builder
+    document.addEventListener('DOMContentLoaded', function() {
+      loadForms();
+      initializeDragAndDrop();
+      initializeEventListeners();
+    });
+
+    // Load existing forms
+    async function loadForms() {
+      try {
+        const response = await fetch('/api/admin/form-builder');
+        const data = await response.json();
+        
+        const formsList = document.getElementById('forms-list');
+        formsList.innerHTML = '';
+        
+        if (data.forms && data.forms.length > 0) {
+          data.forms.forEach(form => {
+            const formItem = document.createElement('div');
+            formItem.className = 'p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors';
+            formItem.innerHTML = `
+              <div class="font-medium text-gray-900">${form.name}</div>
+              <div class="text-sm text-gray-500">${form.category}</div>
+              <div class="text-xs ${form.is_active ? 'text-green-600' : 'text-red-600'} mt-1">
+                ${form.is_active ? 'Active' : 'Inactive'}
+              </div>
+              <div class="text-xs text-blue-600 mt-1">
+                ${form.submission_count || 0} submissions
+              </div>
+            `;
+            formItem.addEventListener('click', () => loadForm(form.id));
+            formsList.appendChild(formItem);
+          });
+        } else {
+          formsList.innerHTML = '<p class="text-sm text-gray-500">No forms created yet</p>';
+        }
+      } catch (error) {
+        console.error('Error loading forms:', error);
+      }
+    }
+
+    // Load specific form
+    async function loadForm(formId) {
+      try {
+        const response = await fetch(`/api/admin/form-builder?id=${formId}`);
+        const data = await response.json();
+        
+        if (data.form) {
+          currentForm = data.form;
+          formFields = data.fields || [];
+          
+          // Populate form configuration
+          document.getElementById('form-name').value = data.form.name || '';
+          document.getElementById('form-description').value = data.form.description || '';
+          document.getElementById('form-category').value = data.form.category || 'general';
+          document.getElementById('form-template').value = data.form.template || 'standard';
+          document.getElementById('form-active').checked = data.form.is_active;
+          
+          // Show all form action buttons when a form is selected
+          document.getElementById('form-actions-container').style.display = 'flex';
+          
+          // Render form fields
+          renderFormFields();
+        }
+      } catch (error) {
+        console.error('Error loading form:', error);
+      }
+    }
+
+    // Render form fields in canvas
+    function renderFormFields() {
+      const canvas = document.getElementById('form-canvas');
+      const emptyState = document.getElementById('empty-state');
+      
+      if (formFields.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      emptyState.style.display = 'none';
+      
+      // Clear existing fields
+      const existingFields = canvas.querySelectorAll('.form-field-item');
+      existingFields.forEach(field => field.remove());
+      
+      // Render fields
+      formFields.forEach((field, index) => {
+        const fieldElement = createFieldElement(field, index);
+        canvas.appendChild(fieldElement);
+      });
+    }
+
+    // Create field element
+    function createFieldElement(field, index) {
+      const fieldDiv = document.createElement('div');
+      fieldDiv.className = 'form-field-item bg-white border border-gray-200 rounded-lg p-4 mb-4';
+      fieldDiv.dataset.fieldIndex = index;
+      
+      let fieldHTML = `
+        <div class="flex justify-between items-start mb-2">
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              ${field.label}
+              ${field.is_required ? '<span class="text-red-500">*</span>' : ''}
+            </label>
+      `;
+      
+      // Render field based on type
+      switch (field.field_type) {
+        case 'text':
+          fieldHTML += `<input type="text" placeholder="${field.placeholder || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" disabled>`;
+          break;
+        case 'textarea':
+          fieldHTML += `<textarea placeholder="${field.placeholder || ''}" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg" disabled></textarea>`;
+          break;
+        case 'dropdown':
+          fieldHTML += `<select class="w-full px-3 py-2 border border-gray-300 rounded-lg" disabled>`;
+          if (field.options && field.options.length > 0) {
+            field.options.forEach(option => {
+              fieldHTML += `<option>${option}</option>`;
+            });
+          } else {
+            fieldHTML += `<option>Option 1</option><option>Option 2</option>`;
+          }
+          fieldHTML += `</select>`;
+          break;
+        case 'multiple_choice':
+          if (field.options && field.options.length > 0) {
+            field.options.forEach(option => {
+              fieldHTML += `<div class="flex items-center mb-2"><input type="radio" name="field_${index}" class="mr-2" disabled><span>${option}</span></div>`;
+            });
+          } else {
+            fieldHTML += `<div class="flex items-center mb-2"><input type="radio" name="field_${index}" class="mr-2" disabled><span>Option 1</span></div>`;
+            fieldHTML += `<div class="flex items-center mb-2"><input type="radio" name="field_${index}" class="mr-2" disabled><span>Option 2</span></div>`;
+          }
+          break;
+        case 'checkbox':
+          fieldHTML += `<div class="flex items-center"><input type="checkbox" class="mr-2" disabled><span>Check this option</span></div>`;
+          break;
+        case 'rating':
+          fieldHTML += `<div class="flex space-x-1">`;
+          for (let i = 1; i <= 5; i++) {
+            fieldHTML += `<svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
+          }
+          fieldHTML += `</div>`;
+          break;
+        case 'date':
+          fieldHTML += `<input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg" disabled>`;
+          break;
+        case 'number':
+          fieldHTML += `<input type="number" placeholder="${field.placeholder || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" disabled>`;
+          break;
+      }
+      
+      fieldHTML += `
+          </div>
+          <div class="flex space-x-2 ml-4">
+            <button class="edit-field-btn text-blue-600 hover:text-blue-700 text-sm" data-index="${index}">Edit</button>
+            <button class="delete-field-btn text-red-600 hover:text-red-700 text-sm" data-index="${index}">Delete</button>
+          </div>
+        </div>
+      `;
+      
+      fieldDiv.innerHTML = fieldHTML;
+      
+      // Add event listeners
+      fieldDiv.querySelector('.edit-field-btn').addEventListener('click', () => editField(index));
+      fieldDiv.querySelector('.delete-field-btn').addEventListener('click', () => deleteField(index));
+      
+      return fieldDiv;
+    }
+
+    // Initialize drag and drop
+    function initializeDragAndDrop() {
+      const fieldTypes = document.querySelectorAll('.field-type-item');
+      const canvas = document.getElementById('form-canvas');
+      
+      fieldTypes.forEach(item => {
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dragend', handleDragEnd);
+        item.draggable = true;
+      });
+      
+      canvas.addEventListener('dragover', handleDragOver);
+      canvas.addEventListener('drop', handleDrop);
+    }
+
+    function handleDragStart(e) {
+      e.dataTransfer.setData('text/plain', e.target.dataset.fieldType);
+      e.target.style.opacity = '0.5';
+    }
+
+    function handleDragEnd(e) {
+      e.target.style.opacity = '1';
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const fieldType = e.dataTransfer.getData('text/plain');
+      addField(fieldType);
+    }
+
+    // Add new field
+    function addField(fieldType) {
+      const newField = {
+        field_type: fieldType,
+        label: getDefaultLabel(fieldType),
+        placeholder: '',
+        is_required: false,
+        field_order: formFields.length,
+        options: fieldType === 'dropdown' || fieldType === 'multiple_choice' ? ['Option 1', 'Option 2'] : null
+      };
+      
+      formFields.push(newField);
+      renderFormFields();
+    }
+
+    function getDefaultLabel(fieldType) {
+      const labels = {
+        text: 'Text Input',
+        textarea: 'Text Area',
+        dropdown: 'Dropdown',
+        multiple_choice: 'Multiple Choice',
+        checkbox: 'Checkbox',
+        rating: 'Rating',
+        date: 'Date',
+        number: 'Number'
+      };
+      return labels[fieldType] || 'Field';
+    }
+
+    // Edit field
+    function editField(index) {
+      currentFieldIndex = index;
+      const field = formFields[index];
+      
+      document.getElementById('field-label').value = field.label;
+      document.getElementById('field-placeholder').value = field.placeholder || '';
+      document.getElementById('field-required').checked = field.is_required;
+      
+      // Show/hide options container
+      const optionsContainer = document.getElementById('field-options-container');
+      if (field.field_type === 'dropdown' || field.field_type === 'multiple_choice') {
+        optionsContainer.classList.remove('hidden');
+        renderFieldOptions(field.options || []);
+      } else {
+        optionsContainer.classList.add('hidden');
+      }
+      
+      document.getElementById('field-config-modal').classList.remove('hidden');
+    }
+
+    // Render field options
+    function renderFieldOptions(options) {
+      const container = document.getElementById('field-options');
+      container.innerHTML = '';
+      
+      options.forEach((option, index) => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'flex items-center space-x-2';
+        optionDiv.innerHTML = `
+          <input type="text" value="${option}" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" data-option-index="${index}">
+          <button class="text-red-600 hover:text-red-700 text-sm remove-option-btn" data-option-index="${index}">Remove</button>
+        `;
+        container.appendChild(optionDiv);
+      });
+      
+      // Add event listeners
+      container.querySelectorAll('.remove-option-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const optionIndex = parseInt(e.target.dataset.optionIndex);
+          options.splice(optionIndex, 1);
+          renderFieldOptions(options);
+        });
+      });
+    }
+
+    // Delete field
+    function deleteField(index) {
+      if (confirm('Are you sure you want to delete this field?')) {
+        formFields.splice(index, 1);
+        renderFormFields();
+      }
+    }
+
+    // Initialize event listeners
+    function initializeEventListeners() {
+      // New form button
+      document.getElementById('new-form-btn').addEventListener('click', () => {
+        currentForm = null;
+        formFields = [];
+        document.getElementById('form-name').value = '';
+        document.getElementById('form-description').value = '';
+        document.getElementById('form-category').value = 'general';
+        document.getElementById('form-template').value = 'standard';
+        document.getElementById('form-active').checked = true;
+        
+        // Hide all form action buttons when creating a new form
+         document.getElementById('form-actions-container').style.display = 'none';
+        
+        renderFormFields();
+      });
+
+      // Save form button
+      document.getElementById('save-form-btn').addEventListener('click', saveForm);
+
+      // Preview form button
+      document.getElementById('preview-form-btn').addEventListener('click', previewForm);
+
+      // Field configuration modal
+      document.getElementById('cancel-field-config').addEventListener('click', () => {
+        document.getElementById('field-config-modal').classList.add('hidden');
+      });
+
+      document.getElementById('save-field-config').addEventListener('click', saveFieldConfig);
+
+      // Add option button
+      document.getElementById('add-option-btn').addEventListener('click', () => {
+        const container = document.getElementById('field-options');
+        const currentOptions = Array.from(container.querySelectorAll('input')).map(input => input.value);
+        currentOptions.push('New Option');
+        renderFieldOptions(currentOptions);
+      });
+
+      // Close preview modal
+      document.getElementById('close-preview').addEventListener('click', () => {
+        document.getElementById('form-preview-modal').classList.add('hidden');
+      });
+
+      // Copy form link
+      document.getElementById('copy-link-btn').addEventListener('click', () => {
+        if (currentForm) {
+          const formUrl = `${window.location.origin}/forms/${currentForm.id}`;
+          navigator.clipboard.writeText(formUrl).then(() => {
+            alert('Form link copied to clipboard!');
+          }).catch(() => {
+            prompt('Copy this link:', formUrl);
+          });
+        }
+      });
+
+      // View submissions
+      document.getElementById('view-submissions-btn').addEventListener('click', () => {
+        if (currentForm) {
+          window.open(`/admin/form-submissions?form_id=${currentForm.id}`, '_blank');
+        }
+      });
+    }
+
+    // Save field configuration
+    function saveFieldConfig() {
+      if (currentFieldIndex !== null) {
+        const field = formFields[currentFieldIndex];
+        field.label = document.getElementById('field-label').value;
+        field.placeholder = document.getElementById('field-placeholder').value;
+        field.is_required = document.getElementById('field-required').checked;
+        
+        // Update options if applicable
+        if (field.field_type === 'dropdown' || field.field_type === 'multiple_choice') {
+          const optionInputs = document.querySelectorAll('#field-options input');
+          field.options = Array.from(optionInputs).map(input => input.value).filter(value => value.trim());
+        }
+        
+        renderFormFields();
+        document.getElementById('field-config-modal').classList.add('hidden');
+        currentFieldIndex = null;
+      }
+    }
+
+    // Save form
+    async function saveForm() {
+      const formData = {
+        name: document.getElementById('form-name').value,
+        description: document.getElementById('form-description').value,
+        category: document.getElementById('form-category').value,
+        template: document.getElementById('form-template').value,
+        is_active: document.getElementById('form-active').checked,
+        fields: formFields
+      };
+
+      if (!formData.name.trim()) {
+        alert('Please enter a form name');
+        return;
+      }
+
+      try {
+        let response;
+        if (currentForm) {
+          // Update existing form
+          response = await fetch('/api/admin/form-builder', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...formData, id: currentForm.id })
+          });
+        } else {
+          // Create new form
+          response = await fetch('/api/admin/form-builder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          });
+        }
+
+        const result = await response.json();
+        if (response.ok) {
+          alert('Form saved successfully!');
+          currentForm = result.form;
+          loadForms();
+        } else {
+          alert('Error saving form: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error saving form:', error);
+        alert('Error saving form');
+      }
+    }
+
+    // Preview form
+    function previewForm() {
+      const formName = document.getElementById('form-name').value || 'Untitled Form';
+      const formDescription = document.getElementById('form-description').value;
+      
+      let previewHTML = `
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">${formName}</h2>
+          ${formDescription ? `<p class="text-gray-600">${formDescription}</p>` : ''}
+        </div>
+        <form class="space-y-6">
+      `;
+      
+      formFields.forEach((field, index) => {
+        previewHTML += `<div class="form-group">`;
+        previewHTML += `<label class="block text-sm font-medium text-gray-700 mb-2">
+          ${field.label}
+          ${field.is_required ? '<span class="text-red-500">*</span>' : ''}
+        </label>`;
+        
+        switch (field.field_type) {
+          case 'text':
+            previewHTML += `<input type="text" placeholder="${field.placeholder || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">`;
+            break;
+          case 'textarea':
+            previewHTML += `<textarea placeholder="${field.placeholder || ''}" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500"></textarea>`;
+            break;
+          case 'dropdown':
+            previewHTML += `<select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">`;
+            previewHTML += `<option value="">Select an option</option>`;
+            if (field.options && field.options.length > 0) {
+              field.options.forEach(option => {
+                previewHTML += `<option value="${option}">${option}</option>`;
+              });
+            }
+            previewHTML += `</select>`;
+            break;
+          case 'multiple_choice':
+            if (field.options && field.options.length > 0) {
+              field.options.forEach(option => {
+                previewHTML += `<div class="flex items-center mb-2">
+                  <input type="radio" name="field_${index}" value="${option}" class="mr-2 text-coral-600 focus:ring-coral-500">
+                  <span>${option}</span>
+                </div>`;
+              });
+            }
+            break;
+          case 'checkbox':
+            previewHTML += `<div class="flex items-center">
+              <input type="checkbox" class="mr-2 text-coral-600 focus:ring-coral-500">
+              <span>Check this option</span>
+            </div>`;
+            break;
+          case 'rating':
+            previewHTML += `<div class="flex space-x-1">`;
+            for (let i = 1; i <= 5; i++) {
+              previewHTML += `<button type="button" class="rating-star text-gray-300 hover:text-yellow-400 focus:text-yellow-400">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+              </button>`;
+            }
+            previewHTML += `</div>`;
+            break;
+          case 'date':
+            previewHTML += `<input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">`;
+            break;
+          case 'number':
+            previewHTML += `<input type="number" placeholder="${field.placeholder || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500">`;
+            break;
+        }
+        
+        previewHTML += `</div>`;
+      });
+      
+      previewHTML += `
+          <div class="pt-6">
+            <button type="submit" class="w-full bg-coral-500 hover:bg-coral-600 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+              Submit Form
+            </button>
+          </div>
+        </form>
+      `;
+      
+      document.getElementById('form-preview-content').innerHTML = previewHTML;
+      document.getElementById('form-preview-modal').classList.remove('hidden');
+      
+      // Add rating functionality to preview
+      document.querySelectorAll('.rating-star').forEach((star, index) => {
+        star.addEventListener('click', () => {
+          const stars = star.parentElement.querySelectorAll('.rating-star');
+          stars.forEach((s, i) => {
+            if (i <= index) {
+              s.classList.remove('text-gray-300');
+              s.classList.add('text-yellow-400');
+            } else {
+              s.classList.remove('text-yellow-400');
+              s.classList.add('text-gray-300');
+            }
+          });
+        });
+      });
+    }
+  </script>
+</Layout>
