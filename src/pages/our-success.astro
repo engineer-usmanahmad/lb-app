@@ -1,0 +1,459 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { supabase } from '../lib/supabase';
+
+export const prerender = false;
+
+// Fetch success stories from database
+const { data: successStories, error } = await supabase
+  .from('success_stories')
+  .select('*')
+  .order('is_featured', { ascending: false })
+  .order('date_achieved', { ascending: false });
+
+if (error) {
+  console.error('Error fetching success stories:', error);
+}
+
+// Get unique certification types and providers for filters
+const certificationTypes = [...new Set(successStories?.map(story => story.certification_type) || [])];
+const certificationProviders = [...new Set(successStories?.map(story => story.certification_provider) || [])];
+---
+
+<Layout title="Our Success - LbisTech">
+  <Header />
+  
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-br from-primary-900 via-primary-800 to-coral-600 text-white py-20 overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100" height="100" fill="url(#grid)" />
+      </svg>
+    </div>
+    
+    <!-- Floating Elements -->
+    <div class="absolute top-20 left-10 w-20 h-20 bg-coral-400 rounded-full opacity-20 animate-pulse"></div>
+    <div class="absolute bottom-20 right-20 w-32 h-32 bg-primary-300 rounded-full opacity-15 animate-bounce"></div>
+    <div class="absolute top-1/2 right-10 w-16 h-16 bg-yellow-400 rounded-full opacity-25 animate-pulse delay-1000"></div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="mb-8">
+        <div class="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium mb-6">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Celebrating Achievements
+        </div>
+      </div>
+      
+      <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+        Our <span class="text-coral-300">Success</span> Stories
+      </h1>
+      
+      <p class="text-xl md:text-2xl text-primary-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+        Celebrating the achievements of our students who have earned prestigious certifications in Cloud and DevOps technologies.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div class="flex items-center text-primary-200">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path>
+          </svg>
+          Industry Certifications
+        </div>
+        <div class="hidden sm:block w-1 h-1 bg-primary-300 rounded-full"></div>
+        <div class="flex items-center text-primary-200">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Career Growth
+        </div>
+        <div class="hidden sm:block w-1 h-1 bg-primary-300 rounded-full"></div>
+        <div class="flex items-center text-primary-200">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Proven Success
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Success Stories Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {successStories && successStories.length > 0 ? (
+        <div class="space-y-8">
+          <!-- Section Header -->
+          <div class="text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Success Stories</h2>
+            <div class="w-24 h-1 bg-gradient-to-r from-primary-500 to-coral-500 mx-auto rounded-full"></div>
+          </div>
+
+          <!-- Filter Section -->
+          <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex flex-col lg:flex-row gap-6 items-center justify-between">
+              <!-- Search Bar -->
+              <div class="flex-1 max-w-md">
+                <div class="relative">
+                  <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search by student name or certification..."
+                    class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all duration-300"
+                  />
+                  <svg class="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Filter Buttons -->
+              <div class="flex flex-wrap gap-3">
+                <button class="filter-btn active px-6 py-2 rounded-full bg-primary-600 text-white hover:bg-primary-700 transition-all duration-300" data-filter="all">
+                  All Certifications
+                </button>
+                {certificationTypes.map(type => (
+                  <button class="filter-btn px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-primary-600 hover:text-white transition-all duration-300" data-filter={type}>
+                    {type}
+                  </button>
+                ))}
+              </div>
+
+              <!-- Provider Filter -->
+              <select id="providerFilter" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all duration-300">
+                <option value="">All Providers</option>
+                {certificationProviders.map(provider => (
+                  <option value={provider}>{provider}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <!-- Success Stories Grid -->
+          <div id="successGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {successStories.map((story) => (
+              <div 
+                class="success-card group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-primary-200 transform hover:scale-105 cursor-pointer"
+                data-type={story.certification_type}
+                data-provider={story.certification_provider}
+                data-student={story.student_name.toLowerCase()}
+                data-title={story.certification_title.toLowerCase()}
+              >
+                <!-- Image Container -->
+                <div class="relative h-64 bg-gradient-to-br from-primary-100 to-coral-100 overflow-hidden">
+                  {story.image_url ? (
+                    <div class="relative w-full h-full">
+                      <img 
+                        src={story.image_url} 
+                        alt={story.image_alt || `${story.student_name} - ${story.certification_title}`}
+                        class="certificate-image w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 bg-white cursor-pointer"
+                        loading="lazy"
+                        data-image-url={story.image_url}
+                        data-caption={`${story.student_name} - ${story.certification_title}`}
+                      />
+                    </div>
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center">
+                      <div class="text-center">
+                        <svg class="w-20 h-20 text-primary-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                        </svg>
+                        <p class="text-primary-600 font-medium">Certificate</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <!-- Featured Badge -->
+                  {story.is_featured && (
+                    <div class="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                      ⭐ Featured
+                    </div>
+                  )}
+                  
+                  <!-- Provider Badge -->
+                  <div class="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-primary-800 shadow-lg">
+                    {story.certification_provider}
+                  </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6">
+                  <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-700 transition-colors duration-300">
+                    {story.student_name}
+                  </h3>
+                  
+                  <p class="text-lg font-semibold text-primary-600 mb-3">
+                    {story.certification_title}
+                  </p>
+                  
+                  <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div class="flex items-center text-sm text-gray-500">
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      {story.date_achieved ? new Date(story.date_achieved).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short' 
+                      }) : 'Date not available'}
+                    </div>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
+                      {story.certification_type}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div class="text-center py-20">
+          <svg class="w-24 h-24 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+          </svg>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">No Success Stories Yet</h3>
+          <p class="text-gray-600 max-w-md mx-auto">
+            We're working hard to showcase our students' achievements. Check back soon!
+          </p>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- Call to Action Section -->
+  <section class="bg-gradient-to-r from-primary-600 to-coral-600 text-white py-16">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Join Our Success Stories?</h2>
+      <p class="text-xl text-primary-100 mb-8">Start your journey towards cloud and DevOps certification today</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/courses" class="bg-white text-primary-600 px-8 py-4 rounded-xl font-semibold hover:bg-primary-50 transition-colors duration-300 shadow-lg">
+          View Our Courses
+        </a>
+        <a href="/contact" class="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-primary-600 transition-colors duration-300">
+          Get Started Today
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Image Modal -->
+  <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
+    <div class="relative w-full h-full flex items-center justify-center">
+      <button 
+        class="absolute top-4 right-4 z-10 text-white hover:text-gray-300 transition-colors duration-200 bg-black bg-opacity-50 rounded-full p-2"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+      <div class="relative max-w-[95vw] max-h-[95vh] flex flex-col items-center">
+        <img 
+          id="modalImage" 
+          src="" 
+          alt="" 
+          class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" 
+          style="max-height: calc(95vh - 60px);"
+        />
+        <div id="modalCaption" class="text-white text-center mt-4 text-lg font-medium max-w-full px-4"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const providerFilter = document.getElementById('providerFilter');
+    const typeButtons = document.querySelectorAll('.type-filter');
+    const successCards = document.querySelectorAll('.success-card');
+
+    // Add click event listeners to certificate images
+    document.querySelectorAll('.certificate-image').forEach(img => {
+      img.addEventListener('click', function() {
+        const imageUrl = this.getAttribute('data-image-url');
+        const caption = this.getAttribute('data-caption');
+        if (imageUrl && caption) {
+          openImageModal(imageUrl, caption);
+        }
+      });
+    });
+    const noResults = document.getElementById('noResults');
+    const successGrid = document.getElementById('successGrid');
+
+    let currentTypeFilter = 'all';
+    let currentProviderFilter = '';
+    let currentSearchTerm = '';
+
+    // Filter functionality
+    function filterCards() {
+      let visibleCount = 0;
+
+      successCards.forEach(card => {
+        const cardType = card.dataset.type;
+        const cardProvider = card.dataset.provider;
+        const cardStudent = card.dataset.student;
+        const cardTitle = card.dataset.title;
+
+        const matchesType = currentTypeFilter === 'all' || cardType === currentTypeFilter;
+        const matchesProvider = !currentProviderFilter || cardProvider === currentProviderFilter;
+        const matchesSearch = !currentSearchTerm || 
+          cardStudent.includes(currentSearchTerm.toLowerCase()) || 
+          cardTitle.includes(currentSearchTerm.toLowerCase());
+
+        if (matchesType && matchesProvider && matchesSearch) {
+          card.style.display = 'block';
+          card.style.animation = 'fadeInUp 0.5s ease-out';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Show/hide no results message
+      if (visibleCount === 0 && noResults) {
+        noResults.classList.remove('hidden');
+        successGrid.classList.add('hidden');
+      } else if (noResults) {
+        noResults.classList.add('hidden');
+        successGrid.classList.remove('hidden');
+      }
+    }
+
+    // Search functionality
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        currentSearchTerm = this.value.trim();
+        filterCards();
+      });
+    }
+
+    // Provider filter
+    if (providerFilter) {
+      providerFilter.addEventListener('change', function() {
+        currentProviderFilter = this.value;
+        filterCards();
+      });
+    }
+
+    // Type filter buttons
+    typeButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Update active state
+        typeButtons.forEach(btn => {
+          btn.classList.remove('active', 'bg-primary-600', 'text-white');
+          btn.classList.add('bg-gray-200', 'text-gray-700');
+        });
+        
+        this.classList.add('active', 'bg-primary-600', 'text-white');
+        this.classList.remove('bg-gray-200', 'text-gray-700');
+
+        currentTypeFilter = this.dataset.filter;
+        filterCards();
+      });
+    });
+
+    // Add CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .success-card {
+        animation: fadeInUp 0.6s ease-out;
+      }
+      
+      .success-card:hover {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      }
+    `;
+    document.head.appendChild(style);
+  });
+
+  // Image modal functions
+  function openImageModal(imageSrc, caption) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modalCaption');
+    
+    // Reset any previous styles
+    modalImage.style.width = '';
+    modalImage.style.height = '';
+    
+    modalImage.src = imageSrc;
+    modalImage.alt = caption;
+    modalCaption.textContent = caption;
+    modal.classList.remove('hidden');
+    
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+    
+    // Wait for image to load and then adjust size if needed
+    modalImage.onload = function() {
+      const img = this;
+      const container = img.parentElement;
+      const maxWidth = window.innerWidth * 0.95;
+      const maxHeight = (window.innerHeight * 0.95) - 60; // Account for caption space
+      
+      // If image is larger than container, it will be automatically scaled down by CSS
+      // But we ensure it uses the full available space for better visibility
+      if (img.naturalWidth > maxWidth || img.naturalHeight > maxHeight) {
+        const widthRatio = maxWidth / img.naturalWidth;
+        const heightRatio = maxHeight / img.naturalHeight;
+        const ratio = Math.min(widthRatio, heightRatio);
+        
+        img.style.width = (img.naturalWidth * ratio) + 'px';
+        img.style.height = (img.naturalHeight * ratio) + 'px';
+      }
+    };
+  }
+
+  function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.add('hidden');
+    
+    // Restore body scroll
+    document.body.style.overflow = 'auto';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Close modal when clicking outside the image
+    document.getElementById('imageModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeImageModal();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeImageModal();
+      }
+    });
+
+    // Add event listener for close button
+    const closeButton = document.querySelector('#imageModal button');
+    if (closeButton) {
+      closeButton.addEventListener('click', closeImageModal);
+    }
+  });
+</script>
+
+<Footer />
+</Layout>
