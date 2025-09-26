@@ -1,0 +1,1094 @@
+---
+export interface Props {
+  wsUrl?: string;
+  enableReconnect?: boolean;
+  reconnectInterval?: number;
+  maxReconnectAttempts?: number;
+  enableHeartbeat?: boolean;
+  heartbeatInterval?: number;
+}
+
+const {
+  wsUrl = 'ws://localhost:3001',
+  enableReconnect = true,
+  reconnectInterval = 5000,
+  maxReconnectAttempts = 10,
+  enableHeartbeat = true,
+  heartbeatInterval = 30000
+} = Astro.props;
+---
+
+<div class="websocket-manager" data-ws-url={wsUrl}>
+  
+  <!-- WebSocket Status Indicator -->
+  <div class="fixed top-4 right-4 z-50">
+    <div id="ws-status-indicator" class="flex items-center space-x-2 bg-white rounded-lg shadow-lg px-4 py-2 border border-gray-200 transition-all duration-300">
+      <div id="ws-status-dot" class="w-3 h-3 rounded-full bg-gray-400 transition-colors duration-300"></div>
+      <span id="ws-status-text" class="text-sm font-medium text-gray-600">Connecting...</span>
+      <div id="ws-reconnect-spinner" class="hidden">
+        <svg class="w-4 h-4 animate-spin text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real-time Notifications Container -->
+  <div id="realtime-notifications" class="fixed top-20 right-4 z-40 space-y-2 max-w-sm">
+    <!-- Notifications will be dynamically added here -->
+  </div>
+
+  <!-- Live Data Indicators -->
+  <div class="live-data-indicators">
+    
+    <!-- Live Response Counter -->
+    <div id="live-response-counter" class="hidden fixed bottom-4 right-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg shadow-lg px-6 py-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-3 h-3 bg-green-300 rounded-full animate-pulse"></div>
+        <div>
+          <p class="text-sm font-medium">Live Responses</p>
+          <p class="text-xl font-bold" id="live-response-count">0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Users Counter -->
+    <div id="active-users-counter" class="hidden fixed bottom-20 right-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-lg px-6 py-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-3 h-3 bg-blue-300 rounded-full animate-pulse"></div>
+        <div>
+          <p class="text-sm font-medium">Active Users</p>
+          <p class="text-xl font-bold" id="active-users-count">0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Status Updates -->
+    <div id="form-status-updates" class="hidden fixed bottom-36 right-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg shadow-lg px-6 py-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-3 h-3 bg-purple-300 rounded-full animate-pulse"></div>
+        <div>
+          <p class="text-sm font-medium">Form Updates</p>
+          <p class="text-xl font-bold" id="form-updates-count">0</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WebSocket Debug Panel (Development Only) -->
+  <div id="ws-debug-panel" class="hidden fixed bottom-4 left-4 bg-gray-900 text-white rounded-lg shadow-lg p-4 max-w-md">
+    <div class="flex items-center justify-between mb-3">
+      <h4 class="text-sm font-semibold">WebSocket Debug</h4>
+      <button onclick="toggleDebugPanel()" class="text-gray-400 hover:text-white">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="space-y-2 text-xs">
+      <div class="flex justify-between">
+        <span>Status:</span>
+        <span id="debug-status" class="font-mono">Disconnected</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Messages Sent:</span>
+        <span id="debug-sent" class="font-mono">0</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Messages Received:</span>
+        <span id="debug-received" class="font-mono">0</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Reconnect Attempts:</span>
+        <span id="debug-reconnects" class="font-mono">0</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Last Heartbeat:</span>
+        <span id="debug-heartbeat" class="font-mono">Never</span>
+      </div>
+    </div>
+    
+    <div class="mt-3 pt-3 border-t border-gray-700">
+      <div class="flex space-x-2">
+        <button onclick="wsManager.connect()" class="px-2 py-1 bg-green-600 hover:bg-green-700 rounded text-xs">
+          Connect
+        </button>
+        <button onclick="wsManager.disconnect()" class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs">
+          Disconnect
+        </button>
+        <button onclick="wsManager.sendHeartbeat()" class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs">
+          Ping
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connection Lost Modal -->
+  <div id="connection-lost-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+      <div class="p-6 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+        </div>
+        
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Connection Lost</h3>
+        <p class="text-gray-600 mb-6">
+          Real-time updates are temporarily unavailable. We're attempting to reconnect automatically.
+        </p>
+        
+        <div class="flex items-center justify-center space-x-2 mb-6">
+          <div class="w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
+          <div class="w-2 h-2 bg-red-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+          <div class="w-2 h-2 bg-red-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+        </div>
+        
+        <div class="flex space-x-3">
+          <button onclick="wsManager.forceReconnect()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Retry Now
+          </button>
+          <button onclick="hideConnectionLostModal()" class="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+            Continue Offline
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+class WebSocketManager {
+  constructor(options = {}) {
+    this.wsUrl = options.wsUrl || 'ws://localhost:3001';
+    this.enableReconnect = options.enableReconnect !== false;
+    this.reconnectInterval = options.reconnectInterval || 5000;
+    this.maxReconnectAttempts = options.maxReconnectAttempts || 10;
+    this.enableHeartbeat = options.enableHeartbeat !== false;
+    this.heartbeatInterval = options.heartbeatInterval || 30000;
+    
+    this.ws = null;
+    this.reconnectAttempts = 0;
+    this.reconnectTimer = null;
+    this.heartbeatTimer = null;
+    this.messagesSent = 0;
+    this.messagesReceived = 0;
+    this.isConnected = false;
+    this.eventListeners = {};
+    this.lastHeartbeat = null;
+    
+    this.init();
+  }
+
+  init() {
+    this.setupEventListeners();
+    this.connect();
+    
+    // Show debug panel in development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      this.showDebugPanel();
+    }
+  }
+
+  setupEventListeners() {
+    // Handle page visibility changes
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && !this.isConnected) {
+        this.connect();
+      }
+    });
+
+    // Handle online/offline events
+    window.addEventListener('online', () => {
+      if (!this.isConnected) {
+        this.connect();
+      }
+    });
+
+    window.addEventListener('offline', () => {
+      this.updateStatus('offline', 'Offline');
+    });
+
+    // Handle beforeunload
+    window.addEventListener('beforeunload', () => {
+      this.disconnect();
+    });
+  }
+
+  connect() {
+    if (this.ws && (this.ws.readyState === WebSocket.CONNECTING || this.ws.readyState === WebSocket.OPEN)) {
+      return;
+    }
+
+    try {
+      this.updateStatus('connecting', 'Connecting...');
+      this.ws = new WebSocket(this.wsUrl);
+      
+      this.ws.onopen = (event) => {
+        this.onOpen(event);
+      };
+      
+      this.ws.onmessage = (event) => {
+        this.onMessage(event);
+      };
+      
+      this.ws.onclose = (event) => {
+        this.onClose(event);
+      };
+      
+      this.ws.onerror = (event) => {
+        this.onError(event);
+      };
+      
+    } catch (error) {
+      console.error('WebSocket connection error:', error);
+      this.handleReconnect();
+    }
+  }
+
+  disconnect() {
+    this.enableReconnect = false;
+    
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
+    
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
+    
+    this.isConnected = false;
+    this.updateStatus('disconnected', 'Disconnected');
+  }
+
+  onOpen(event) {
+    console.log('WebSocket connected');
+    this.isConnected = true;
+    this.reconnectAttempts = 0;
+    this.updateStatus('connected', 'Connected');
+    this.hideConnectionLostModal();
+    this.hideReconnectSpinner();
+    
+    // Start heartbeat
+    if (this.enableHeartbeat) {
+      this.startHeartbeat();
+    }
+    
+    // Send initial connection message
+    this.send({
+      type: 'connection',
+      action: 'connect',
+      timestamp: Date.now(),
+      userAgent: navigator.userAgent,
+      url: window.location.href
+    });
+    
+    // Trigger custom event
+    this.emit('connected', event);
+    
+    // Show success notification
+    this.showNotification('Connected to real-time updates', 'success');
+  }
+
+  onMessage(event) {
+    this.messagesReceived++;
+    this.updateDebugInfo();
+    
+    try {
+      const data = JSON.parse(event.data);
+      this.handleMessage(data);
+    } catch (error) {
+      console.error('Error parsing WebSocket message:', error);
+    }
+  }
+
+  onClose(event) {
+    console.log('WebSocket disconnected:', event.code, event.reason);
+    this.isConnected = false;
+    this.updateStatus('disconnected', 'Disconnected');
+    
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
+    
+    // Trigger custom event
+    this.emit('disconnected', event);
+    
+    // Handle reconnection
+    if (this.enableReconnect && event.code !== 1000) { // 1000 = normal closure
+      this.handleReconnect();
+    }
+  }
+
+  onError(event) {
+    console.error('WebSocket error:', event);
+    this.emit('error', event);
+    
+    if (!this.isConnected) {
+      this.handleReconnect();
+    }
+  }
+
+  handleMessage(data) {
+    switch (data.type) {
+      case 'heartbeat':
+        this.handleHeartbeat(data);
+        break;
+      case 'response':
+        this.handleNewResponse(data);
+        break;
+      case 'form_update':
+        this.handleFormUpdate(data);
+        break;
+      case 'user_activity':
+        this.handleUserActivity(data);
+        break;
+      case 'analytics_update':
+        this.handleAnalyticsUpdate(data);
+        break;
+      case 'notification':
+        this.handleNotification(data);
+        break;
+      case 'system':
+        this.handleSystemMessage(data);
+        break;
+      default:
+        console.log('Unknown message type:', data.type);
+    }
+    
+    // Trigger custom event
+    this.emit('message', data);
+  }
+
+  handleHeartbeat(data) {
+    this.lastHeartbeat = new Date();
+    this.updateDebugInfo();
+    
+    // Send heartbeat response
+    this.send({
+      type: 'heartbeat',
+      action: 'pong',
+      timestamp: Date.now()
+    });
+  }
+
+  handleNewResponse(data) {
+    // Update live response counter
+    const counter = document.getElementById('live-response-count');
+    if (counter) {
+      const currentCount = parseInt(counter.textContent) || 0;
+      counter.textContent = currentCount + 1;
+      this.showLiveIndicator('live-response-counter');
+    }
+    
+    // Show notification
+    this.showNotification(`New response received for ${data.formTitle || 'form'}`, 'info');
+    
+    // Update charts if they exist
+    this.updateCharts('response', data);
+    
+    // Trigger custom event
+    this.emit('newResponse', data);
+  }
+
+  handleFormUpdate(data) {
+    // Update form status counter
+    const counter = document.getElementById('form-updates-count');
+    if (counter) {
+      const currentCount = parseInt(counter.textContent) || 0;
+      counter.textContent = currentCount + 1;
+      this.showLiveIndicator('form-status-updates');
+    }
+    
+    // Show notification
+    this.showNotification(`Form "${data.formTitle}" was ${data.action}`, 'info');
+    
+    // Trigger custom event
+    this.emit('formUpdate', data);
+  }
+
+  handleUserActivity(data) {
+    // Update active users counter
+    const counter = document.getElementById('active-users-count');
+    if (counter) {
+      counter.textContent = data.activeUsers || 0;
+      this.showLiveIndicator('active-users-counter');
+    }
+    
+    // Trigger custom event
+    this.emit('userActivity', data);
+  }
+
+  handleAnalyticsUpdate(data) {
+    // Update analytics dashboard
+    this.updateAnalyticsDashboard(data);
+    
+    // Trigger custom event
+    this.emit('analyticsUpdate', data);
+  }
+
+  handleNotification(data) {
+    this.showNotification(data.message, data.level || 'info', data.duration);
+  }
+
+  handleSystemMessage(data) {
+    console.log('System message:', data.message);
+    
+    if (data.action === 'maintenance') {
+      this.showNotification('System maintenance in progress', 'warning', 10000);
+    }
+    
+    // Trigger custom event
+    this.emit('systemMessage', data);
+  }
+
+  send(data) {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      try {
+        this.ws.send(JSON.stringify(data));
+        this.messagesSent++;
+        this.updateDebugInfo();
+        return true;
+      } catch (error) {
+        console.error('Error sending WebSocket message:', error);
+        return false;
+      }
+    } else {
+      console.warn('WebSocket not connected, message not sent:', data);
+      return false;
+    }
+  }
+
+  handleReconnect() {
+    if (!this.enableReconnect || this.reconnectAttempts >= this.maxReconnectAttempts) {
+      this.updateStatus('failed', 'Connection Failed');
+      this.showConnectionLostModal();
+      return;
+    }
+    
+    this.reconnectAttempts++;
+    this.updateStatus('reconnecting', `Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+    this.showReconnectSpinner();
+    this.updateDebugInfo();
+    
+    this.reconnectTimer = setTimeout(() => {
+      this.connect();
+    }, this.reconnectInterval);
+  }
+
+  forceReconnect() {
+    this.reconnectAttempts = 0;
+    this.enableReconnect = true;
+    this.hideConnectionLostModal();
+    this.connect();
+  }
+
+  startHeartbeat() {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+    }
+    
+    this.heartbeatTimer = setInterval(() => {
+      this.sendHeartbeat();
+    }, this.heartbeatInterval);
+  }
+
+  sendHeartbeat() {
+    this.send({
+      type: 'heartbeat',
+      action: 'ping',
+      timestamp: Date.now()
+    });
+  }
+
+  updateStatus(status, text) {
+    const statusDot = document.getElementById('ws-status-dot');
+    const statusText = document.getElementById('ws-status-text');
+    const debugStatus = document.getElementById('debug-status');
+    
+    const statusColors = {
+      connecting: 'bg-yellow-400',
+      connected: 'bg-green-500',
+      reconnecting: 'bg-orange-400',
+      disconnected: 'bg-red-500',
+      failed: 'bg-red-600',
+      offline: 'bg-gray-400'
+    };
+    
+    if (statusDot) {
+      statusDot.className = `w-3 h-3 rounded-full transition-colors duration-300 ${statusColors[status] || 'bg-gray-400'}`;
+    }
+    
+    if (statusText) {
+      statusText.textContent = text;
+    }
+    
+    if (debugStatus) {
+      debugStatus.textContent = status;
+    }
+  }
+
+  showReconnectSpinner() {
+    const spinner = document.getElementById('ws-reconnect-spinner');
+    if (spinner) {
+      spinner.classList.remove('hidden');
+    }
+  }
+
+  hideReconnectSpinner() {
+    const spinner = document.getElementById('ws-reconnect-spinner');
+    if (spinner) {
+      spinner.classList.add('hidden');
+    }
+  }
+
+  showConnectionLostModal() {
+    const modal = document.getElementById('connection-lost-modal');
+    if (modal) {
+      modal.classList.remove('hidden');
+    }
+  }
+
+  hideConnectionLostModal() {
+    const modal = document.getElementById('connection-lost-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+
+  showLiveIndicator(indicatorId) {
+    const indicator = document.getElementById(indicatorId);
+    if (indicator) {
+      indicator.classList.remove('hidden');
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        indicator.classList.add('hidden');
+      }, 5000);
+    }
+  }
+
+  showNotification(message, type = 'info', duration = 5000) {
+    const container = document.getElementById('realtime-notifications');
+    if (!container) return;
+    
+    const notification = document.createElement('div');
+    notification.className = `notification-item transform transition-all duration-300 translate-x-full`;
+    
+    const typeStyles = {
+      success: 'bg-green-500 text-white',
+      error: 'bg-red-500 text-white',
+      warning: 'bg-yellow-500 text-white',
+      info: 'bg-blue-500 text-white'
+    };
+    
+    const typeIcons = {
+      success: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>`,
+      error: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>`,
+      warning: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>`,
+      info: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`
+    };
+    
+    notification.innerHTML = `
+      <div class="flex items-start space-x-3 ${typeStyles[type]} rounded-lg shadow-lg p-4 max-w-sm">
+        <div class="flex-shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            ${typeIcons[type]}
+          </svg>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm font-medium">${message}</p>
+          <p class="text-xs opacity-75 mt-1">${new Date().toLocaleTimeString()}</p>
+        </div>
+        <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 opacity-75 hover:opacity-100">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    `;
+    
+    container.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+      notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Auto-remove
+    setTimeout(() => {
+      notification.classList.add('translate-x-full');
+      setTimeout(() => {
+        if (notification.parentElement) {
+          notification.remove();
+        }
+      }, 300);
+    }, duration);
+  }
+
+  updateCharts(type, data) {
+    // Update Chart.js charts if they exist
+    if (typeof Chart !== 'undefined') {
+      const charts = Chart.instances;
+      
+      Object.values(charts).forEach(chart => {
+        if (chart && chart.canvas) {
+          const chartId = chart.canvas.id;
+          
+          // Update specific charts based on data type
+          if (type === 'response' && chartId.includes('response')) {
+            this.updateResponseChart(chart, data);
+          } else if (type === 'analytics' && chartId.includes('analytics')) {
+            this.updateAnalyticsChart(chart, data);
+          }
+        }
+      });
+    }
+  }
+
+  updateResponseChart(chart, data) {
+    // Add new data point to response trend chart
+    if (chart.data && chart.data.datasets && chart.data.datasets[0]) {
+      const now = new Date();
+      const timeLabel = now.toLocaleTimeString();
+      
+      chart.data.labels.push(timeLabel);
+      chart.data.datasets[0].data.push(data.responseCount || 1);
+      
+      // Keep only last 20 data points
+      if (chart.data.labels.length > 20) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+      }
+      
+      chart.update('none'); // Update without animation for performance
+    }
+  }
+
+  updateAnalyticsChart(chart, data) {
+    // Update analytics charts with new data
+    if (chart.data && data.analytics) {
+      // Update based on chart type and data structure
+      chart.data = { ...chart.data, ...data.analytics };
+      chart.update();
+    }
+  }
+
+  updateAnalyticsDashboard(data) {
+    // Update dashboard metrics
+    if (data.metrics) {
+      Object.entries(data.metrics).forEach(([key, value]) => {
+        const element = document.getElementById(key);
+        if (element) {
+          element.textContent = value;
+          
+          // Add animation effect
+          element.classList.add('animate-pulse');
+          setTimeout(() => {
+            element.classList.remove('animate-pulse');
+          }, 1000);
+        }
+      });
+    }
+    
+    // Update progress bars
+    if (data.progress) {
+      Object.entries(data.progress).forEach(([key, value]) => {
+        const progressBar = document.querySelector(`[data-progress="${key}"]`);
+        if (progressBar) {
+          progressBar.style.width = `${value}%`;
+        }
+      });
+    }
+  }
+
+  showDebugPanel() {
+    const debugPanel = document.getElementById('ws-debug-panel');
+    if (debugPanel) {
+      debugPanel.classList.remove('hidden');
+    }
+  }
+
+  hideDebugPanel() {
+    const debugPanel = document.getElementById('ws-debug-panel');
+    if (debugPanel) {
+      debugPanel.classList.add('hidden');
+    }
+  }
+
+  updateDebugInfo() {
+    document.getElementById('debug-sent').textContent = this.messagesSent;
+    document.getElementById('debug-received').textContent = this.messagesReceived;
+    document.getElementById('debug-reconnects').textContent = this.reconnectAttempts;
+    document.getElementById('debug-heartbeat').textContent = 
+      this.lastHeartbeat ? this.lastHeartbeat.toLocaleTimeString() : 'Never';
+  }
+
+  // Event system
+  on(event, callback) {
+    if (!this.eventListeners[event]) {
+      this.eventListeners[event] = [];
+    }
+    this.eventListeners[event].push(callback);
+  }
+
+  off(event, callback) {
+    if (this.eventListeners[event]) {
+      this.eventListeners[event] = this.eventListeners[event].filter(cb => cb !== callback);
+    }
+  }
+
+  emit(event, data) {
+    if (this.eventListeners[event]) {
+      this.eventListeners[event].forEach(callback => {
+        try {
+          callback(data);
+        } catch (error) {
+          console.error(`Error in event listener for ${event}:`, error);
+        }
+      });
+    }
+  }
+
+  // Public API methods
+  sendMessage(type, data) {
+    return this.send({
+      type: type,
+      ...data,
+      timestamp: Date.now()
+    });
+  }
+
+  getConnectionStatus() {
+    return {
+      isConnected: this.isConnected,
+      reconnectAttempts: this.reconnectAttempts,
+      messagesSent: this.messagesSent,
+      messagesReceived: this.messagesReceived,
+      lastHeartbeat: this.lastHeartbeat
+    };
+  }
+}
+
+// Global functions
+function toggleDebugPanel() {
+  const debugPanel = document.getElementById('ws-debug-panel');
+  if (debugPanel) {
+    debugPanel.classList.toggle('hidden');
+  }
+}
+
+function hideConnectionLostModal() {
+  if (window.wsManager) {
+    window.wsManager.hideConnectionLostModal();
+  }
+}
+
+// Initialize WebSocket Manager
+document.addEventListener('DOMContentLoaded', () => {
+  const wsContainer = document.querySelector('.websocket-manager');
+  const wsUrl = wsContainer?.dataset.wsUrl || 'ws://localhost:3001';
+  
+  window.wsManager = new WebSocketManager({
+    wsUrl: wsUrl,
+    enableReconnect: true,
+    reconnectInterval: 5000,
+    maxReconnectAttempts: 10,
+    enableHeartbeat: true,
+    heartbeatInterval: 30000
+  });
+  
+  // Example event listeners
+  window.wsManager.on('connected', () => {
+    console.log('WebSocket connected successfully');
+  });
+  
+  window.wsManager.on('newResponse', (data) => {
+    console.log('New response received:', data);
+    // Handle new response in your application
+  });
+  
+  window.wsManager.on('formUpdate', (data) => {
+    console.log('Form updated:', data);
+    // Handle form update in your application
+  });
+  
+  window.wsManager.on('analyticsUpdate', (data) => {
+    console.log('Analytics updated:', data);
+    // Handle analytics update in your application
+  });
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  if (window.wsManager) {
+    window.wsManager.disconnect();
+  }
+});
+</script>
+
+<style>
+/* WebSocket Manager Styles */
+.websocket-manager {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Status Indicator */
+#ws-status-indicator {
+  backdrop-filter: blur(10px);
+  animation: slideInDown 0.3s ease;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Live Data Indicators */
+.live-data-indicators > div {
+  animation: slideInRight 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Notification Animations */
+.notification-item {
+  animation: slideInFromRight 0.3s ease;
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Debug Panel */
+#ws-debug-panel {
+  backdrop-filter: blur(10px);
+  animation: slideInUp 0.3s ease;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Connection Lost Modal */
+#connection-lost-modal .bg-white {
+  animation: modalBounceIn 0.3s ease;
+}
+
+@keyframes modalBounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-50px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Pulse Animation for Live Indicators */
+.animate-pulse-custom {
+  animation: pulseCustom 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulseCustom {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+/* Bounce Animation for Connection Dots */
+.animate-bounce-custom {
+  animation: bounceCustom 1s infinite;
+}
+
+@keyframes bounceCustom {
+  0%, 20%, 53%, 80%, 100% {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+/* Hover Effects */
+#ws-status-indicator:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.live-data-indicators > div:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #ws-status-indicator {
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  #realtime-notifications {
+    top: 4rem;
+    right: 1rem;
+    left: 1rem;
+    max-width: none;
+  }
+  
+  .live-data-indicators > div {
+    right: 1rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  #ws-debug-panel {
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+  }
+  
+  #connection-lost-modal .bg-white {
+    margin: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .notification-item .flex {
+    padding: 0.75rem;
+  }
+  
+  .notification-item p {
+    font-size: 0.75rem;
+  }
+  
+  .live-data-indicators > div {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .live-data-indicators p {
+    font-size: 0.75rem;
+  }
+  
+  .live-data-indicators .text-xl {
+    font-size: 1.25rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  #ws-status-indicator {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
+  }
+  
+  #ws-debug-panel {
+    background-color: #111827;
+    color: #f9fafb;
+  }
+  
+  #connection-lost-modal .bg-white {
+    background-color: #374151;
+    color: #f9fafb;
+  }
+}
+
+/* High Performance */
+.websocket-manager * {
+  will-change: transform, opacity;
+}
+
+/* Accessibility */
+#ws-status-indicator:focus-within {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.notification-item button:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .websocket-manager,
+  #ws-status-indicator,
+  #realtime-notifications,
+  .live-data-indicators,
+  #ws-debug-panel,
+  #connection-lost-modal {
+    display: none !important;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .websocket-manager *,
+  .websocket-manager *::before,
+  .websocket-manager *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>

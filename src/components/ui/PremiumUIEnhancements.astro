@@ -1,0 +1,1143 @@
+---
+export interface Props {
+  theme?: 'corporate' | 'modern' | 'executive';
+  enableAnimations?: boolean;
+  enableRealTime?: boolean;
+}
+
+const { 
+  theme = 'corporate', 
+  enableAnimations = true, 
+  enableRealTime = true 
+} = Astro.props;
+
+// Theme configurations
+const themes = {
+  corporate: {
+    primary: 'from-blue-600 to-blue-800',
+    secondary: 'from-indigo-500 to-indigo-700',
+    accent: 'from-cyan-500 to-blue-600',
+    background: 'bg-gradient-to-br from-slate-50 to-blue-50'
+  },
+  modern: {
+    primary: 'from-green-500 to-emerald-600',
+    secondary: 'from-teal-500 to-green-600',
+    accent: 'from-lime-400 to-green-500',
+    background: 'bg-gradient-to-br from-emerald-50 to-teal-50'
+  },
+  executive: {
+    primary: 'from-gray-700 to-gray-900',
+    secondary: 'from-slate-600 to-gray-700',
+    accent: 'from-blue-500 to-indigo-600',
+    background: 'bg-gradient-to-br from-gray-50 to-slate-100'
+  }
+};
+
+const currentTheme = themes[theme];
+---
+
+<!-- Premium UI Enhancement Wrapper -->
+<div class={`premium-ui-wrapper ${currentTheme.background} min-h-screen transition-all duration-500`}>
+  
+  <!-- Animated Background Elements -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+      <div class="shape shape-5"></div>
+    </div>
+  </div>
+
+  <!-- Premium Loading Overlay -->
+  <div id="premium-loader" class="fixed inset-0 bg-white z-50 flex items-center justify-center transition-opacity duration-500">
+    <div class="loading-container text-center">
+      <div class="premium-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      <h3 class="mt-6 text-xl font-semibold text-gray-700">Loading Premium Experience</h3>
+      <p class="mt-2 text-gray-500">Preparing your analytics dashboard...</p>
+      <div class="loading-progress mt-4">
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <span class="progress-text text-sm text-gray-600 mt-2 block">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Premium Navigation Enhancement -->
+  <nav class="premium-nav sticky top-0 z-40 backdrop-blur-lg bg-white/80 border-b border-gray-200/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-4">
+          <div class="nav-logo-container">
+            <div class={`w-10 h-10 rounded-lg bg-gradient-to-r ${currentTheme.primary} flex items-center justify-center shadow-lg`}>
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="nav-breadcrumb">
+            <span class="text-sm text-gray-500">Analytics</span>
+            <span class="text-sm text-gray-300 mx-2">/</span>
+            <span class="text-sm font-medium text-gray-900">Dashboard</span>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <!-- Real-time Status Indicator -->
+          {enableRealTime && (
+            <div class="real-time-indicator flex items-center space-x-2 px-3 py-1 bg-green-100 rounded-full">
+              <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span class="text-xs font-medium text-green-700">Live</span>
+            </div>
+          )}
+
+          <!-- Theme Switcher -->
+          <div class="theme-switcher">
+            <button class="theme-btn p-2 rounded-lg hover:bg-gray-100 transition-colors" onclick="toggleTheme()">
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Notification Bell -->
+          <div class="notification-container relative">
+            <button class="notification-btn p-2 rounded-lg hover:bg-gray-100 transition-colors relative" onclick="toggleNotifications()">
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM10.07 2.82l3.93 3.93-3.93 3.93-3.93-3.93 3.93-3.93zM2.82 10.07l3.93 3.93-3.93 3.93L2.82 14l3.93-3.93z"></path>
+              </svg>
+              <span class="notification-badge absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
+            </button>
+            
+            <!-- Notification Dropdown -->
+            <div id="notification-dropdown" class="notification-dropdown absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 hidden">
+              <div class="p-4 border-b border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-900">Notifications</h3>
+              </div>
+              <div class="max-h-64 overflow-y-auto">
+                <div class="notification-item p-4 hover:bg-gray-50 border-b border-gray-100 cursor-pointer">
+                  <div class="flex items-start space-x-3">
+                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-gray-900">New form response received</p>
+                      <p class="text-xs text-gray-500 mt-1">2 minutes ago</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="notification-item p-4 hover:bg-gray-50 border-b border-gray-100 cursor-pointer">
+                  <div class="flex items-start space-x-3">
+                    <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-gray-900">Weekly report generated</p>
+                      <p class="text-xs text-gray-500 mt-1">1 hour ago</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="notification-item p-4 hover:bg-gray-50 cursor-pointer">
+                  <div class="flex items-start space-x-3">
+                    <div class="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-gray-900">Form sharing limit reached</p>
+                      <p class="text-xs text-gray-500 mt-1">3 hours ago</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="p-4 border-t border-gray-100">
+                <button class="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium">
+                  View all notifications
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Premium Card Components -->
+  <div class="premium-cards-container p-6">
+    <div class="max-w-7xl mx-auto">
+      
+      <!-- Hero Stats Cards -->
+      <div class="hero-stats grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="premium-card stat-card group">
+          <div class={`card-header bg-gradient-to-r ${currentTheme.primary} text-white p-4 rounded-t-lg`}>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm opacity-90">Total Forms</p>
+                <p class="text-2xl font-bold">247</p>
+              </div>
+              <div class="stat-icon">
+                <svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="card-body bg-white p-4 rounded-b-lg">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-green-600 font-medium">+12% this month</span>
+              <div class="trend-indicator">
+                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="premium-card stat-card group">
+          <div class={`card-header bg-gradient-to-r ${currentTheme.secondary} text-white p-4 rounded-t-lg`}>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm opacity-90">Responses</p>
+                <p class="text-2xl font-bold">1,847</p>
+              </div>
+              <div class="stat-icon">
+                <svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="card-body bg-white p-4 rounded-b-lg">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-green-600 font-medium">+28% this week</span>
+              <div class="trend-indicator">
+                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="premium-card stat-card group">
+          <div class={`card-header bg-gradient-to-r ${currentTheme.accent} text-white p-4 rounded-t-lg`}>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm opacity-90">Avg Rating</p>
+                <p class="text-2xl font-bold">4.8</p>
+              </div>
+              <div class="stat-icon">
+                <svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="card-body bg-white p-4 rounded-b-lg">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-blue-600 font-medium">Excellent</span>
+              <div class="rating-stars flex space-x-1">
+                {[1,2,3,4,5].map(star => (
+                  <svg class="w-3 h-3 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="premium-card stat-card group">
+          <div class="card-header bg-gradient-to-r from-purple-600 to-purple-800 text-white p-4 rounded-t-lg">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm opacity-90">Completion Rate</p>
+                <p class="text-2xl font-bold">87%</p>
+              </div>
+              <div class="stat-icon">
+                <svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="card-body bg-white p-4 rounded-b-lg">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-green-600 font-medium">Above average</span>
+              <div class="completion-bar w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-purple-500 rounded-full" style="width: 87%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Dashboard Widgets -->
+      <div class="dashboard-widgets grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        
+        <!-- Quick Actions Widget -->
+        <div class="premium-card quick-actions-widget col-span-1">
+          <div class="card-header p-4 border-b border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
+          </div>
+          <div class="card-body p-4">
+            <div class="space-y-3">
+              <button class="quick-action-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group">
+                <div class={`w-10 h-10 rounded-lg bg-gradient-to-r ${currentTheme.primary} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                </div>
+                <div class="flex-1 text-left">
+                  <p class="font-medium text-gray-900">Create New Form</p>
+                  <p class="text-sm text-gray-500">Start building a feedback form</p>
+                </div>
+              </button>
+
+              <button class="quick-action-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group">
+                <div class={`w-10 h-10 rounded-lg bg-gradient-to-r ${currentTheme.secondary} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1 text-left">
+                  <p class="font-medium text-gray-900">Share Forms</p>
+                  <p class="text-sm text-gray-500">Distribute via multiple channels</p>
+                </div>
+              </button>
+
+              <button class="quick-action-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group">
+                <div class={`w-10 h-10 rounded-lg bg-gradient-to-r ${currentTheme.accent} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1 text-left">
+                  <p class="font-medium text-gray-900">Generate Report</p>
+                  <p class="text-sm text-gray-500">Export analytics and insights</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity Widget -->
+        <div class="premium-card recent-activity-widget col-span-2">
+          <div class="card-header p-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
+            <button class="text-sm text-blue-600 hover:text-blue-700 font-medium">View All</button>
+          </div>
+          <div class="card-body p-4">
+            <div class="activity-timeline space-y-4">
+              <div class="activity-item flex items-start space-x-3">
+                <div class="activity-icon w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-900">New response received</p>
+                  <p class="text-xs text-gray-500">Azure Training Feedback - 2 minutes ago</p>
+                </div>
+              </div>
+
+              <div class="activity-item flex items-start space-x-3">
+                <div class="activity-icon w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-900">Form shared via WhatsApp</p>
+                  <p class="text-xs text-gray-500">DevOps Training Form - 15 minutes ago</p>
+                </div>
+              </div>
+
+              <div class="activity-item flex items-start space-x-3">
+                <div class="activity-icon w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-900">Weekly report generated</p>
+                  <p class="text-xs text-gray-500">Analytics Summary - 1 hour ago</p>
+                </div>
+              </div>
+
+              <div class="activity-item flex items-start space-x-3">
+                <div class="activity-icon w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                  <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-900">New form created</p>
+                  <p class="text-xs text-gray-500">Kubernetes Training Feedback - 3 hours ago</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Elements Showcase -->
+      <div class="interactive-showcase grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Hover Effects Demo -->
+        <div class="premium-card hover-demo-card">
+          <div class="card-header p-4 border-b border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900">Interactive Elements</h3>
+          </div>
+          <div class="card-body p-4 space-y-4">
+            <button class="premium-button w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+              Hover Me
+            </button>
+            
+            <div class="interactive-card p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-lg transition-all duration-300 cursor-pointer">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900">Interactive Card</p>
+                  <p class="text-sm text-gray-500">Hover for effects</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Indicators -->
+        <div class="premium-card progress-demo-card">
+          <div class="card-header p-4 border-b border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900">Progress Indicators</h3>
+          </div>
+          <div class="card-body p-4 space-y-4">
+            <div class="progress-item">
+              <div class="flex justify-between text-sm mb-1">
+                <span class="font-medium text-gray-700">Form Completion</span>
+                <span class="text-gray-500">87%</span>
+              </div>
+              <div class="progress-bar-container w-full bg-gray-200 rounded-full h-2">
+                <div class="progress-bar-fill bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-1000" style="width: 87%"></div>
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <div class="flex justify-between text-sm mb-1">
+                <span class="font-medium text-gray-700">Response Rate</span>
+                <span class="text-gray-500">64%</span>
+              </div>
+              <div class="progress-bar-container w-full bg-gray-200 rounded-full h-2">
+                <div class="progress-bar-fill bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-1000" style="width: 64%"></div>
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <div class="flex justify-between text-sm mb-1">
+                <span class="font-medium text-gray-700">Satisfaction</span>
+                <span class="text-gray-500">92%</span>
+              </div>
+              <div class="progress-bar-container w-full bg-gray-200 rounded-full h-2">
+                <div class="progress-bar-fill bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-1000" style="width: 92%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-time Updates Demo -->
+        <div class="premium-card realtime-demo-card">
+          <div class="card-header p-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900">Live Updates</h3>
+            <div class="live-indicator flex items-center space-x-2">
+              <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <span class="text-xs font-medium text-red-600">LIVE</span>
+            </div>
+          </div>
+          <div class="card-body p-4">
+            <div class="realtime-counter text-center">
+              <div class="counter-value text-3xl font-bold text-gray-900 mb-2" id="live-counter">1,847</div>
+              <p class="text-sm text-gray-500 mb-4">Total Responses</p>
+              <div class="pulse-animation w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+                <div class="w-8 h-8 bg-blue-500 rounded-full animate-ping"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success/Error Toast Notifications -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+  <!-- Premium Modal Overlay -->
+  <div id="premium-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+    <div class="premium-modal bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform scale-95 transition-transform duration-300">
+      <div class="modal-header p-6 border-b border-gray-100">
+        <h3 class="text-xl font-semibold text-gray-900">Premium Feature</h3>
+      </div>
+      <div class="modal-body p-6">
+        <p class="text-gray-600">This is a premium modal with enhanced animations and styling.</p>
+      </div>
+      <div class="modal-footer p-6 border-t border-gray-100 flex justify-end space-x-3">
+        <button class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors" onclick="closePremiumModal()">
+          Cancel
+        </button>
+        <button class={`px-6 py-2 bg-gradient-to-r ${currentTheme.primary} text-white rounded-lg hover:shadow-lg transition-all duration-200`}>
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+class PremiumUIManager {
+  constructor() {
+    this.theme = 'corporate';
+    this.animationsEnabled = true;
+    this.realTimeEnabled = true;
+    this.notificationCount = 3;
+    
+    this.init();
+  }
+
+  init() {
+    this.setupLoader();
+    this.setupAnimations();
+    this.setupRealTimeUpdates();
+    this.setupInteractiveElements();
+    this.setupNotifications();
+  }
+
+  setupLoader() {
+    const loader = document.getElementById('premium-loader');
+    const progressFill = document.querySelector('.progress-fill');
+    const progressText = document.querySelector('.progress-text');
+    
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 15;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+        
+        setTimeout(() => {
+          loader.style.opacity = '0';
+          setTimeout(() => {
+            loader.style.display = 'none';
+          }, 500);
+        }, 500);
+      }
+      
+      progressFill.style.width = `${progress}%`;
+      progressText.textContent = `${Math.round(progress)}%`;
+    }, 200);
+  }
+
+  setupAnimations() {
+    if (!this.animationsEnabled) return;
+
+    // Animate cards on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.premium-card').forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      observer.observe(card);
+    });
+
+    // Stagger animation for stat cards
+    document.querySelectorAll('.stat-card').forEach((card, index) => {
+      setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      }, index * 100);
+    });
+  }
+
+  setupRealTimeUpdates() {
+    if (!this.realTimeEnabled) return;
+
+    const counter = document.getElementById('live-counter');
+    let currentValue = 1847;
+
+    setInterval(() => {
+      if (Math.random() > 0.7) { // 30% chance of update
+        currentValue += Math.floor(Math.random() * 3) + 1;
+        counter.textContent = currentValue.toLocaleString();
+        
+        // Add pulse effect
+        counter.classList.add('animate-pulse');
+        setTimeout(() => {
+          counter.classList.remove('animate-pulse');
+        }, 1000);
+
+        // Show toast notification
+        this.showToast('New response received!', 'success');
+      }
+    }, 5000);
+  }
+
+  setupInteractiveElements() {
+    // Add ripple effect to buttons
+    document.querySelectorAll('.premium-button, .quick-action-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const ripple = document.createElement('span');
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.classList.add('ripple');
+        
+        button.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
+
+    // Parallax effect for floating shapes
+    document.addEventListener('mousemove', (e) => {
+      const shapes = document.querySelectorAll('.shape');
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      
+      shapes.forEach((shape, index) => {
+        const speed = (index + 1) * 0.5;
+        const xPos = (x - 0.5) * speed * 20;
+        const yPos = (y - 0.5) * speed * 20;
+        
+        shape.style.transform = `translate(${xPos}px, ${yPos}px)`;
+      });
+    });
+  }
+
+  setupNotifications() {
+    // Auto-update notification badge
+    setInterval(() => {
+      if (Math.random() > 0.8) { // 20% chance
+        this.notificationCount++;
+        document.querySelector('.notification-badge').textContent = this.notificationCount;
+        
+        // Add new notification to dropdown
+        this.addNotificationToDropdown();
+      }
+    }, 10000);
+  }
+
+  addNotificationToDropdown() {
+    const dropdown = document.getElementById('notification-dropdown');
+    const notificationsList = dropdown.querySelector('.max-h-64');
+    
+    const newNotification = document.createElement('div');
+    newNotification.className = 'notification-item p-4 hover:bg-gray-50 border-b border-gray-100 cursor-pointer';
+    newNotification.innerHTML = `
+      <div class="flex items-start space-x-3">
+        <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+        <div class="flex-1">
+          <p class="text-sm font-medium text-gray-900">New form response received</p>
+          <p class="text-xs text-gray-500 mt-1">Just now</p>
+        </div>
+      </div>
+    `;
+    
+    notificationsList.insertBefore(newNotification, notificationsList.firstChild);
+  }
+
+  showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    
+    const colors = {
+      success: 'bg-green-600',
+      error: 'bg-red-600',
+      warning: 'bg-yellow-600',
+      info: 'bg-blue-600'
+    };
+    
+    toast.className = `toast px-6 py-3 rounded-lg text-white shadow-lg transform translate-x-full transition-transform duration-300 ${colors[type]}`;
+    toast.textContent = message;
+    
+    container.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => {
+      toast.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Animate out
+    setTimeout(() => {
+      toast.style.transform = 'translateX(full)';
+      setTimeout(() => {
+        if (container.contains(toast)) {
+          container.removeChild(toast);
+        }
+      }, 300);
+    }, 3000);
+  }
+
+  toggleTheme() {
+    const themes = ['corporate', 'modern', 'executive'];
+    const currentIndex = themes.indexOf(this.theme);
+    this.theme = themes[(currentIndex + 1) % themes.length];
+    
+    // Apply theme changes (would require more complex implementation)
+    this.showToast(`Switched to ${this.theme} theme`, 'info');
+  }
+}
+
+// Global functions
+function toggleNotifications() {
+  const dropdown = document.getElementById('notification-dropdown');
+  dropdown.classList.toggle('hidden');
+}
+
+function toggleTheme() {
+  window.premiumUI.toggleTheme();
+}
+
+function closePremiumModal() {
+  const modal = document.getElementById('premium-modal-overlay');
+  modal.classList.add('hidden');
+}
+
+function showPremiumModal() {
+  const modal = document.getElementById('premium-modal-overlay');
+  modal.classList.remove('hidden');
+  
+  setTimeout(() => {
+    modal.querySelector('.premium-modal').style.transform = 'scale(1)';
+  }, 100);
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  window.premiumUI = new PremiumUIManager();
+});
+
+// Close notification dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const dropdown = document.getElementById('notification-dropdown');
+  const button = document.querySelector('.notification-btn');
+  
+  if (!dropdown.contains(e.target) && !button.contains(e.target)) {
+    dropdown.classList.add('hidden');
+  }
+});
+</script>
+
+<style>
+/* Premium UI Styles */
+.premium-ui-wrapper {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Floating Background Shapes */
+.floating-shapes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+  animation: float 20s infinite linear;
+}
+
+.shape-1 {
+  width: 80px;
+  height: 80px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 120px;
+  height: 120px;
+  top: 20%;
+  right: 10%;
+  animation-delay: -5s;
+}
+
+.shape-3 {
+  width: 60px;
+  height: 60px;
+  bottom: 20%;
+  left: 20%;
+  animation-delay: -10s;
+}
+
+.shape-4 {
+  width: 100px;
+  height: 100px;
+  bottom: 10%;
+  right: 20%;
+  animation-delay: -15s;
+}
+
+.shape-5 {
+  width: 40px;
+  height: 40px;
+  top: 50%;
+  left: 50%;
+  animation-delay: -7s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-30px) rotate(120deg);
+  }
+  66% {
+    transform: translateY(30px) rotate(240deg);
+  }
+}
+
+/* Premium Loading Spinner */
+.premium-spinner {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.spinner-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.spinner-ring:nth-child(2) {
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+  border-top-color: #8b5cf6;
+  animation-delay: -0.3s;
+}
+
+.spinner-ring:nth-child(3) {
+  width: 60%;
+  height: 60%;
+  top: 20%;
+  left: 20%;
+  border-top-color: #10b981;
+  animation-delay: -0.6s;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Progress Bar Animation */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Premium Cards */
+.premium-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.premium-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card .card-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card .card-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.stat-card:hover .card-header::before {
+  left: 100%;
+}
+
+/* Interactive Elements */
+.quick-action-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: ripple-animation 0.6s linear;
+  pointer-events: none;
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Navigation Enhancements */
+.premium-nav {
+  transition: all 0.3s ease;
+}
+
+.nav-logo-container {
+  transition: transform 0.3s ease;
+}
+
+.nav-logo-container:hover {
+  transform: scale(1.1);
+}
+
+/* Notification Styles */
+.notification-dropdown {
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notification-badge {
+  animation: pulse 2s infinite;
+}
+
+/* Activity Timeline */
+.activity-timeline .activity-item {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.activity-timeline .activity-item::before {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  top: 2rem;
+  width: 2px;
+  height: calc(100% + 1rem);
+  background: #e5e7eb;
+}
+
+.activity-timeline .activity-item:last-child::before {
+  display: none;
+}
+
+.activity-icon {
+  position: relative;
+  z-index: 1;
+}
+
+/* Progress Bars */
+.progress-bar-fill {
+  animation: progressFill 2s ease-in-out;
+}
+
+@keyframes progressFill {
+  from {
+    width: 0%;
+  }
+}
+
+/* Real-time Indicators */
+.live-indicator .animate-pulse {
+  animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Modal Enhancements */
+.premium-modal {
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Toast Notifications */
+.toast {
+  min-width: 300px;
+  max-width: 400px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .dashboard-widgets {
+    grid-template-columns: 1fr;
+  }
+  
+  .interactive-showcase {
+    grid-template-columns: 1fr;
+  }
+  
+  .premium-card {
+    margin-bottom: 1rem;
+  }
+  
+  .stat-card .card-header {
+    padding: 1rem;
+  }
+  
+  .stat-card .card-body {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .premium-nav .max-w-7xl {
+    padding: 0 1rem;
+  }
+  
+  .premium-cards-container {
+    padding: 1rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .premium-ui-wrapper {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  }
+  
+  .premium-card {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
+  }
+  
+  .premium-nav {
+    background: rgba(31, 41, 55, 0.8);
+    border-color: rgba(75, 85, 99, 0.5);
+  }
+}
+
+/* High Performance Animations */
+.premium-card,
+.quick-action-btn,
+.premium-button {
+  will-change: transform;
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .shape {
+    animation: none;
+  }
+}
+
+/* Focus States */
+.premium-button:focus,
+.quick-action-btn:focus,
+.theme-btn:focus,
+.notification-btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .floating-shapes,
+  .premium-nav,
+  #toast-container,
+  #premium-modal-overlay {
+    display: none !important;
+  }
+  
+  .premium-card {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+}
+</style>

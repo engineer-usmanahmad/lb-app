@@ -1,0 +1,557 @@
+---
+// Advanced Charts Component with Professional Themes
+---
+
+<div class="advanced-charts-container">
+  <!-- Response Trends Line Chart -->
+  <div class="chart-container mb-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Response Trends Analysis</h3>
+        <div class="flex space-x-2">
+          <button class="chart-period-btn px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors" data-period="7d" data-chart="trends">7D</button>
+          <button class="chart-period-btn px-3 py-1 text-xs font-medium text-white bg-coral-600 rounded-md hover:bg-coral-700 transition-colors active" data-period="30d" data-chart="trends">30D</button>
+          <button class="chart-period-btn px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors" data-period="90d" data-chart="trends">90D</button>
+        </div>
+      </div>
+      <div class="h-80 relative">
+        <canvas id="advancedTrendsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating Distribution Pie Chart -->
+  <div class="chart-container mb-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Rating Distribution</h3>
+        <div class="text-sm text-gray-500">Interactive breakdown</div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="h-64 relative">
+          <canvas id="ratingPieChart"></canvas>
+        </div>
+        <div class="space-y-3">
+          <div class="rating-stat flex items-center justify-between p-3 bg-green-50 rounded-lg">
+            <div class="flex items-center">
+              <div class="w-4 h-4 bg-green-500 rounded-full mr-3"></div>
+              <span class="text-sm font-medium">5 Stars</span>
+            </div>
+            <span class="text-lg font-bold text-green-600" id="rating-5">40%</span>
+          </div>
+          <div class="rating-stat flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+            <div class="flex items-center">
+              <div class="w-4 h-4 bg-blue-500 rounded-full mr-3"></div>
+              <span class="text-sm font-medium">4 Stars</span>
+            </div>
+            <span class="text-lg font-bold text-blue-600" id="rating-4">30%</span>
+          </div>
+          <div class="rating-stat flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+            <div class="flex items-center">
+              <div class="w-4 h-4 bg-yellow-500 rounded-full mr-3"></div>
+              <span class="text-sm font-medium">3 Stars</span>
+            </div>
+            <span class="text-lg font-bold text-yellow-600" id="rating-3">15%</span>
+          </div>
+          <div class="rating-stat flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+            <div class="flex items-center">
+              <div class="w-4 h-4 bg-orange-500 rounded-full mr-3"></div>
+              <span class="text-sm font-medium">2 Stars</span>
+            </div>
+            <span class="text-lg font-bold text-orange-600" id="rating-2">10%</span>
+          </div>
+          <div class="rating-stat flex items-center justify-between p-3 bg-red-50 rounded-lg">
+            <div class="flex items-center">
+              <div class="w-4 h-4 bg-red-500 rounded-full mr-3"></div>
+              <span class="text-sm font-medium">1 Star</span>
+            </div>
+            <span class="text-lg font-bold text-red-600" id="rating-1">5%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course Performance Bar Chart -->
+  <div class="chart-container mb-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Course Performance Comparison</h3>
+        <div class="flex space-x-2">
+          <select id="courseMetricSelect" class="text-sm border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-coral-500">
+            <option value="responses">Total Responses</option>
+            <option value="rating">Average Rating</option>
+            <option value="completion">Completion Rate</option>
+          </select>
+        </div>
+      </div>
+      <div class="h-80 relative">
+        <canvas id="coursePerformanceChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Satisfaction Gauge Chart -->
+  <div class="chart-container mb-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Overall Satisfaction Score</h3>
+        <div class="text-sm text-gray-500">Real-time gauge</div>
+      </div>
+      <div class="h-64 relative">
+        <canvas id="satisfactionGaugeChart"></canvas>
+      </div>
+      <div class="mt-4 text-center">
+        <div class="text-3xl font-bold text-green-600" id="satisfactionScore">8.4</div>
+        <div class="text-sm text-gray-500">out of 10</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Response Heat Map -->
+  <div class="chart-container mb-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Response Pattern Heat Map</h3>
+        <div class="text-sm text-gray-500">Weekly activity</div>
+      </div>
+      <div class="h-48 relative">
+        <canvas id="responseHeatMapChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Advanced Charts Implementation with Professional Themes
+document.addEventListener('DOMContentLoaded', function() {
+  // Professional Color Themes
+  const themes = {
+    corporate: {
+      primary: '#1e3c72',
+      secondary: '#2a5298',
+      gradient: ['#1e3c72', '#2a5298']
+    },
+    modern: {
+      primary: '#11998e',
+      secondary: '#38ef7d',
+      gradient: ['#11998e', '#38ef7d']
+    },
+    executive: {
+      primary: '#2c3e50',
+      secondary: '#3498db',
+      gradient: ['#2c3e50', '#3498db']
+    }
+  };
+
+  // Current theme
+  let currentTheme = themes.corporate;
+
+  // Advanced Trends Chart with Animations
+  const trendsCtx = document.getElementById('advancedTrendsChart').getContext('2d');
+  const trendsChart = new Chart(trendsCtx, {
+    type: 'line',
+    data: {
+      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+      datasets: [{
+        label: 'Responses',
+        data: [65, 78, 90, 81, 95, 102],
+        borderColor: currentTheme.primary,
+        backgroundColor: `${currentTheme.primary}20`,
+        borderWidth: 3,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: currentTheme.primary,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 2000,
+        easing: 'easeInOutQuart'
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: currentTheme.primary,
+          borderWidth: 1,
+          cornerRadius: 8,
+          displayColors: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#6B7280'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: '#6B7280'
+          }
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      }
+    }
+  });
+
+  // Animated Rating Pie Chart
+  const ratingCtx = document.getElementById('ratingPieChart').getContext('2d');
+  const ratingChart = new Chart(ratingCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['5 Stars', '4 Stars', '3 Stars', '2 Stars', '1 Star'],
+      datasets: [{
+        data: [40, 30, 15, 10, 5],
+        backgroundColor: [
+          '#10B981',
+          '#3B82F6',
+          '#F59E0B',
+          '#EF4444',
+          '#6B7280'
+        ],
+        borderWidth: 0,
+        hoverBorderWidth: 3,
+        hoverBorderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        animateRotate: true,
+        animateScale: true,
+        duration: 2000
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          cornerRadius: 8,
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.parsed + '%';
+            }
+          }
+        }
+      },
+      cutout: '60%',
+      onHover: (event, activeElements) => {
+        event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+      }
+    }
+  });
+
+  // Course Performance Bar Chart
+  const courseCtx = document.getElementById('coursePerformanceChart').getContext('2d');
+  const courseChart = new Chart(courseCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Azure Training', 'DevOps Complete', 'Docker Mastery', 'Kubernetes', 'Ansible Expert', 'Jenkins Expert'],
+      datasets: [{
+        label: 'Responses',
+        data: [85, 92, 78, 88, 76, 82],
+        backgroundColor: [
+          '#1e3c72',
+          '#2a5298',
+          '#11998e',
+          '#38ef7d',
+          '#2c3e50',
+          '#3498db'
+        ],
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 2000,
+        easing: 'easeOutBounce'
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          cornerRadius: 8
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#6B7280'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: '#6B7280',
+            maxRotation: 45
+          }
+        }
+      }
+    }
+  });
+
+  // Satisfaction Gauge Chart
+  const gaugeCtx = document.getElementById('satisfactionGaugeChart').getContext('2d');
+  const gaugeChart = new Chart(gaugeCtx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [84, 16],
+        backgroundColor: [
+          '#10B981',
+          '#E5E7EB'
+        ],
+        borderWidth: 0,
+        cutout: '80%',
+        circumference: 180,
+        rotation: 270
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 2000,
+        easing: 'easeInOutQuart'
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          enabled: false
+        }
+      }
+    }
+  });
+
+  // Response Heat Map Chart
+  const heatMapCtx = document.getElementById('responseHeatMapChart').getContext('2d');
+  const heatMapChart = new Chart(heatMapCtx, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'Response Activity',
+        data: [
+          {x: 'Mon', y: 1, v: 15},
+          {x: 'Tue', y: 1, v: 22},
+          {x: 'Wed', y: 1, v: 18},
+          {x: 'Thu', y: 1, v: 25},
+          {x: 'Fri', y: 1, v: 12},
+          {x: 'Sat', y: 1, v: 8},
+          {x: 'Sun', y: 1, v: 5}
+        ],
+        backgroundColor: function(context) {
+          const value = context.parsed.v;
+          const alpha = value / 25;
+          return `rgba(30, 60, 114, ${alpha})`;
+        },
+        pointRadius: function(context) {
+          return context.parsed.v / 2;
+        }
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            title: function(context) {
+              return context[0].parsed.x;
+            },
+            label: function(context) {
+              return 'Responses: ' + context.parsed.v;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'category',
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          grid: {
+            display: false
+          }
+        },
+        y: {
+          display: false
+        }
+      }
+    }
+  });
+
+  // Period selection functionality
+  document.querySelectorAll('.chart-period-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const period = this.dataset.period;
+      const chartType = this.dataset.chart;
+      
+      // Update active state
+      document.querySelectorAll(`[data-chart="${chartType}"]`).forEach(b => {
+        b.classList.remove('bg-coral-600', 'text-white');
+        b.classList.add('bg-gray-100', 'text-gray-600');
+      });
+      this.classList.remove('bg-gray-100', 'text-gray-600');
+      this.classList.add('bg-coral-600', 'text-white');
+      
+      // Update chart data based on period
+      updateChartData(chartType, period);
+    });
+  });
+
+  // Course metric selection
+  document.getElementById('courseMetricSelect').addEventListener('change', function() {
+    const metric = this.value;
+    updateCourseChart(metric);
+  });
+
+  // Update chart data function
+  function updateChartData(chartType, period) {
+    // Simulate data update based on period
+    const data = {
+      '7d': [12, 19, 15, 25, 22, 30, 28],
+      '30d': [65, 78, 90, 81, 95, 102],
+      '90d': [45, 52, 68, 74, 81, 88, 95, 102, 108, 115, 122, 128]
+    };
+    
+    if (chartType === 'trends') {
+      trendsChart.data.datasets[0].data = data[period];
+      trendsChart.update('active');
+    }
+  }
+
+  // Update course chart function
+  function updateCourseChart(metric) {
+    const data = {
+      responses: [85, 92, 78, 88, 76, 82],
+      rating: [4.5, 4.8, 4.2, 4.6, 4.1, 4.4],
+      completion: [92, 88, 85, 90, 82, 87]
+    };
+    
+    courseChart.data.datasets[0].data = data[metric];
+    courseChart.data.datasets[0].label = metric.charAt(0).toUpperCase() + metric.slice(1);
+    courseChart.update('active');
+  }
+
+  // Animate rating statistics on load
+  function animateRatingStats() {
+    const stats = document.querySelectorAll('.rating-stat span[id^="rating-"]');
+    stats.forEach((stat, index) => {
+      setTimeout(() => {
+        stat.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+          stat.style.transform = 'scale(1)';
+        }, 200);
+      }, index * 100);
+    });
+  }
+
+  // Initialize animations
+  setTimeout(animateRatingStats, 1000);
+
+  // Real-time data simulation
+  setInterval(() => {
+    // Simulate real-time updates
+    const newValue = Math.floor(Math.random() * 10) + 80;
+    document.getElementById('satisfactionScore').textContent = (newValue / 10).toFixed(1);
+    
+    // Update gauge chart
+    gaugeChart.data.datasets[0].data = [newValue, 100 - newValue];
+    gaugeChart.update('none');
+  }, 5000);
+});
+</script>
+
+<style>
+.chart-container {
+  transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.rating-stat {
+  transition: all 0.2s ease;
+}
+
+.rating-stat:hover {
+  transform: translateX(4px);
+}
+
+.chart-period-btn {
+  transition: all 0.2s ease;
+}
+
+.chart-period-btn:hover {
+  transform: translateY(-1px);
+}
+
+#satisfactionScore {
+  transition: all 0.3s ease;
+}
+
+canvas {
+  transition: opacity 0.3s ease;
+}
+
+.advanced-charts-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
