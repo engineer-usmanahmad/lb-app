@@ -298,7 +298,10 @@ const formFields = fields || [];
         } else {
           errorDiv.classList.remove('hidden');
           successDiv.classList.add('hidden');
-          errorText.textContent = result.error || 'Please try again.';
+          const serverErrors = Array.isArray(result.errors) ? result.errors : [];
+          errorText.textContent = serverErrors.length
+            ? serverErrors.join('\n')
+            : (result.error || 'Please try again.');
         }
       } catch (error) {
         console.error('Form submission error:', error);

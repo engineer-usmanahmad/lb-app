@@ -863,15 +863,13 @@ export const prerender = false;
     async function deleteForm(formId, event) {
       event.stopPropagation(); // Prevent form loading when delete button is clicked
       
-      if (!confirm('Are you sure you want to delete this form? This action cannot be undone.')) {
+      if (!confirm('Are you sure you want to delete this form?')) {
         return;
       }
       
       try {
-        const response = await fetch('/api/admin/form-builder', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: formId })
+        const response = await fetch(`/api/admin/form-builder?id=${encodeURIComponent(formId)}`, {
+          method: 'DELETE'
         });
         
         const result = await response.json();
