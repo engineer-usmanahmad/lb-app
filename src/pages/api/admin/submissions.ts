@@ -15,6 +15,8 @@ export const GET: APIRoute = async ({ url }) => {
 
     const form_id = url.searchParams.get('form_id');
     const count_only = url.searchParams.get('count_only') === 'true';
+    const from_date = url.searchParams.get('from_date');
+    const to_date = url.searchParams.get('to_date');
     
     // If no form_id and count_only is true, return counts for all forms
     if (count_only && !form_id) {
@@ -66,10 +68,23 @@ export const GET: APIRoute = async ({ url }) => {
     
     // If count_only is true, return only the count for the specified form
     if (count_only) {
-      const { count, error: countError } = await supabaseAdmin
+      let countQuery = supabaseAdmin
         .from('form_submissions')
         .select('*', { count: 'exact', head: true })
         .eq('form_id', form_id);
+
+      // Optional date range filtering for count
+      if (from_date) {
+        countQuery = countQuery.gte('submitted_at', from_date);
+      }
+      if (to_date) {
+        // Include the entire day by ending at 23:59:59 of to_date
+        const toEnd = new Date(to_date);
+        toEnd.setHours(23, 59, 59, 999);
+        countQuery = countQuery.lte('submitted_at', toEnd.toISOString());
+      }
+
+      const { count, error: countError } = await countQuery;
       
       if (countError) {
         console.error('Submissions count error:', countError);
@@ -85,11 +100,22 @@ export const GET: APIRoute = async ({ url }) => {
       });
     }
 
-    const { data: submissions, error } = await supabaseAdmin
+    let query = supabaseAdmin
       .from('form_submissions')
       .select('*')
-      .eq('form_id', form_id)
-      .order('submitted_at', { ascending: false });
+      .eq('form_id', form_id);
+
+    // Optional date range filtering
+    if (from_date) {
+      query = query.gte('submitted_at', from_date);
+    }
+    if (to_date) {
+      const toEnd = new Date(to_date);
+      toEnd.setHours(23, 59, 59, 999);
+      query = query.lte('submitted_at', toEnd.toISOString());
+    }
+
+    const { data: submissions, error } = await query.order('submitted_at', { ascending: false });
 
     if (error) {
       console.error('Submissions fetch error:', error);

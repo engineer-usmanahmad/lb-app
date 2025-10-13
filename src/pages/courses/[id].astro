@@ -40,11 +40,7 @@ const courseTestimonials = [
   }
 ];
 
-export function getStaticPaths() {
-  return courses.map(course => ({
-    params: { id: course.id }
-  }));
-}
+// In server output mode, dynamic routes are resolved at runtime.
 ---
 
 <Layout title={`${course.title} - LbisTech`} description={course.description}>

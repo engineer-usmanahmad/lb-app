@@ -14,11 +14,7 @@ if (!trainer) {
   return Astro.redirect('/about');
 }
 
-export function getStaticPaths() {
-  return trainers.map(trainer => ({
-    params: { id: trainer.id }
-  }));
-}
+// In server output mode, dynamic routes are resolved at runtime.
 ---
 
 <Layout title={`${trainer.name} - LbisTech Trainer`} description={`Meet ${trainer.name}, ${trainer.title} at LbisTech. ${trainer.bio}`}>
