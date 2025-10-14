@@ -113,7 +113,8 @@ export const courses: Course[] = [
           'AWS Management Console & CLI',
           'AWS Identity and Access Management (IAM)',
           'AWS Billing and Cost Management'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'compute-services',
@@ -635,7 +636,8 @@ export const courses: Course[] = [
           'Services and Service Discovery',
           'DaemonSets and StatefulSets',
           'Jobs and CronJobs'
-        ]
+        ],
+        projects: 'ABC'
       },
       {
         id: 'k8s-config',
@@ -1259,6 +1261,300 @@ export const courses: Course[] = [
           'System backup strategies',
           'Performance monitoring scripts',
           'Advanced scripting techniques'
+        ],
+        projects: 'ABC'
+      }
+    ]
+  }
+  ,
+  {
+    id: 'docker-kubernetes-mastery',
+    title: 'Complete Docker & Kubernetes Mastery - Basics to Advanced',
+    description: 'Master containerization from basics to advanced level with this comprehensive training course. Learn Docker and Kubernetes with hands-on real-world projects. Perfect for DevOps engineers, developers, and IT professionals looking to master container orchestration and deployment strategies.',
+    duration: '8-9 Sessions',
+    level: 'Basics to Advanced',
+    image: 'https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg?auto=compress&cs=tinysrgb&w=800',
+    features: [
+      'Complete understanding of containerization concepts and architecture',
+      'Master Docker from installation to advanced container management',
+      'Build and manage Docker images using Dockerfiles and best practices',
+      'Work with Docker networking, volumes, and bind mounts effectively',
+      'Implement Docker Compose for multi-container applications',
+      'Build 3 real-world Docker projects for production environments',
+      'Understand Kubernetes architecture and core components deeply',
+      'Deploy and manage applications on Kubernetes clusters (Minikube, Kubeadm, EKS, GKE)',
+      'Master Kubernetes Pods, Deployments, Services, and ReplicaSets',
+      'Implement Kubernetes ConfigMaps, Secrets, PV/PVC for data management',
+      'Configure auto-scaling with HPA, VPA, and Cluster Autoscaler',
+      'Deploy 3 real-world Kubernetes projects in cloud environments'
+    ],
+    price: 14999,
+    originalPrice: 21999,
+    is_free: false,
+    modules: [
+      // Section 1: Docker Mastery
+      {
+        id: 'section-docker',
+        title: 'Section 1: Docker Mastery',
+        duration: '',
+        topics: [],
+        projects: ''
+      },
+      {
+        id: 'docker-intro',
+        title: 'Introduction to Containerization',
+        duration: '1 session',
+        topics: [
+          'What is containerization and why it matters',
+          'Containerization architecture with detailed diagrams',
+          'Containerization vs Virtualization - Key differences',
+          'Benefits and use cases of containers'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'docker-fundamentals',
+        title: 'Docker Fundamentals',
+        duration: '1 session',
+        topics: [
+          'Introduction to Docker and its ecosystem',
+          'Docker installation on Linux, Windows, and Mac',
+          'Understanding Docker architecture',
+          'Docker CLI commands and best practices'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'docker-images-containers',
+        title: 'Docker Images & Containers',
+        duration: '1 session',
+        topics: [
+          'Docker containers vs Docker images explained',
+          'Creating and managing containers',
+          'Container lifecycle management',
+          'Working with container logs and debugging'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'docker-registry',
+        title: 'Docker Hub & Registry',
+        duration: '1 session',
+        topics: [
+          'Introduction to Docker Hub',
+          'Pushing and pulling images from Docker Hub',
+          'Creating private registries',
+          'Image tagging and versioning strategies'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'docker-networking',
+        title: 'Docker Networking',
+        duration: '1 session',
+        topics: [
+          'Docker network types (bridge, host, overlay, none)',
+          'Creating custom networks',
+          'Container communication and DNS',
+          'Network security best practices'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'docker-storage',
+        title: 'Docker Storage',
+        duration: '1 session',
+        topics: [
+          'Understanding Docker volumes',
+          'Creating and managing volumes',
+          'Docker bind mounts explained',
+          'Data persistence strategies'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'dockerfile-building',
+        title: 'Dockerfile & Image Building',
+        duration: '1 session',
+        topics: [
+          'Dockerfile syntax and instructions',
+          'Building optimized Docker images',
+          'Multi-stage builds',
+          'Image layer caching and best practices'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'docker-compose',
+        title: 'Docker Compose',
+        duration: '1 session',
+        topics: [
+          'Introduction to Docker Compose',
+          'Writing docker-compose.yml files',
+          'Multi-container application deployment',
+          'Docker Compose networking and volumes'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'docker-projects',
+        title: 'Docker Real-World Projects',
+        duration: '2 sessions',
+        topics: [
+          'Project 1: Deploying a full-stack web application with Docker',
+          'Project 2: Building a microservices architecture using Docker',
+          'Project 3: CI/CD pipeline integration with Docker'
+        ],
+        projects: 'ABC'
+      },
+      // Section 2: Kubernetes Mastery
+      {
+        id: 'section-kubernetes',
+        title: 'Section 2: Kubernetes Mastery',
+        duration: '',
+        topics: [],
+        projects: ''
+      },
+      {
+        id: 'k8s-intro',
+        title: 'Kubernetes Introduction',
+        duration: '1 session',
+        topics: [
+          'What is Kubernetes and why use it',
+          'Kubernetes architecture with detailed diagrams',
+          'Control plane and worker node components',
+          'Kubernetes vs Docker Swarm comparison'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'k8s-components',
+        title: 'Kubernetes Components Deep Dive',
+        duration: '1 session',
+        topics: [
+          'API Server, Scheduler, and Controller Manager',
+          'etcd - Kubernetes data store',
+          'Kubelet and Kube-proxy explained',
+          'Container Runtime Interface (CRI)'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'k8s-installation',
+        title: 'Kubernetes Installation & Setup',
+        duration: '1 session',
+        topics: [
+          'Installing Minikube for local development',
+          'Kubeadm cluster setup on bare metal/VMs',
+          'AWS EKS (Elastic Kubernetes Service) setup',
+          'Google Kubernetes Engine (GKE) setup'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'k8s-pods',
+        title: 'Kubernetes Pods',
+        duration: '1 session',
+        topics: [
+          'Understanding Pods - the smallest unit',
+          'Creating and managing Pods',
+          'Multi-container Pods',
+          'Pod lifecycle and troubleshooting'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'k8s-deployments',
+        title: 'Kubernetes Deployments',
+        duration: '1 session',
+        topics: [
+          'Deployment concepts and strategies',
+          'Creating declarative deployments',
+          'Rolling updates and rollbacks',
+          'Deployment scaling techniques'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'k8s-replicasets',
+        title: 'Kubernetes ReplicaSets',
+        duration: '1 session',
+        topics: [
+          'ReplicaSet fundamentals',
+          'Managing replica counts',
+          'Self-healing capabilities',
+          'ReplicaSet vs Deployment'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'k8s-services',
+        title: 'Kubernetes Services',
+        duration: '1 session',
+        topics: [
+          'Service types (ClusterIP, NodePort, LoadBalancer)',
+          'Service discovery mechanisms',
+          'Exposing applications externally',
+          'Ingress controllers'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'k8s-config',
+        title: 'Kubernetes Configuration Management',
+        duration: '1 session',
+        topics: [
+          'ConfigMaps for application configuration',
+          'Secrets for sensitive data management',
+          'Environment variables in Kubernetes',
+          'Configuration best practices'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'k8s-storage',
+        title: 'Kubernetes Storage',
+        duration: '1 session',
+        topics: [
+          'Persistent Volumes (PV) concepts',
+          'Persistent Volume Claims (PVC)',
+          'Storage classes and dynamic provisioning',
+          'StatefulSets for stateful applications'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'k8s-jobs',
+        title: 'Kubernetes Jobs & CronJobs',
+        duration: '1 session',
+        topics: [
+          'Running batch jobs in Kubernetes',
+          'CronJobs for scheduled tasks',
+          'Job completion and failure handling',
+          'Parallel job execution'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'k8s-autoscaling',
+        title: 'Kubernetes Auto-Scaling',
+        duration: '1 session',
+        topics: [
+          'Horizontal Pod Autoscaler (HPA) configuration',
+          'Vertical Pod Autoscaler (VPA) setup',
+          'Cluster Autoscaler for node scaling',
+          'Metrics Server installation and usage'
+        ],
+        projects: 'ABC'
+      },
+      {
+        id: 'k8s-projects',
+        title: 'Kubernetes Real-World Projects',
+        duration: '2 sessions',
+        topics: [
+          'Project 1: Deploying a production-ready microservices application',
+          'Project 2: Setting up a complete CI/CD pipeline with Kubernetes',
+          'Project 3: Implementing auto-scaling and load balancing in cloud'
         ],
         projects: 'ABC'
       }
