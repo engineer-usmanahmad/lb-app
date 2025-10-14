@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
-import Hero from '../components/Hero.astro';
+import AnnouncementSlider from '../components/AnnouncementSlider.astro';
 import CourseCard from '../components/CourseCard.astro';
 import TestimonialSlider from '../components/TestimonialSlider.astro';
 import NeedHelpCard from '../components/NeedHelpCard.astro';
@@ -16,7 +16,9 @@ const featuredCourses = courses.filter(course =>
 
 <Layout title="LbisTech - Professional Technology Education">
   <Header />
-  <Hero />
+  
+  <!-- Course Announcement Slider -->
+  <AnnouncementSlider />
   
   <!-- Why Choose LbisTech -->
   <section class="py-16 bg-gray-50">
