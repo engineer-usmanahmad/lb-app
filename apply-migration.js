@@ -27,7 +27,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 async function applyMigration() {
   try {
     console.log('Reading migration file...');
-    const migrationSQL = readFileSync(join(__dirname, 'add-active-column-events.sql'), 'utf8');
+    const migrationSQL = readFileSync(join(__dirname, 'supabase/manual-scripts/add-active-column-events.sql'), 'utf8');
     
     console.log('Applying migration to add active column to events table...');
     

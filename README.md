@@ -49,9 +49,52 @@ npm run preview
 
 ## Database Setup
 
-Run the migration files in your Supabase dashboard:
-1. `supabase/migrations/create_contact_submissions.sql`
-2. `supabase/migrations/create_enrollment_submissions.sql`
+### SQL Files Organization
+
+The project uses a well-organized SQL file structure within the `supabase/` directory:
+
+```
+supabase/
+├── setup/                    # Initial database setup files
+│   ├── supabase-setup.sql           # AWS config table and trigger setup
+│   ├── create_base_tables.sql       # Review forms and form responses tables
+│   ├── create_analytics_tables_fixed.sql  # Analytics tables setup
+│   └── create-events-table-supabase.sql   # Events table creation
+├── fixes/                    # Bug fixes and corrections
+│   ├── fix-events-table.sql         # Events table structure fixes
+│   ├── fix-aws-config.sql           # AWS configuration fixes
+│   ├── fix-rls-policies.sql         # Row Level Security policy fixes
+│   ├── fix-success-stories-table.sql       # Success stories table fixes
+│   └── corrected-success-stories-table.sql # Corrected success stories structure
+├── manual-scripts/           # Manual operations and utilities
+│   ├── add-active-column-events.sql # Add active column to events table
+│   └── manual_analytics_tables.sql  # Manual analytics table operations
+└── migrations/               # Supabase migrations (auto-generated)
+    ├── create_contact_submissions.sql
+    ├── create_enrollment_submissions.sql
+    └── [other migration files...]
+```
+
+### Setup Instructions
+
+Run the migration files in your Supabase dashboard in this order:
+
+1. **Initial Setup** (run these first):
+   - `supabase/setup/supabase-setup.sql`
+   - `supabase/setup/create_base_tables.sql`
+   - `supabase/setup/create_analytics_tables_fixed.sql`
+   - `supabase/setup/create-events-table-supabase.sql`
+
+2. **Core Migrations** (run these next):
+   - `supabase/migrations/create_contact_submissions.sql`
+   - `supabase/migrations/create_enrollment_submissions.sql`
+   - All other files in `supabase/migrations/`
+
+3. **Fixes** (apply if needed):
+   - Files in `supabase/fixes/` as required for bug fixes
+
+4. **Manual Scripts** (run manually when needed):
+   - Files in `supabase/manual-scripts/` for specific operations
 
 ## Deployment on Ubuntu Server
 
