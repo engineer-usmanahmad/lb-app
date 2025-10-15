@@ -130,7 +130,7 @@ if (!form) {
               )}
               
               {field.field_type === 'rating' && (
-                <div class="flex space-x-2" data-rating-field={`field_${field.id}`}>
+                <div class="flex space-x-2" data-rating-field={`field_${field.id}`} data-required={field.is_required ? 'true' : 'false'}>
                   {[1, 2, 3, 4, 5].map((rating) => (
                     <button 
                       type="button" 
@@ -142,7 +142,7 @@ if (!form) {
                       </svg>
                     </button>
                   ))}
-                  <input type="hidden" name={`field_${field.id}`} required={field.is_required} />
+                  <input type="hidden" name={`field_${field.id}`} />
                 </div>
               )}
               
@@ -215,6 +215,11 @@ if (!form) {
               s.classList.add('text-gray-300');
             }
           });
+
+          // Clear any rating validation UI
+          ratingGroup.classList.remove('ring-2', 'ring-red-500');
+          const msg = ratingGroup.querySelector('.rating-error');
+          if (msg) msg.remove();
         });
       });
     });
@@ -222,6 +227,36 @@ if (!form) {
     // Form submission
     document.getElementById('public-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      
+      // Client-side validation for rating fields (hidden inputs are ignored by native validation)
+      let ratingValid = true;
+      const ratingGroups = document.querySelectorAll('[data-rating-field]');
+      ratingGroups.forEach(group => {
+        const hiddenInput = group.querySelector('input[type="hidden"]');
+        const isRequired = group.getAttribute('data-required') === 'true';
+        if (isRequired) {
+          const value = parseInt(hiddenInput.value, 10);
+          if (!value || Number.isNaN(value) || value < 1) {
+            ratingValid = false;
+            // Simple inline indication
+            group.classList.add('ring-2', 'ring-red-500');
+            let msg = group.querySelector('.rating-error');
+            if (!msg) {
+              msg = document.createElement('div');
+              msg.className = 'rating-error text-red-500 text-sm mt-2';
+              msg.textContent = 'Please select a rating.';
+              group.appendChild(msg);
+            }
+            // Scroll into view like native required fields behavior
+            group.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      });
+      if (!ratingValid) {
+        // Trigger native validation messages for other fields
+        e.target.reportValidity();
+        return;
+      }
       
       const formData = new FormData(e.target);
       const submissionData = {};
@@ -242,12 +277,17 @@ if (!form) {
               submission_data: submissionData
             })
         });
-        
-        if (response.ok) {
+        const result = await response.json();
+        if (response.ok && result.ok) {
           document.getElementById('public-form').style.display = 'none';
           document.getElementById('success-message').classList.remove('hidden');
         } else {
-          alert('Error submitting form. Please try again.');
+          // Show server-provided validation feedback if available
+          const serverErrors = Array.isArray(result.errors) ? result.errors : [];
+          const message = serverErrors.length
+            ? serverErrors.join('\n')
+            : (result.error || 'Error submitting form. Please try again.');
+          alert(message);
         }
       } catch (error) {
         console.error('Error submitting form:', error);

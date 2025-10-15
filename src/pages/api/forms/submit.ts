@@ -46,6 +46,108 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         });
       }
 
+      // Fetch fields for validation
+      const { data: fields, error: fieldsError } = await supabase
+        .from('form_fields')
+        .select('id, field_type, label, is_required, validation')
+        .eq('form_id', form_id)
+        .order('field_order');
+
+      if (fieldsError) {
+        return new Response(JSON.stringify({ ok: false, error: 'Failed to validate form fields' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Helper to get value for a field from the submission_data payload
+      const getValueForField = (field: any) => {
+        const payload: any = submission_data || {};
+
+        // Try exact label key
+        if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+          // Common public form: name is "field_<id>"
+          const idKey = `field_${field.id}`;
+          if (Object.prototype.hasOwnProperty.call(payload, idKey)) {
+            return payload[idKey];
+          }
+
+          if (Object.prototype.hasOwnProperty.call(payload, field.label)) {
+            return payload[field.label];
+          }
+          // Try normalized label key (lowercase, non-alphanumeric to underscore)
+          const normalized = String(field.label)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_|_$/g, '');
+          if (Object.prototype.hasOwnProperty.call(payload, normalized)) {
+            return payload[normalized];
+          }
+          // If payload has a fields array, search by label or id
+          if (Array.isArray(payload.fields)) {
+            const found = payload.fields.find((f: any) => 
+              (f.label && String(f.label) === field.label) || (f.id && f.id === field.id)
+            );
+            if (found) return found.value ?? found.response ?? found.answer ?? null;
+          }
+        }
+
+        // If payload itself is an array of responses
+        if (Array.isArray(payload)) {
+          const found = payload.find((f: any) => 
+            (f.label && String(f.label) === field.label) || (f.id && f.id === field.id)
+          );
+          if (found) return found.value ?? found.response ?? found.answer ?? null;
+        }
+
+        return null;
+      };
+
+      // Validate required fields, including rating
+      const missing: string[] = [];
+      const invalid: string[] = [];
+      for (const field of (fields || [])) {
+        if (field.is_required) {
+          const value = getValueForField(field);
+          const isEmptyArray = Array.isArray(value) && value.length === 0;
+          const isEmptyString = typeof value === 'string' && value.trim() === '';
+          const isNullish = value === null || value === undefined;
+          if (isNullish || isEmptyString || isEmptyArray) {
+            missing.push(field.label);
+            continue;
+          }
+        }
+
+        // Rating-specific validation: must be a number >= 1
+        // Treat empty string as "no value" so optional ratings aren't flagged
+        if (String(field.field_type).toLowerCase() === 'rating') {
+          const value = getValueForField(field);
+          const hasValue = (
+            value !== null &&
+            value !== undefined &&
+            !(typeof value === 'string' && value.trim() === '')
+          );
+          if (hasValue) {
+            const num = typeof value === 'number' ? value : parseFloat(String(value));
+            if (Number.isNaN(num) || num < 1) {
+              invalid.push(`${field.label} must be at least 1 star`);
+            }
+          } else if (field.is_required) {
+            missing.push(field.label);
+          }
+        }
+      }
+
+      if (missing.length > 0 || invalid.length > 0) {
+        return new Response(JSON.stringify({ 
+          ok: false, 
+          error: `Please complete required fields. ${missing.length ? 'Missing: ' + missing.join(', ') + '. ' : ''}${invalid.length ? 'Invalid: ' + invalid.join(', ') + '.' : ''}`
+        }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
       // Insert form submission
       const { data: submission, error: submissionError } = await supabase
         .from('form_submissions')

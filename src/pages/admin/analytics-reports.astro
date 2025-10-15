@@ -1,0 +1,524 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { supabaseAdmin } from '../../lib/supabase-admin';
+
+// Check authentication
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect('/auth/login');
+}
+
+// Fetch forms for report generation
+let userForms = [];
+try {
+  const { data: forms } = await supabaseAdmin
+    .from('review_forms')
+    .select('id, name, created_at, active')
+    .eq('created_by', user.id)
+    .order('created_at', { ascending: false });
+  
+  userForms = forms || [];
+} catch (error) {
+  console.error('Error fetching forms:', error);
+}
+---
+
+<Layout title="Analytics Reports - LbisTech">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">Analytics Reports</h1>
+            <p class="mt-1 text-sm text-gray-500">Generate comprehensive reports and export data</p>
+          </div>
+          <div class="flex space-x-3">
+            <button id="scheduleReport" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Schedule Report
+            </button>
+            <button id="generateReport" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-coral-600 hover:bg-coral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral-500 transition-colors">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Generate Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Report Configuration -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Report Settings -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">Report Configuration</h3>
+            
+            <!-- Form Selection -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Select Forms</label>
+              <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-3">
+                <label class="flex items-center">
+                  <input type="checkbox" id="selectAllForms" class="rounded border-gray-300 text-coral-600 focus:ring-coral-500">
+                  <span class="ml-2 text-sm font-medium text-gray-900">Select All Forms</span>
+                </label>
+                <hr class="my-2">
+                {userForms.map((form) => (
+                  <label class="flex items-center">
+                    <input type="checkbox" name="selectedForms" value={form.id} class="form-checkbox rounded border-gray-300 text-coral-600 focus:ring-coral-500">
+                    <span class="ml-2 text-sm text-gray-700">{form.name}</span>
+                    <span class={`ml-auto px-2 py-1 text-xs rounded-full ${form.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                      {form.active ? 'Active' : 'Inactive'}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <!-- Date Range -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                <input type="date" id="startDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                <input type="date" id="endDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+              </div>
+            </div>
+
+            <!-- Report Type -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Report Type</label>
+              <select id="reportType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                <option value="comprehensive">Comprehensive Analytics</option>
+                <option value="summary">Executive Summary</option>
+                <option value="detailed">Detailed Response Analysis</option>
+                <option value="comparison">Course Comparison</option>
+                <option value="trends">Trend Analysis</option>
+              </select>
+            </div>
+
+            <!-- Advanced Filters -->
+            <div class="mb-6">
+              <h4 class="text-md font-medium text-gray-900 mb-3">Advanced Filters</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Rating</label>
+                  <select id="minRating" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                    <option value="">All Ratings</option>
+                    <option value="1">1 Star and above</option>
+                    <option value="2">2 Stars and above</option>
+                    <option value="3">3 Stars and above</option>
+                    <option value="4">4 Stars and above</option>
+                    <option value="5">5 Stars only</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Response Status</label>
+                  <select id="responseStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+                    <option value="">All Responses</option>
+                    <option value="complete">Complete Only</option>
+                    <option value="partial">Partial Only</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Include Options -->
+            <div class="mb-6">
+              <h4 class="text-md font-medium text-gray-900 mb-3">Include in Report</h4>
+              <div class="grid grid-cols-2 gap-4">
+                <label class="flex items-center">
+                  <input type="checkbox" id="includeCharts" checked class="rounded border-gray-300 text-coral-600 focus:ring-coral-500">
+                  <span class="ml-2 text-sm text-gray-700">Charts & Graphs</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" id="includeRawData" class="rounded border-gray-300 text-coral-600 focus:ring-coral-500">
+                  <span class="ml-2 text-sm text-gray-700">Raw Data</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" id="includeComments" checked class="rounded border-gray-300 text-coral-600 focus:ring-coral-500">
+                  <span class="ml-2 text-sm text-gray-700">Comments</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" id="includeTrends" checked class="rounded border-gray-300 text-coral-600 focus:ring-coral-500">
+                  <span class="ml-2 text-sm text-gray-700">Trend Analysis</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Export Options -->
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">Export Options</h3>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <!-- PDF Export -->
+              <button id="exportPDF" class="export-btn flex flex-col items-center p-4 border-2 border-red-200 rounded-lg hover:border-red-400 hover:bg-red-50 transition-colors">
+                <svg class="w-8 h-8 text-red-600 mb-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-sm font-medium text-gray-900">PDF Report</span>
+                <span class="text-xs text-gray-500">High-quality charts</span>
+              </button>
+
+              <!-- Excel Export -->
+              <button id="exportExcel" class="export-btn flex flex-col items-center p-4 border-2 border-green-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors">
+                <svg class="w-8 h-8 text-green-600 mb-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-sm font-medium text-gray-900">Excel</span>
+                <span class="text-xs text-gray-500">Detailed analytics</span>
+              </button>
+
+              <!-- CSV Export -->
+              <button id="exportCSV" class="export-btn flex flex-col items-center p-4 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                <svg class="w-8 h-8 text-blue-600 mb-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-sm font-medium text-gray-900">CSV</span>
+                <span class="text-xs text-gray-500">Raw data</span>
+              </button>
+
+              <!-- PowerPoint Export -->
+              <button id="exportPPT" class="export-btn flex flex-col items-center p-4 border-2 border-orange-200 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors">
+                <svg class="w-8 h-8 text-orange-600 mb-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 2h6v4H7V5zm8 8v2h1a1 1 0 100-2h-1zM6 9a1 1 0 000 2h1v-2H6z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-sm font-medium text-gray-900">PowerPoint</span>
+                <span class="text-xs text-gray-500">Presentations</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Report Preview & Scheduled Reports -->
+        <div class="space-y-8">
+          <!-- Report Preview -->
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Report Preview</h3>
+            <div id="reportPreview" class="space-y-4">
+              <div class="text-center py-8 text-gray-500">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <p class="mt-2 text-sm">Configure settings to preview report</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scheduled Reports -->
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-gray-900">Scheduled Reports</h3>
+              <button id="addSchedule" class="text-sm text-coral-600 hover:text-coral-700 font-medium">+ Add Schedule</button>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">Weekly Summary</p>
+                  <p class="text-xs text-gray-500">Every Monday at 9:00 AM</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Active</span>
+                  <button class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">Monthly Analytics</p>
+                  <p class="text-xs text-gray-500">1st of every month at 8:00 AM</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Active</span>
+                  <button class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Reports -->
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Reports</h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">Q4 Analytics Report</p>
+                    <p class="text-xs text-gray-500">Generated 2 hours ago</p>
+                  </div>
+                </div>
+                <button class="text-coral-600 hover:text-coral-700 text-sm font-medium">Download</button>
+              </div>
+              
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">Course Performance Data</p>
+                    <p class="text-xs text-gray-500">Generated yesterday</p>
+                  </div>
+                </div>
+                <button class="text-coral-600 hover:text-coral-700 text-sm font-medium">Download</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule Report Modal -->
+  <div id="scheduleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Schedule Report</h3>
+          <button id="closeScheduleModal" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <form id="scheduleForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Report Name</label>
+            <input type="text" id="scheduleName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500 focus:border-coral-500" placeholder="Enter report name">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Frequency</label>
+            <select id="scheduleFrequency" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500 focus:border-coral-500">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email Recipients</label>
+            <textarea id="scheduleEmails" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-coral-500 focus:border-coral-500" rows="3" placeholder="Enter email addresses (comma separated)"></textarea>
+          </div>
+          
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" id="cancelSchedule" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">Cancel</button>
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-coral-600 rounded-md hover:bg-coral-700 transition-colors">Schedule Report</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set default dates
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+      
+      document.getElementById('startDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+      document.getElementById('endDate').value = today.toISOString().split('T')[0];
+
+      // Select all forms functionality
+      document.getElementById('selectAllForms').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('input[name="selectedForms"]');
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = this.checked;
+        });
+        updateReportPreview();
+      });
+
+      // Update preview when settings change
+      document.querySelectorAll('input, select').forEach(element => {
+        element.addEventListener('change', updateReportPreview);
+      });
+
+      // Export functionality
+      document.getElementById('exportPDF').addEventListener('click', () => exportReport('pdf'));
+      document.getElementById('exportExcel').addEventListener('click', () => exportReport('excel'));
+      document.getElementById('exportCSV').addEventListener('click', () => exportReport('csv'));
+      document.getElementById('exportPPT').addEventListener('click', () => exportReport('ppt'));
+
+      // Generate report
+      document.getElementById('generateReport').addEventListener('click', function() {
+        const selectedForms = Array.from(document.querySelectorAll('input[name="selectedForms"]:checked')).map(cb => cb.value);
+        if (selectedForms.length === 0) {
+          alert('Please select at least one form to generate a report.');
+          return;
+        }
+        generateReport();
+      });
+
+      // Schedule modal functionality
+      document.getElementById('scheduleReport').addEventListener('click', () => {
+        document.getElementById('scheduleModal').classList.remove('hidden');
+      });
+
+      document.getElementById('closeScheduleModal').addEventListener('click', () => {
+        document.getElementById('scheduleModal').classList.add('hidden');
+      });
+
+      document.getElementById('cancelSchedule').addEventListener('click', () => {
+        document.getElementById('scheduleModal').classList.add('hidden');
+      });
+
+      document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        scheduleReport();
+      });
+
+      function updateReportPreview() {
+        const selectedForms = document.querySelectorAll('input[name="selectedForms"]:checked').length;
+        const reportType = document.getElementById('reportType').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        const preview = document.getElementById('reportPreview');
+        
+        if (selectedForms > 0 && startDate && endDate) {
+          preview.innerHTML = `
+            <div class="space-y-3">
+              <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                <span class="text-sm font-medium text-blue-900">Selected Forms</span>
+                <span class="text-sm text-blue-700">${selectedForms} forms</span>
+              </div>
+              <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                <span class="text-sm font-medium text-green-900">Date Range</span>
+                <span class="text-sm text-green-700">${startDate} to ${endDate}</span>
+              </div>
+              <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                <span class="text-sm font-medium text-purple-900">Report Type</span>
+                <span class="text-sm text-purple-700">${reportType.charAt(0).toUpperCase() + reportType.slice(1)}</span>
+              </div>
+              <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                <p class="text-xs text-gray-600">This report will include analytics data, charts, and insights based on your selected criteria.</p>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      function exportReport(format) {
+        const selectedForms = Array.from(document.querySelectorAll('input[name="selectedForms"]:checked')).map(cb => cb.value);
+        if (selectedForms.length === 0) {
+          alert('Please select at least one form to export.');
+          return;
+        }
+
+        // Show loading state
+        const button = document.getElementById(`export${format.toUpperCase()}`);
+        const originalContent = button.innerHTML;
+        button.innerHTML = '<svg class="animate-spin w-4 h-4 mx-auto" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+        button.disabled = true;
+
+        // Simulate export process
+        setTimeout(() => {
+          button.innerHTML = originalContent;
+          button.disabled = false;
+          
+          // Create download notification
+          showNotification(`${format.toUpperCase()} report exported successfully!`, 'success');
+          
+          // In a real implementation, this would trigger the actual export
+          console.log(`Exporting ${format} report for forms:`, selectedForms);
+        }, 2000);
+      }
+
+      function generateReport() {
+        const button = document.getElementById('generateReport');
+        const originalContent = button.innerHTML;
+        button.innerHTML = '<svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Generating...';
+        button.disabled = true;
+
+        setTimeout(() => {
+          button.innerHTML = originalContent;
+          button.disabled = false;
+          showNotification('Report generated successfully!', 'success');
+        }, 3000);
+      }
+
+      function scheduleReport() {
+        const name = document.getElementById('scheduleName').value;
+        const frequency = document.getElementById('scheduleFrequency').value;
+        const emails = document.getElementById('scheduleEmails').value;
+
+        if (!name || !emails) {
+          alert('Please fill in all required fields.');
+          return;
+        }
+
+        // Simulate scheduling
+        setTimeout(() => {
+          document.getElementById('scheduleModal').classList.add('hidden');
+          showNotification(`Report "${name}" scheduled successfully!`, 'success');
+          
+          // Reset form
+          document.getElementById('scheduleForm').reset();
+        }, 1000);
+      }
+
+      function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+          type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+
+      // Initialize preview
+      updateReportPreview();
+    });
+  </script>
+
+  <style>
+    .export-btn {
+      transition: all 0.2s ease;
+    }
+
+    .export-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-checkbox:checked {
+      background-color: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .form-checkbox:focus {
+      ring-color: #ef4444;
+    }
+  </style>
+</Layout>

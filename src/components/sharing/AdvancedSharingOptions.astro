@@ -1,0 +1,836 @@
+---
+export interface Props {
+  formId: string;
+  formTitle: string;
+  formUrl: string;
+  userId: string;
+}
+
+const { formId, formTitle, formUrl, userId } = Astro.props;
+
+// Generate QR code data URL (this would typically be done server-side)
+const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(formUrl)}`;
+---
+
+<div class="advanced-sharing-container bg-white rounded-lg shadow-lg p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h3 class="text-xl font-bold text-gray-900">Share Your Form</h3>
+    <div class="flex items-center space-x-2">
+      <span class="text-sm text-gray-500">Form ID:</span>
+      <code class="px-2 py-1 bg-gray-100 rounded text-sm font-mono">{formId}</code>
+    </div>
+  </div>
+
+  <!-- Quick Share Options -->
+  <div class="quick-share-section mb-8">
+    <h4 class="text-lg font-semibold text-gray-800 mb-4">Quick Share</h4>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <!-- Copy Link -->
+      <button
+        class="share-option flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
+        onclick="copyToClipboard()"
+      >
+        <svg class="w-8 h-8 text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+        </svg>
+        <span class="text-sm font-medium text-gray-700">Copy Link</span>
+      </button>
+
+      <!-- Email Share -->
+      <button
+        class="share-option flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all duration-200"
+        onclick="shareViaEmail()"
+      >
+        <svg class="w-8 h-8 text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+        <span class="text-sm font-medium text-gray-700">Email</span>
+      </button>
+
+      <!-- SMS Share -->
+      <button
+        class="share-option flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all duration-200"
+        onclick="shareViaSMS()"
+      >
+        <svg class="w-8 h-8 text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+        <span class="text-sm font-medium text-gray-700">SMS</span>
+      </button>
+
+      <!-- QR Code -->
+      <button
+        class="share-option flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-200"
+        onclick="showQRCode()"
+      >
+        <svg class="w-8 h-8 text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+        </svg>
+        <span class="text-sm font-medium text-gray-700">QR Code</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- WhatsApp Bulk Distribution -->
+  <div class="whatsapp-bulk-section mb-8">
+    <h4 class="text-lg font-semibold text-gray-800 mb-4">WhatsApp Bulk Distribution</h4>
+    <div class="bg-green-50 rounded-lg p-6">
+      <div class="flex items-center mb-4">
+        <svg class="w-6 h-6 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.700"></path>
+        </svg>
+        <h5 class="text-lg font-semibold text-green-800">Send to Multiple Contacts</h5>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Contact List Upload -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Upload Contact List</label>
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-green-400 transition-colors">
+            <input
+              type="file"
+              id="contact-file"
+              accept=".csv,.xlsx,.txt"
+              class="hidden"
+              onchange="handleContactUpload(event)"
+            />
+            <label for="contact-file" class="cursor-pointer">
+              <svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+              </svg>
+              <p class="text-sm text-gray-600">Click to upload CSV, Excel, or Text file</p>
+              <p class="text-xs text-gray-500 mt-1">Format: Name, Phone Number</p>
+            </label>
+          </div>
+        </div>
+
+        <!-- Manual Contact Entry -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Add Contacts Manually</label>
+          <div class="space-y-3">
+            <div class="flex space-x-2">
+              <input
+                type="text"
+                id="contact-name"
+                placeholder="Contact Name"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+              <input
+                type="tel"
+                id="contact-phone"
+                placeholder="Phone Number"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+              <button
+                type="button"
+                onclick="addContact()"
+                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Add
+              </button>
+            </div>
+            <div id="contact-list" class="max-h-32 overflow-y-auto space-y-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Customization -->
+      <div class="mt-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Customize Message</label>
+        <textarea
+          id="whatsapp-message"
+          rows="4"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="Hi &#123;name&#125;, please fill out this feedback form: &#123;link&#125;"
+        >Hi &#123;name&#125;, 
+
+I hope you're doing well! I'd love to get your feedback on the recent training session. 
+
+Please take a few minutes to fill out this form: &#123;link&#125;
+
+Your input is valuable and helps us improve our training programs.
+
+Thank you!</textarea>
+        <p class="text-xs text-gray-500 mt-1">Use &#123;name&#125; for contact name and &#123;link&#125; for form URL</p>
+      </div>
+
+      <!-- Scheduling Options -->
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Send Immediately or Schedule</label>
+          <select
+            id="send-timing"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          >
+            <option value="immediate">Send Immediately</option>
+            <option value="scheduled">Schedule for Later</option>
+          </select>
+        </div>
+        <div id="schedule-datetime" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Schedule Date & Time</label>
+          <input
+            type="datetime-local"
+            id="schedule-time"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      <!-- Send Button -->
+      <div class="mt-6 flex justify-between items-center">
+        <div class="text-sm text-gray-600">
+          <span id="contact-count">0</span> contacts selected
+        </div>
+        <button
+          type="button"
+          onclick="sendWhatsAppBulk()"
+          class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+          disabled
+          id="send-bulk-btn"
+        >
+          Send WhatsApp Messages
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Media Sharing -->
+  <div class="social-media-section mb-8">
+    <h4 class="text-lg font-semibold text-gray-800 mb-4">Social Media Sharing</h4>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <!-- Facebook -->
+      <button
+        class="social-share-btn flex flex-col items-center p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        onclick="shareOnFacebook()"
+      >
+        <svg class="w-8 h-8 mb-2" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path>
+        </svg>
+        <span class="text-sm font-medium">Facebook</span>
+      </button>
+
+      <!-- Twitter -->
+      <button
+        class="social-share-btn flex flex-col items-center p-4 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors"
+        onclick="shareOnTwitter()"
+      >
+        <svg class="w-8 h-8 mb-2" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"></path>
+        </svg>
+        <span class="text-sm font-medium">Twitter</span>
+      </button>
+
+      <!-- LinkedIn -->
+      <button
+        class="social-share-btn flex flex-col items-center p-4 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
+        onclick="shareOnLinkedIn()"
+      >
+        <svg class="w-8 h-8 mb-2" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path>
+        </svg>
+        <span class="text-sm font-medium">LinkedIn</span>
+      </button>
+
+      <!-- Telegram -->
+      <button
+        class="social-share-btn flex flex-col items-center p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        onclick="shareOnTelegram()"
+      >
+        <svg class="w-8 h-8 mb-2" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"></path>
+        </svg>
+        <span class="text-sm font-medium">Telegram</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- QR Code Section -->
+  <div class="qr-code-section mb-8">
+    <h4 class="text-lg font-semibold text-gray-800 mb-4">QR Code Options</h4>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- QR Code Display -->
+      <div class="qr-display bg-gray-50 rounded-lg p-6 text-center">
+        <div class="mb-4">
+          <img
+            id="qr-code-image"
+            src={qrCodeUrl}
+            alt="QR Code for form"
+            class="mx-auto border-4 border-white shadow-lg rounded-lg"
+          />
+        </div>
+        <p class="text-sm text-gray-600 mb-4">Scan to access the form</p>
+        <div class="flex justify-center space-x-3">
+          <button
+            onclick="downloadQRCode()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+          >
+            Download PNG
+          </button>
+          <button
+            onclick="printQRCode()"
+            class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+          >
+            Print
+          </button>
+        </div>
+      </div>
+
+      <!-- QR Code Customization -->
+      <div class="qr-customization">
+        <h5 class="text-md font-semibold text-gray-800 mb-3">Customize QR Code</h5>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Size</label>
+            <select
+              id="qr-size"
+              onchange="updateQRCode()"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="200x200">Small (200x200)</option>
+              <option value="300x300" selected>Medium (300x300)</option>
+              <option value="400x400">Large (400x400)</option>
+              <option value="500x500">Extra Large (500x500)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Color</label>
+            <div class="grid grid-cols-4 gap-2">
+              {['000000', '1e3c72', '11998e', '2c3e50'].map(color => (
+                <button
+                  class={`w-full h-8 rounded border-2 ${color === '000000' ? 'border-gray-400' : 'border-gray-200'}`}
+                  style={`background-color: #${color}`}
+                  onclick={`updateQRColor('${color}')`}
+                  data-color={color}
+                ></button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Add Logo/Text</label>
+            <input
+              type="text"
+              id="qr-text"
+              placeholder="Enter text to embed"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onchange="updateQRCode()"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Format</label>
+            <select
+              id="qr-format"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="png">PNG</option>
+              <option value="jpg">JPG</option>
+              <option value="svg">SVG</option>
+              <option value="pdf">PDF</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sharing Analytics -->
+  <div class="sharing-analytics-section">
+    <h4 class="text-lg font-semibold text-gray-800 mb-4">Sharing Analytics</h4>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Total Shares -->
+      <div class="analytics-card bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-blue-100 text-sm">Total Shares</p>
+            <p class="text-2xl font-bold" id="total-shares">0</p>
+          </div>
+          <svg class="w-8 h-8 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Click Through Rate -->
+      <div class="analytics-card bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-green-100 text-sm">Click Rate</p>
+            <p class="text-2xl font-bold" id="click-rate">0%</p>
+          </div>
+          <svg class="w-8 h-8 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Response Rate -->
+      <div class="analytics-card bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-4 text-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-purple-100 text-sm">Response Rate</p>
+            <p class="text-2xl font-bold" id="response-rate">0%</p>
+          </div>
+          <svg class="w-8 h-8 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sharing Methods Breakdown -->
+    <div class="mt-6">
+      <h5 class="text-md font-semibold text-gray-800 mb-3">Sharing Methods Performance</h5>
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="space-y-3">
+          {[
+            { method: 'WhatsApp', shares: 45, color: 'bg-green-500' },
+            { method: 'Email', shares: 32, color: 'bg-blue-500' },
+            { method: 'QR Code', shares: 18, color: 'bg-purple-500' },
+            { method: 'Social Media', shares: 12, color: 'bg-pink-500' },
+            { method: 'Direct Link', shares: 28, color: 'bg-indigo-500' }
+          ].map(item => (
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class={`w-3 h-3 rounded-full ${item.color}`}></div>
+                <span class="text-sm font-medium text-gray-700">{item.method}</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="w-24 bg-gray-200 rounded-full h-2">
+                  <div class={`h-2 rounded-full ${item.color}`} style={`width: ${(item.shares / 50) * 100}%`}></div>
+                </div>
+                <span class="text-sm font-bold text-gray-600 w-8">{item.shares}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden form URL input -->
+<input type="hidden" id="form-url" value={formUrl} />
+<input type="hidden" id="form-title" value={formTitle} />
+
+<script>
+class AdvancedSharingManager {
+  constructor() {
+    this.formUrl = document.getElementById('form-url').value;
+    this.formTitle = document.getElementById('form-title').value;
+    this.contacts = [];
+    this.qrColor = '000000';
+    this.qrSize = '300x300';
+    
+    this.init();
+  }
+
+  init() {
+    this.setupEventListeners();
+    this.loadSharingAnalytics();
+  }
+
+  setupEventListeners() {
+    // Send timing change
+    document.getElementById('send-timing').addEventListener('change', (e) => {
+      const scheduleDiv = document.getElementById('schedule-datetime');
+      if (e.target.value === 'scheduled') {
+        scheduleDiv.classList.remove('hidden');
+      } else {
+        scheduleDiv.classList.add('hidden');
+      }
+    });
+  }
+
+  loadSharingAnalytics() {
+    // Simulate loading analytics data
+    setTimeout(() => {
+      document.getElementById('total-shares').textContent = '127';
+      document.getElementById('click-rate').textContent = '68%';
+      document.getElementById('response-rate').textContent = '42%';
+    }, 1000);
+  }
+}
+
+// Global functions for sharing
+function copyToClipboard() {
+  const formUrl = document.getElementById('form-url').value;
+  navigator.clipboard.writeText(formUrl).then(() => {
+    showNotification('Link copied to clipboard!', 'success');
+    trackShare('copy_link');
+  });
+}
+
+function shareViaEmail() {
+  const formUrl = document.getElementById('form-url').value;
+  const formTitle = document.getElementById('form-title').value;
+  const subject = encodeURIComponent(`Feedback Request: ${formTitle}`);
+  const body = encodeURIComponent(`Hi,
+
+I would appreciate your feedback on our recent training session. Please take a few minutes to fill out this form:
+
+${formUrl}
+
+Thank you for your time!`);
+  
+  window.open(`mailto:?subject=${subject}&body=${body}`);
+  trackShare('email');
+}
+
+function shareViaSMS() {
+  const formUrl = document.getElementById('form-url').value;
+  const message = encodeURIComponent(`Please provide your feedback: ${formUrl}`);
+  window.open(`sms:?body=${message}`);
+  trackShare('sms');
+}
+
+function showQRCode() {
+  // QR code is already visible, just scroll to it
+  document.querySelector('.qr-code-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function shareOnFacebook() {
+  const formUrl = document.getElementById('form-url').value;
+  const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(formUrl)}`;
+  window.open(shareUrl, 'facebook-share', 'width=580,height=296');
+  trackShare('facebook');
+}
+
+function shareOnTwitter() {
+  const formUrl = document.getElementById('form-url').value;
+  const formTitle = document.getElementById('form-title').value;
+  const text = encodeURIComponent(`Please share your feedback: ${formTitle}`);
+  const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(formUrl)}`;
+  window.open(shareUrl, 'twitter-share', 'width=580,height=296');
+  trackShare('twitter');
+}
+
+function shareOnLinkedIn() {
+  const formUrl = document.getElementById('form-url').value;
+  const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(formUrl)}`;
+  window.open(shareUrl, 'linkedin-share', 'width=580,height=296');
+  trackShare('linkedin');
+}
+
+function shareOnTelegram() {
+  const formUrl = document.getElementById('form-url').value;
+  const formTitle = document.getElementById('form-title').value;
+  const text = encodeURIComponent(`${formTitle}: ${formUrl}`);
+  const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(formUrl)}&text=${text}`;
+  window.open(shareUrl, 'telegram-share', 'width=580,height=296');
+  trackShare('telegram');
+}
+
+// Contact management functions
+function handleContactUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const content = e.target.result;
+    parseContactFile(content, file.name);
+  };
+  reader.readAsText(file);
+}
+
+function parseContactFile(content, filename) {
+  const lines = content.split('\n');
+  let contacts = [];
+
+  lines.forEach(line => {
+    const parts = line.split(',');
+    if (parts.length >= 2) {
+      const name = parts[0].trim();
+      const phone = parts[1].trim();
+      if (name && phone) {
+        contacts.push({ name, phone });
+      }
+    }
+  });
+
+  if (contacts.length > 0) {
+    window.sharingManager.contacts = [...window.sharingManager.contacts, ...contacts];
+    updateContactList();
+    showNotification(`${contacts.length} contacts imported successfully!`, 'success');
+  } else {
+    showNotification('No valid contacts found in file', 'error');
+  }
+}
+
+function addContact() {
+  const name = document.getElementById('contact-name').value.trim();
+  const phone = document.getElementById('contact-phone').value.trim();
+
+  if (!name || !phone) {
+    showNotification('Please enter both name and phone number', 'error');
+    return;
+  }
+
+  if (!window.sharingManager) {
+    window.sharingManager = { contacts: [] };
+  }
+
+  window.sharingManager.contacts.push({ name, phone });
+  updateContactList();
+  
+  // Clear inputs
+  document.getElementById('contact-name').value = '';
+  document.getElementById('contact-phone').value = '';
+  
+  showNotification('Contact added successfully!', 'success');
+}
+
+function updateContactList() {
+  const contactList = document.getElementById('contact-list');
+  const contactCount = document.getElementById('contact-count');
+  const sendBtn = document.getElementById('send-bulk-btn');
+
+  if (!window.sharingManager || !window.sharingManager.contacts) {
+    return;
+  }
+
+  contactList.innerHTML = '';
+  window.sharingManager.contacts.forEach((contact, index) => {
+    const contactDiv = document.createElement('div');
+    contactDiv.className = 'flex items-center justify-between p-2 bg-white rounded border';
+    contactDiv.innerHTML = `
+      <span class="text-sm">${contact.name} - ${contact.phone}</span>
+      <button onclick="removeContact(${index})" class="text-red-500 hover:text-red-700">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    `;
+    contactList.appendChild(contactDiv);
+  });
+
+  contactCount.textContent = window.sharingManager.contacts.length;
+  sendBtn.disabled = window.sharingManager.contacts.length === 0;
+}
+
+function removeContact(index) {
+  if (window.sharingManager && window.sharingManager.contacts) {
+    window.sharingManager.contacts.splice(index, 1);
+    updateContactList();
+  }
+}
+
+function sendWhatsAppBulk() {
+  if (!window.sharingManager || window.sharingManager.contacts.length === 0) {
+    showNotification('Please add contacts first', 'error');
+    return;
+  }
+
+  const message = document.getElementById('whatsapp-message').value;
+  const formUrl = document.getElementById('form-url').value;
+  const sendTiming = document.getElementById('send-timing').value;
+
+  if (sendTiming === 'scheduled') {
+    const scheduleTime = document.getElementById('schedule-time').value;
+    if (!scheduleTime) {
+      showNotification('Please select a schedule time', 'error');
+      return;
+    }
+  }
+
+  // Simulate sending messages
+  showNotification('Sending WhatsApp messages...', 'info');
+  
+  let sentCount = 0;
+  window.sharingManager.contacts.forEach((contact, index) => {
+    setTimeout(() => {
+      const personalizedMessage = message
+        .replace('{name}', contact.name)
+        .replace('{link}', formUrl);
+      
+      // Open WhatsApp with pre-filled message
+      const whatsappUrl = `https://wa.me/${contact.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(personalizedMessage)}`;
+      
+      if (index === 0) {
+        // Open first one immediately
+        window.open(whatsappUrl);
+      }
+      
+      sentCount++;
+      if (sentCount === window.sharingManager.contacts.length) {
+        showNotification(`WhatsApp messages prepared for ${sentCount} contacts!`, 'success');
+        trackShare('whatsapp_bulk', sentCount);
+      }
+    }, index * 1000); // Stagger by 1 second
+  });
+}
+
+// QR Code functions
+function updateQRCode() {
+  const size = document.getElementById('qr-size').value;
+  const text = document.getElementById('qr-text').value;
+  const formUrl = document.getElementById('form-url').value;
+  
+  let qrData = formUrl;
+  if (text) {
+    qrData += `\n${text}`;
+  }
+  
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}&color=${window.sharingManager?.qrColor || '000000'}&data=${encodeURIComponent(qrData)}`;
+  document.getElementById('qr-code-image').src = qrUrl;
+}
+
+function updateQRColor(color) {
+  if (!window.sharingManager) {
+    window.sharingManager = {};
+  }
+  window.sharingManager.qrColor = color;
+  
+  // Update button styles
+  document.querySelectorAll('[data-color]').forEach(btn => {
+    if (btn.getAttribute('data-color') === color) {
+      btn.classList.add('border-gray-400');
+      btn.classList.remove('border-gray-200');
+    } else {
+      btn.classList.remove('border-gray-400');
+      btn.classList.add('border-gray-200');
+    }
+  });
+  
+  updateQRCode();
+}
+
+function downloadQRCode() {
+  const qrImage = document.getElementById('qr-code-image');
+  const format = document.getElementById('qr-format').value;
+  
+  // Create download link
+  const link = document.createElement('a');
+  link.download = `form-qr-code.${format}`;
+  link.href = qrImage.src;
+  link.click();
+  
+  trackShare('qr_download');
+}
+
+function printQRCode() {
+  const qrImage = document.getElementById('qr-code-image');
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <html>
+      <head><title>QR Code - ${document.getElementById('form-title').value}</title></head>
+      <body style="text-align: center; padding: 20px;">
+        <h2>${document.getElementById('form-title').value}</h2>
+        <img src="${qrImage.src}" style="max-width: 100%;" />
+        <p>Scan this QR code to access the feedback form</p>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.print();
+  
+  trackShare('qr_print');
+}
+
+// Analytics tracking
+function trackShare(method, count = 1) {
+  // This would typically send data to your analytics backend
+  console.log(`Share tracked: ${method}, count: ${count}`);
+  
+  // Update local analytics
+  const totalShares = document.getElementById('total-shares');
+  const currentCount = parseInt(totalShares.textContent) || 0;
+  totalShares.textContent = currentCount + count;
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 transition-all duration-300 ${
+    type === 'success' ? 'bg-green-600' :
+    type === 'error' ? 'bg-red-600' :
+    type === 'warning' ? 'bg-yellow-600' : 'bg-blue-600'
+  }`;
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    setTimeout(() => {
+      if (document.body.contains(notification)) {
+        document.body.removeChild(notification);
+      }
+    }, 300);
+  }, 3000);
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  window.sharingManager = new AdvancedSharingManager();
+});
+</script>
+
+<style>
+.share-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.social-share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.analytics-card {
+  transition: transform 0.2s ease;
+}
+
+.analytics-card:hover {
+  transform: translateY(-2px);
+}
+
+#qr-code-image {
+  transition: all 0.3s ease;
+}
+
+#qr-code-image:hover {
+  transform: scale(1.05);
+}
+
+.advanced-sharing-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .social-share-btn,
+  .share-option {
+    padding: 12px;
+  }
+  
+  .social-share-btn svg,
+  .share-option svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

@@ -1,0 +1,881 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { supabaseAdmin } from '../../lib/supabase-admin';
+
+// Auth guard (support both admin and user for now)
+const admin = Astro.locals.admin;
+const user = Astro.locals.user;
+if (!admin && !user) {
+  return Astro.redirect('/auth/login');
+}
+
+// Fetch Feedback forms
+let feedbackForms = [] as any[];
+try {
+  const { data: forms } = await supabaseAdmin
+    .from('form_templates')
+    .select('*')
+    .eq('category', 'feedback')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false });
+  feedbackForms = forms || [];
+} catch (err) {
+  console.error('Error loading feedback forms:', err);
+}
+
+// Initial selection disabled: user must choose a form manually
+const initialFormId = null;
+let initialFields = [] as any[];
+let initialSubmissions = [] as any[];
+
+if (initialFormId) {
+  try {
+    const { data: fields } = await supabaseAdmin
+      .from('form_fields')
+      .select('*')
+      .eq('form_id', initialFormId)
+      .order('field_order');
+    initialFields = fields || [];
+    const { data: subs } = await supabaseAdmin
+      .from('form_submissions')
+      .select('*')
+      .eq('form_id', initialFormId)
+      .order('submitted_at', { ascending: false })
+      .limit(50);
+    initialSubmissions = subs || [];
+  } catch (err) {
+    console.error('Error loading initial data:', err);
+  }
+}
+---
+
+<Layout title="Feedback Forms – Management & Analytics">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
+    <!-- Sticky Header -->
+    <div class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-white text-sm shadow">FB</span>
+            Feedback Management
+          </h1>
+          <p class="text-sm text-gray-600">View individual responses and summary analytics</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="/admin/dashboard" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-600 text-white hover:bg-gray-700 transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Dashboard
+          </a>
+          <button id="export-summary" class="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-sm">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M13 7H7v6h6V7z"/><path d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V9l-4-4H5z"/></svg>
+            Export Summary (CSV)
+          </button>
+          <button id="print-summary" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition shadow-sm">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M4 4h12v4H4z"/><path d="M6 10h8v6H6z"/></svg>
+            Print
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+      <div class="bg-white rounded-xl shadow-sm border p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Select Form</label>
+            <select id="form-select" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+              {feedbackForms.length > 0 ? (
+                <>
+                  <option value="" selected>Select form</option>
+                  {feedbackForms.map(f => (
+                    <option value={f.id}>{f.name}</option>
+                  ))}
+                </>
+              ) : (
+                <option value="" disabled selected>No Feedback forms found</option>
+              )}
+            </select>
+          </div>
+          <div class="flex gap-3">
+            <button id="apply-filters" type="button" class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition w-full shadow-sm">Apply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+      <div class="bg-white rounded-xl shadow-sm border">
+        <div class="px-4 pt-4">
+          <nav class="flex gap-2" aria-label="Tabs">
+            <button id="tab-individual" class="tab-btn inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-600 bg-indigo-600 text-white shadow-sm">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L6.5 20l2-7L3 9h7z"/></svg>
+              Individual Responses
+            </button>
+            <button id="tab-summary" class="tab-btn inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-indigo-50 hover:border-indigo-200">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h4v16H4zM10 10h4v10h-4zM16 6h4v14h-4z"/></svg>
+              Summary Analytics
+            </button>
+          </nav>
+        </div>
+
+        <!-- Split View -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-0">
+          <!-- Left: Submissions List -->
+          <div class="lg:border-r lg:col-span-1 p-4" id="submissions-pane">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-lg font-semibold text-gray-900">Submissions</h2>
+              <div class="text-sm text-gray-500" id="submission-count">0</div>
+            </div>
+            <div id="submission-list" class="space-y-2 max-h-[70vh] overflow-auto"></div>
+            <div class="flex justify-between mt-3">
+              <button id="prev-page" class="px-3 py-1 rounded border border-gray-200 bg-white text-gray-700 hover:border-indigo-300 hover:bg-indigo-50">Prev</button>
+              <button id="next-page" class="px-3 py-1 rounded border border-gray-200 bg-white text-gray-700 hover:border-indigo-300 hover:bg-indigo-50">Next</button>
+            </div>
+          </div>
+
+          <!-- Right: Detail / Summary -->
+          <div class="lg:col-span-2 p-4" id="detail-pane">
+            <!-- Individual Detail -->
+            <div id="individual-view">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-900" id="detail-title">Select a submission</h2>
+                  <p class="text-sm text-gray-500" id="detail-meta"></p>
+                </div>
+                <div class="flex gap-2">
+                  <button id="prev-sub" class="px-3 py-2 rounded border border-gray-200 bg-white text-gray-700 hover:border-indigo-300 hover:bg-indigo-50">Previous</button>
+                  <button id="next-sub" class="px-3 py-2 rounded border border-gray-200 bg-white text-gray-700 hover:border-indigo-300 hover:bg-indigo-50">Next</button>
+                  <button id="print-sub" class="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm">Print</button>
+                </div>
+              </div>
+              <div id="qa-cards" class="space-y-3"></div>
+            </div>
+
+            <!-- Summary Analytics -->
+            <div id="summary-view" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div class="rounded-xl p-4 text-white shadow bg-gradient-to-r from-indigo-500 to-indigo-600">
+                <div class="flex items-center justify-between">
+                  <div class="text-sm opacity-90">Total Submissions</div>
+                  <svg class="w-5 h-5 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11h18v2H3z"/></svg>
+                </div>
+                <div class="mt-1 text-3xl font-bold" id="stat-total">0</div>
+              </div>
+              <div class="rounded-xl p-4 text-white shadow bg-gradient-to-r from-sky-500 to-blue-600">
+                <div class="flex items-center justify-between">
+                  <div class="text-sm opacity-90">Latest Submission</div>
+                  <svg class="w-5 h-5 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
+                </div>
+                <div class="mt-1 text-lg font-semibold" id="stat-latest">—</div>
+              </div>
+              <!-- Removed Average Rating stat card per request -->
+            </div>
+              <div class="space-y-6">
+                <div class="bg-white rounded-lg border p-4">
+                  <h3 class="font-semibold text-gray-900 mb-2">Rating Distribution</h3>
+                  <canvas id="rating-chart" height="160"></canvas>
+                </div>
+                <div class="bg-white rounded-lg border p-4">
+                  <h3 class="font-semibold text-gray-900 mb-2">Yes/No/Somewhat</h3>
+                  <canvas id="yn-chart" height="160"></canvas>
+                </div>
+                <div class="bg-white rounded-lg border p-4">
+                  <h3 class="font-semibold text-gray-900 mb-2">Multiple Choice</h3>
+                  <canvas id="mc-chart" height="160"></canvas>
+                </div>
+                <div class="bg-white rounded-lg border p-4">
+                  <h3 class="font-semibold text-gray-900 mb-2">Text Responses</h3>
+                  <input id="text-search" type="text" placeholder="Search responses…" class="w-full border rounded mb-3 px-3 py-2" />
+                  <div id="text-list" class="space-y-2 max-h-[40vh] overflow-auto"></div>
+                  <div id="word-cloud" class="flex flex-wrap gap-2 mt-2"></div>
+                </div>
+                <div class="bg-white rounded-lg border p-4">
+                  <h3 class="font-semibold text-gray-900 mb-2">Question Summaries</h3>
+                  <div id="question-summary-list" class="space-y-4"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <div id="initial-data" data-json={JSON.stringify({ feedbackForms, initialFields, initialSubmissions })} style="display:none"></div>
+
+  <script>
+    // Server-provided initial data (parsed from data attribute)
+    const initialEl = document.getElementById('initial-data');
+    const initialJson = (initialEl && initialEl.getAttribute('data-json')) || '{}';
+    const initialData = JSON.parse(initialJson);
+    const formsList = initialData.feedbackForms || [];
+    let fields = initialData.initialFields || [];
+    let submissions = initialData.initialSubmissions || [];
+    let pageIndex = 0;
+    let selectedIndex = 0;
+
+    const formSelect = document.getElementById('form-select');
+    const applyBtn = document.getElementById('apply-filters');
+    const statusBar = document.createElement('div');
+    statusBar.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-3';
+    statusBar.innerHTML = '<div id="status-msg" class="hidden bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-2 rounded">Please select a form and click Apply.</div>';
+    document.querySelector('.min-h-screen')?.prepend(statusBar);
+    const subList = document.getElementById('submission-list');
+    const subCount = document.getElementById('submission-count');
+    const qaCards = document.getElementById('qa-cards');
+    const detailTitle = document.getElementById('detail-title');
+    const detailMeta = document.getElementById('detail-meta');
+    const prevPage = document.getElementById('prev-page');
+    const nextPage = document.getElementById('next-page');
+    const prevSub = document.getElementById('prev-sub');
+    const nextSub = document.getElementById('next-sub');
+    const printSub = document.getElementById('print-sub');
+    const tabIndividual = document.getElementById('tab-individual');
+    const tabSummary = document.getElementById('tab-summary');
+    const individualView = document.getElementById('individual-view');
+    const summaryView = document.getElementById('summary-view');
+    const statTotal = document.getElementById('stat-total');
+    const statLatest = document.getElementById('stat-latest');
+    const exportSummary = document.getElementById('export-summary');
+    const printSummary = document.getElementById('print-summary');
+    const textSearch = document.getElementById('text-search');
+    const textList = document.getElementById('text-list');
+    const wordCloud = document.getElementById('word-cloud');
+
+    let ratingChart, ynChart, mcChart;
+
+    function parsePayload(payload) {
+      if (!payload) return null;
+      try {
+        return typeof payload === 'string' ? JSON.parse(payload) : payload;
+      } catch {
+        return null;
+      }
+    }
+
+    function normalizeKey(k) {
+      return String(k || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    }
+
+    function getAnswerForField(field, payload) {
+      if (!field || !payload) return null;
+      const label = String(field.label || field.field_name || '').trim();
+      const fid = field.id;
+
+      // 1) Direct key matches on root
+      if (label && payload[label] !== undefined) return payload[label];
+      if (field.field_name && payload[field.field_name] !== undefined) return payload[field.field_name];
+      if (fid && payload[fid] !== undefined) return payload[fid];
+      // 1a) Keys shaped like 'field_<uuid>' or containing field id
+      if (fid) {
+        const fidLower = String(fid).toLowerCase();
+        const idKey = Object.keys(payload || {}).find(k => {
+          const kn = String(k).toLowerCase();
+          return kn === `field_${fidLower}` || kn.includes(fidLower);
+        });
+        if (idKey) {
+          const v = payload[idKey];
+          if (v && typeof v === 'object') return v.value ?? v.answer ?? v.response ?? v.selected ?? v.text ?? null;
+          return v ?? null;
+        }
+      }
+      const labNorm = normalizeKey(label);
+      const candidates = Object.keys(payload || {});
+      const matchKey = candidates.find(k => normalizeKey(k).includes(labNorm));
+      if (matchKey && payload[matchKey] !== undefined) return payload[matchKey];
+
+      // 2) Common nested shapes: answers/responses array or object
+      const nestedSources = [
+        payload.answers,
+        payload.responses,
+        payload.response,
+        payload.data,
+        payload.fields,
+      ].filter(Boolean);
+      for (const src of nestedSources) {
+        // Array of { label, field_name, id, value }
+        if (Array.isArray(src)) {
+          const found = src.find((item) => {
+            const ilabel = normalizeKey(item?.label || item?.field_name || '');
+            const iid = item?.id;
+            return (
+              (ilabel && ilabel.includes(labNorm)) ||
+              (iid && fid && String(iid) === String(fid)) ||
+              (item?.label && item?.label === label) ||
+              (item?.field_name && item?.field_name === field.field_name)
+            );
+          });
+          if (found) return found.value ?? found.answer ?? found.response ?? found.selected ?? found.text ?? null;
+        } else if (typeof src === 'object' && src) {
+          // Object keyed by label or id
+          if (label && src[label] !== undefined) return src[label];
+          if (fid && src[fid] !== undefined) return src[fid];
+          if (fid) {
+            const fidLower = String(fid).toLowerCase();
+            const idKey = Object.keys(src).find(k => {
+              const kn = String(k).toLowerCase();
+              return kn === `field_${fidLower}` || kn.includes(fidLower);
+            });
+            if (idKey && src[idKey] !== undefined) return src[idKey];
+          }
+          const keys = Object.keys(src);
+          const mk = keys.find(k => normalizeKey(k).includes(labNorm));
+          if (mk && src[mk] !== undefined) return src[mk];
+        }
+      }
+
+      // 3) Fallback: scan any array values for a {label:..., value:...}
+      for (const val of Object.values(payload)) {
+        if (Array.isArray(val)) {
+          const found = val.find((item) => {
+            const ilabel = normalizeKey(item?.label || item?.field_name || '');
+            const iid = item?.id;
+            return (
+              (ilabel && ilabel.includes(labNorm)) ||
+              (iid && fid && String(iid) === String(fid))
+            );
+          });
+          if (found) return found.value ?? found.answer ?? found.response ?? found.selected ?? found.text ?? null;
+        }
+      }
+      return null;
+    }
+
+    function extractRespondent(payload) {
+      // Try direct keys first
+      let name = payload.name || payload.full_name || payload.student_name || payload['Full Name'] || '';
+      let email = payload.email || payload.email_address || payload['Email'] || '';
+
+      const nameKeys = ['full name','name','student name'];
+      const emailKeys = ['email','email address'];
+
+      // Scan object keys by normalization
+      if (!name) {
+        const mk = Object.keys(payload || {}).find(k => nameKeys.some(nk => normalizeKey(k).includes(nk)));
+        if (mk) name = payload[mk];
+      }
+      if (!email) {
+        const ek = Object.keys(payload || {}).find(k => emailKeys.some(ekey => normalizeKey(k).includes(ekey)));
+        if (ek) email = payload[ek];
+      }
+
+      // Scan nested arrays like answers/responses
+      const nested = [payload.answers, payload.responses, payload.response, payload.data, payload.fields].filter(Boolean);
+      for (const src of nested) {
+        if (Array.isArray(src)) {
+          if (!name) {
+            const ni = src.find(i => nameKeys.some(nk => normalizeKey(i?.label || i?.field_name || '').includes(nk)));
+            if (ni) name = ni.value ?? ni.answer ?? ni.text ?? '';
+          }
+          if (!email) {
+            const ei = src.find(i => emailKeys.some(ek => normalizeKey(i?.label || i?.field_name || '').includes(ek)));
+            if (ei) email = ei.value ?? ei.answer ?? ei.text ?? '';
+          }
+        }
+      }
+
+      return { name: name || '', email: email || '' };
+    }
+
+    function isPrimitive(val) {
+      return val === null || ['string','number','boolean'].includes(typeof val);
+    }
+
+    function extractEntries(payload) {
+      const entries = [] as { label: string, value: any }[];
+      const pushEntry = (label, value) => {
+        if (value === undefined) return;
+        const v = Array.isArray(value) ? value.join(', ') : value;
+        entries.push({ label: String(label), value: v });
+      };
+      const coerceVal = (obj:any) => obj?.value ?? obj?.answer ?? obj?.text ?? obj?.selected ?? obj?.response ?? obj;
+
+      // Root level
+      Object.entries(payload || {}).forEach(([k, v]) => {
+        if (isPrimitive(v)) {
+          pushEntry(k, v);
+        } else if (Array.isArray(v)) {
+          if (v.every(isPrimitive)) {
+            pushEntry(k, v);
+          } else {
+            v.forEach((item, idx) => {
+              if (typeof item === 'object' && item) {
+                const label = item.label || item.field_name || item.id || `${k}[${idx}]`;
+                pushEntry(label, coerceVal(item));
+              } else {
+                pushEntry(`${k}[${idx}]`, item);
+              }
+            });
+          }
+        } else if (typeof v === 'object' && v) {
+          // One level deep
+          Object.entries(v).forEach(([k2, v2]) => {
+            if (isPrimitive(v2)) {
+              pushEntry(`${k} > ${k2}`, v2);
+            } else if (Array.isArray(v2)) {
+              const lab = `${k} > ${k2}`;
+              if (v2.every(isPrimitive)) pushEntry(lab, v2);
+              else v2.forEach((item, idx) => pushEntry(`${lab}[${idx}]`, coerceVal(item)));
+            } else if (typeof v2 === 'object' && v2) {
+              const lab = `${k} > ${k2}`;
+              const val = coerceVal(v2);
+              pushEntry(lab, val);
+            }
+          });
+        }
+      });
+      return entries;
+    }
+
+    function renderSubmissions() {
+      subList.innerHTML = '';
+      const pageSize = 20;
+      const start = pageIndex * pageSize;
+      const page = submissions.slice(start, start + pageSize);
+      subCount.textContent = `${submissions.length} total`;
+      page.forEach((s, idx) => {
+        const payload = parsePayload(s.response_data || s.submission_data || s.data) || {};
+        const who = extractRespondent(payload);
+        const title = who.name || who.email || `Submission ${start + idx + 1}`;
+        const el = document.createElement('button');
+        el.className = 'w-full text-left p-3 rounded-lg border border-gray-200 bg-white hover:shadow-md hover:border-indigo-200 transition';
+        el.innerHTML = `
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+              <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-white text-xs shadow">${(title || 'S').slice(0,1).toUpperCase()}</span>
+              <div>
+                <div class="font-medium text-gray-900">${title || 'Submission'}</div>
+                <div class="text-xs text-gray-500">${new Date(s.submitted_at || s.created_at).toLocaleString()}</div>
+              </div>
+            </div>
+          </div>
+        `;
+        el.addEventListener('click', () => {
+          selectedIndex = start + idx;
+          renderDetail();
+        });
+        subList.appendChild(el);
+      });
+    }
+
+    function fieldIcon(ft) {
+      if (!ft) return '';
+      if (ft.includes('rating')) return '⭐⭐⭐⭐⭐';
+      if (ft.includes('select')) return '🔘';
+      if (ft.includes('choice')) return '🔘';
+      if (ft.includes('boolean')) return '✔️';
+      return '✏️';
+    }
+
+    function renderDetail() {
+      qaCards.innerHTML = '';
+      const sub = submissions[selectedIndex];
+      if (!sub) return;
+      const payload = parsePayload(sub.response_data || sub.submission_data || sub.data) || {};
+      const { name: respondentName = 'Anonymous', email: respondentEmail = '' } = extractRespondent(payload);
+      const submittedAt = new Date(sub.submitted_at || sub.created_at).toLocaleString();
+      detailTitle.textContent = String(respondentName);
+      detailMeta.textContent = `${respondentEmail ? respondentEmail + ' • ' : ''}${submittedAt} • ID: ${sub.id || '—'}`;
+      fields.forEach((f) => {
+        const rawVal = getAnswerForField(f, payload);
+        const card = document.createElement('div');
+        card.className = 'rounded-xl border bg-white p-4 shadow-sm hover:shadow-md transition';
+        const ft = String(f.field_type || '').toLowerCase();
+        let displayVal = '';
+        if (ft.includes('rating')) {
+          const num = parseFloat(String(rawVal ?? '').trim());
+          const stars = isNaN(num) ? '' : '★'.repeat(num) + '☆'.repeat(Math.max(0, 5 - num));
+          const pct = !isNaN(num) ? Math.max(0, Math.min(100, (num / 5) * 100)) : 0;
+          displayVal = stars
+            ? `
+              <div class="space-y-2">
+                <div class="flex items-center gap-3">
+                  <span class="text-yellow-500 text-lg tracking-wider">${stars}</span>
+                  <span class="text-xs text-gray-600">${num}/5</span>
+                </div>
+                <div class="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
+                  <div class="h-2 w-[${pct}%] rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600" style="width:${pct}%"></div>
+                </div>
+              </div>
+            `
+            : (String(rawVal ?? '').trim().replace(/\s+/g, ' ') || '—');
+        } else if (ft.includes('boolean')) {
+          const v = String(rawVal ?? '').trim().toLowerCase();
+          const badge = v === 'yes' || v === 'true' ? '<span class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs">Yes</span>'
+            : v === 'no' || v === 'false' ? '<span class="px-2 py-1 rounded bg-red-100 text-red-700 text-xs">No</span>'
+            : (rawVal ? '<span class="px-2 py-1 rounded bg-yellow-100 text-yellow-700 text-xs">Somewhat</span>' : '—');
+          displayVal = badge;
+        } else if (ft.includes('select') || ft.includes('choice')) {
+          const arrRaw = Array.isArray(rawVal) ? rawVal : typeof rawVal === 'string' ? rawVal.split(',') : [rawVal].filter(Boolean);
+          const arr = arrRaw.map(x => String(x ?? '').trim()).filter(Boolean);
+          displayVal = arr.map(x => `<span class="inline-block mr-2 mb-2 px-2 py-1 rounded border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs">${x}</span>`).join('') || '—';
+        } else {
+          displayVal = (String(rawVal ?? '').trim().replace(/\s+/g, ' ') || '—');
+        }
+        card.innerHTML = `
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500">${fieldIcon(ft)} ${f.label || f.field_name || 'Question'}</div>
+              <div class="mt-1 text-gray-900 whitespace-pre-wrap">${displayVal}</div>
+            </div>
+          </div>
+        `;
+        qaCards.appendChild(card);
+      });
+
+      // Removed raw "All Submission Entries" list to avoid confusing field IDs.
+
+      // Navigation state
+      prevSub.disabled = (selectedIndex <= 0);
+      nextSub.disabled = (selectedIndex >= submissions.length - 1);
+    }
+
+    function computeSummary() {
+      statTotal.textContent = String(submissions.length);
+      if (submissions.length > 0) {
+        const latest = submissions[0];
+        statLatest.textContent = new Date(latest.submitted_at || latest.created_at).toLocaleString();
+      } else {
+        statLatest.textContent = '—';
+      }
+
+      // Hide legacy chart/text sections (kept in markup but not needed)
+      ['rating-chart','yn-chart','mc-chart','text-search','text-list','word-cloud'].forEach(id => {
+        const el = document.getElementById(id);
+        const parentCard = el && el.closest('.bg-white');
+        if (parentCard) (parentCard as HTMLElement).style.display = 'none';
+      });
+
+      // Average for the specific "Review/Feedback" rating question
+      const avgEl = document.getElementById('stat-average');
+      let avg = null;
+      const reviewField = fields.find(f => {
+        const l = String(f.label || f.field_name || '').toLowerCase();
+        return l.includes('review') || l.includes('feedback');
+      });
+      if (reviewField) {
+        let sum = 0;
+        let count = 0;
+        submissions.forEach(s => {
+          const p = parsePayload(s.response_data || s.submission_data || s.data) || {};
+          const v = getAnswerForField(reviewField, p);
+          const n = Number(v);
+          if (!isNaN(n)) { sum += n; count += 1; }
+        });
+        avg = count ? (sum / count) : null;
+      }
+      if (avgEl) avgEl.textContent = avg != null ? avg.toFixed(2) : '—';
+
+      // Per-question summaries list (show all data or averages where applicable)
+      const qsList = document.getElementById('question-summary-list');
+      if (qsList) {
+        qsList.innerHTML = '';
+        fields.forEach((f) => {
+          const ft = String(f.field_type || '').toLowerCase();
+          const answersRaw = submissions.map(s => {
+            const p = parsePayload(s.response_data || s.submission_data || s.data) || {};
+            return getAnswerForField(f, p);
+          }).filter(a => a !== null && a !== undefined && a !== '');
+          const wrap = document.createElement('div');
+          wrap.className = 'rounded-xl border bg-white p-4 shadow-sm';
+          const title = `<div class=\"text-sm font-medium text-gray-800 mb-2\">${f.label || f.field_name || 'Question'}</div>`;
+          let body = '';
+
+          if (ft.includes('rating')) {
+            const nums = answersRaw.map(v => Number(v)).filter(n => !isNaN(n));
+            const sum = nums.reduce((acc,n)=>acc+n, 0);
+            const avgQ = nums.length ? (sum / nums.length) : null;
+            const pct = avgQ != null ? Math.max(0, Math.min(100, (avgQ / 5) * 100)) : 0;
+            const fullStars = avgQ != null ? Math.round(avgQ) : 0;
+            const emptyStars = 5 - fullStars;
+            const distCounts = [1,2,3,4,5].map(star => nums.filter(n => Math.round(n) === star).length);
+            body = `
+              <div class=\"flex items-center gap-4\">
+                <div class=\"flex items-center text-yellow-500 text-2xl\">${'★'.repeat(fullStars)}${'☆'.repeat(emptyStars)}</div>
+                <div class=\"flex-1\">
+                  <div class=\"h-2 rounded-full bg-gray-200 overflow-hidden\">
+                    <div class=\"h-2 bg-gradient-to-r from-yellow-400 to-yellow-600\" style=\"width:${pct}%\"></div>
+                  </div>
+                  <div class=\"mt-1 text-xs text-gray-500\">Average <span class=\"font-semibold\">${avgQ != null ? avgQ.toFixed(2) : '—'}</span> • ${nums.length} responses</div>
+                </div>
+              </div>
+              <div class=\"mt-3 flex flex-wrap gap-2\">
+                ${[1,2,3,4,5].map((star, i) => `<span class=\\"inline-flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-50 border border-yellow-200 text-yellow-700 text-xs\\">${star}★ <span class=\\"font-semibold\\">${distCounts[i]}</span></span>`).join('')}
+              </div>
+            `;
+          } else if (ft.includes('boolean')) {
+            const counts = { yes: 0, no: 0, somewhat: 0 };
+            answersRaw.forEach(v => {
+              const sv = String(v).toLowerCase();
+              if (sv === 'yes' || sv === 'true') counts.yes++;
+              else if (sv === 'no' || sv === 'false') counts.no++;
+              else counts.somewhat++;
+            });
+            const total = counts.yes + counts.no + counts.somewhat;
+            const yesPct = total ? Math.round((counts.yes/total)*100) : 0;
+            const noPct = total ? Math.round((counts.no/total)*100) : 0;
+            const somePct = total ? Math.round((counts.somewhat/total)*100) : 0;
+            body = `
+              <div class=\"h-2 rounded-full bg-gray-200 overflow-hidden flex\">
+                <div class=\"h-2 bg-green-500\" style=\"width:${yesPct}%\"></div>
+                <div class=\"h-2 bg-red-500\" style=\"width:${noPct}%\"></div>
+                <div class=\"h-2 bg-yellow-400\" style=\"width:${somePct}%\"></div>
+              </div>
+              <div class=\"mt-2 flex flex-wrap gap-2 text-xs\">
+                <span class=\"inline-flex items-center gap-1 px-2 py-1 rounded bg-green-50 text-green-700 border border-green-200\">Yes <span class=\"font-semibold\">${counts.yes}</span></span>
+                <span class=\"inline-flex items-center gap-1 px-2 py-1 rounded bg-red-50 text-red-700 border border-red-200\">No <span class=\"font-semibold\">${counts.no}</span></span>
+                <span class=\"inline-flex items-center gap-1 px-2 py-1 rounded bg-yellow-50 text-yellow-700 border border-yellow-200\">Somewhat <span class=\"font-semibold\">${counts.somewhat}</span></span>
+              </div>
+            `;
+          } else if (ft.includes('select') || ft.includes('choice')) {
+            const all = [];
+            answersRaw.forEach(v => {
+              const arr = Array.isArray(v) ? v : typeof v === 'string' ? v.split(',') : [v];
+              arr.filter(Boolean).forEach(o => all.push(String(o).trim()));
+            });
+            if (all.length) {
+              const freq = all.reduce((acc, x) => { acc[x] = (acc[x]||0)+1; return acc; }, {} as Record<string, number>);
+              body = `<div class=\"flex flex-wrap gap-2\">${Object.entries(freq).map(([x,c])=>`<span class=\\"inline-flex items-center gap-2 px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs\\"><span>${x}</span><span class=\\"px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 font-semibold\\">${c}</span></span>`).join('')}</div>`;
+            } else {
+              body = '<span class=\"text-xs text-gray-500\">No data</span>';
+            }
+          } else {
+            const allTexts = answersRaw.map(t => String(t));
+            body = allTexts.length
+              ? `<div class=\"space-y-2\">${allTexts.map(t=>`<div class=\\"p-3 rounded-lg bg-gray-50 border text-sm text-gray-700\\">${t}</div>`).join('')}</div>`
+              : '<span class=\"text-xs text-gray-500\">No data</span>';
+          }
+
+          wrap.innerHTML = title + body;
+          qsList.appendChild(wrap);
+        });
+      }
+    }
+
+    function showMessage(msg, type = 'info') {
+      const el = document.getElementById('status-msg');
+      if (!el) return;
+      const styles = {
+        info: 'bg-blue-50 border-blue-200 text-blue-800',
+        error: 'bg-red-50 border-red-200 text-red-800',
+        warn: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+        success: 'bg-green-50 border-green-200 text-green-800'
+      };
+      el.className = `bg-white border px-4 py-2 rounded ${styles[type] || styles.info}`;
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function clearMessage() {
+      const el = document.getElementById('status-msg');
+      if (el) el.classList.add('hidden');
+    }
+
+    function setLoading(state) {
+      if (!applyBtn) return;
+      applyBtn.disabled = state;
+      applyBtn.innerHTML = state
+        ? '<svg class="animate-spin h-4 w-4 mr-2 inline-block" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle></svg>Applying…'
+        : 'Apply';
+    }
+
+    function renderSkeleton() {
+      subList.innerHTML = '';
+      for (let i = 0; i < 6; i++) {
+        const sk = document.createElement('div');
+        sk.className = 'animate-pulse h-16 bg-gray-100 rounded';
+        subList.appendChild(sk);
+      }
+      qaCards.innerHTML = '<div class="animate-pulse h-24 bg-gray-100 rounded"></div>';
+      statTotal.textContent = '0';
+      statLatest.textContent = '—';
+    }
+
+    async function loadFormData() {
+      const formId = formSelect?.value;
+      try {
+        clearMessage();
+        // Validate input
+        if (!formId) {
+          submissions = [];
+          fields = [];
+          renderSubmissions();
+          qaCards.innerHTML = '';
+          statTotal.textContent = '0';
+          statLatest.textContent = '—';
+          showMessage('Please select a form before applying filters.', 'warn');
+          return;
+        }
+
+        setLoading(true);
+        renderSkeleton();
+
+        if (!formId) {
+          submissions = [];
+          fields = [];
+          renderSubmissions();
+          qaCards.innerHTML = '';
+          statTotal.textContent = '0';
+          statLatest.textContent = '—';
+          return;
+        }
+
+        // Fetch fields for selected form
+        const fRes = await fetch(`/api/admin/form-builder?id=${encodeURIComponent(formId)}`);
+        if (!fRes.ok) {
+          throw new Error(`Failed to fetch form fields (${fRes.status})`);
+        }
+        const fJson = await fRes.json();
+        fields = fJson.fields || [];
+
+        // Build server-side params without date filters
+        const params = new URLSearchParams({ form_id: String(formId) });
+
+        const sRes = await fetch(`/api/admin/submissions?${params.toString()}`);
+        if (!sRes.ok) {
+          throw new Error(`Failed to fetch submissions (${sRes.status})`);
+        }
+        const sJson = await sRes.json();
+        submissions = (sJson.data || sJson.submissions || []);
+
+        if (!submissions || submissions.length === 0) {
+          subList.innerHTML = '<div class="text-sm text-gray-500">No submissions found for the selected form.</div>';
+          qaCards.innerHTML = '';
+          statTotal.textContent = '0';
+          statLatest.textContent = '—';
+          showMessage('No submissions found for the selected form.', 'info');
+          return;
+        }
+
+        pageIndex = 0;
+        selectedIndex = 0;
+        renderSubmissions();
+        renderDetail();
+        computeSummary();
+        showMessage('Data loaded successfully.', 'success');
+      } catch (err) {
+        console.error('Failed to load form data', err);
+        subList.innerHTML = '<div class="text-sm text-red-600">Failed to load data. Please retry or adjust filters.</div>';
+        qaCards.innerHTML = '';
+        statTotal.textContent = '0';
+        statLatest.textContent = '—';
+        showMessage('Error fetching submissions. Check network and try again.', 'error');
+      }
+      finally {
+        setLoading(false);
+      }
+    }
+
+    // Tab switching
+    tabIndividual.addEventListener('click', () => {
+      tabIndividual.classList.add('bg-indigo-600','text-white','border-indigo-600','shadow-sm');
+      tabIndividual.classList.remove('bg-white','text-gray-700','border-gray-200');
+      tabSummary.classList.add('bg-white','text-gray-700','border-gray-200');
+      tabSummary.classList.remove('bg-indigo-600','text-white','border-indigo-600');
+      individualView.classList.remove('hidden');
+      summaryView.classList.add('hidden');
+    });
+    tabSummary.addEventListener('click', () => {
+      tabSummary.classList.add('bg-indigo-600','text-white','border-indigo-600','shadow-sm');
+      tabSummary.classList.remove('bg-white','text-gray-700','border-gray-200');
+      tabIndividual.classList.add('bg-white','text-gray-700','border-gray-200');
+      tabIndividual.classList.remove('bg-indigo-600','text-white','border-indigo-600');
+      individualView.classList.add('hidden');
+      summaryView.classList.remove('hidden');
+      computeSummary();
+    });
+
+    // Pagination
+    prevPage.addEventListener('click', () => {
+      if (pageIndex > 0) { pageIndex--; renderSubmissions(); }
+    });
+    nextPage.addEventListener('click', () => {
+      const maxPage = Math.floor(submissions.length / 20);
+      if (pageIndex < maxPage) { pageIndex++; renderSubmissions(); }
+    });
+
+    // Navigation within detail
+    prevSub.addEventListener('click', () => {
+      if (selectedIndex > 0) { selectedIndex--; renderDetail(); }
+    });
+    nextSub.addEventListener('click', () => {
+      if (selectedIndex < submissions.length - 1) { selectedIndex++; renderDetail(); }
+    });
+    printSub.addEventListener('click', () => window.print());
+
+    // Export summary CSV
+    exportSummary.addEventListener('click', () => {
+      const rows = submissions.map(s => {
+        const p = parsePayload(s.response_data || s.submission_data || s.data) || {};
+        return {
+          submitted_at: s.submitted_at || s.created_at,
+          ...p
+        };
+      });
+      const headers = Object.keys(rows[0] || { submitted_at: '' });
+      const csv = [headers.join(','), ...rows.map(r => headers.map(h => JSON.stringify(r[h] ?? '').replace(/\n/g, ' ').replace(/\r/g, ' ')).join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'summary.csv'; a.click();
+      URL.revokeObjectURL(url);
+    });
+    printSummary.addEventListener('click', () => window.print());
+
+    // Filters
+    if (applyBtn) {
+      applyBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Apply clicked');
+        loadFormData();
+      });
+    }
+    if (formSelect) {
+      formSelect.addEventListener('change', () => {
+        console.log('Form changed');
+        clearMessage();
+        // Reset view until user clicks Apply
+        submissions = [];
+        fields = [];
+        pageIndex = 0;
+        selectedIndex = 0;
+        subList.innerHTML = '<div class="text-sm text-gray-500">Select a form and click Apply to load submissions.</div>';
+        qaCards.innerHTML = '';
+        statTotal.textContent = '0';
+        statLatest.textContent = '—';
+      });
+    }
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', () => {
+      // Fallback: bind events again if needed (defensive wiring)
+      if (applyBtn && !applyBtn.getAttribute('data-bound')) {
+        applyBtn.setAttribute('data-bound', 'true');
+        applyBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          console.log('Apply clicked (DOMContentLoaded)');
+          loadFormData();
+        });
+      }
+      if (formsList.length === 0) {
+        subList.innerHTML = '<div class="text-sm text-gray-500">No Feedback forms found. Create a form in Form Builder first.</div>';
+        qaCards.innerHTML = '';
+        statTotal.textContent = '0';
+        statLatest.textContent = '—';
+        return;
+      }
+      // Initial state: prompt user to select form and click Apply
+      subList.innerHTML = '<div class="text-sm text-gray-500">Select a form and click Apply to load submissions.</div>';
+      qaCards.innerHTML = '';
+      statTotal.textContent = '0';
+      statLatest.textContent = '—';
+    });
+  </script>
+</Layout>

@@ -1,0 +1,1022 @@
+---
+export interface Props {
+  formId: string;
+  formData: any;
+  enableMultiStep?: boolean;
+  enableConditionalLogic?: boolean;
+  enableAutoSave?: boolean;
+  enableValidation?: boolean;
+}
+
+const { 
+  formId, 
+  formData, 
+  enableMultiStep = true, 
+  enableConditionalLogic = true, 
+  enableAutoSave = true,
+  enableValidation = true 
+} = Astro.props;
+
+// Multi-step form configuration
+const formSteps = [
+  {
+    id: 'basic-info',
+    title: 'Basic Information',
+    description: 'Tell us about yourself',
+    fields: ['name', 'email', 'phone']
+  },
+  {
+    id: 'course-details',
+    title: 'Course Experience',
+    description: 'Share your course experience',
+    fields: ['course', 'trainer', 'rating']
+  },
+  {
+    id: 'feedback',
+    title: 'Detailed Feedback',
+    description: 'Provide detailed feedback',
+    fields: ['comments', 'suggestions', 'recommend']
+  },
+  {
+    id: 'additional',
+    title: 'Additional Information',
+    description: 'Any additional details',
+    fields: ['improvements', 'future_courses']
+  }
+];
+---
+
+<div class="enhanced-form-container" data-form-id={formId}>
+  <!-- Multi-Step Progress Indicator -->
+  {enableMultiStep && (
+    <div class="multi-step-progress mb-8">
+      <div class="flex items-center justify-between">
+        {formSteps.map((step, index) => (
+          <div class="flex items-center" key={step.id}>
+            <div class={`step-indicator flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
+              index === 0 ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 text-gray-400'
+            }`} data-step={index + 1}>
+              <span class="text-sm font-semibold">{index + 1}</span>
+            </div>
+            {index < formSteps.length - 1 && (
+              <div class={`step-connector w-full h-1 mx-4 transition-all duration-300 ${
+                index === 0 ? 'bg-gray-300' : 'bg-gray-200'
+              }`}></div>
+            )}
+          </div>
+        ))}
+      </div>
+      
+      <div class="step-info mt-4 text-center">
+        <h3 class="text-lg font-semibold text-gray-900" id="step-title">Basic Information</h3>
+        <p class="text-sm text-gray-600" id="step-description">Tell us about yourself</p>
+      </div>
+    </div>
+  )}
+
+  <!-- Enhanced Form -->
+  <form id="enhanced-form" class="space-y-6" data-auto-save={enableAutoSave}>
+    <!-- Step 1: Basic Information -->
+    <div class="form-step active" data-step="1">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Name Field -->
+        <div class="form-group">
+          <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+            Full Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            placeholder="Enter your full name"
+            data-validation="required|min:2"
+          />
+          <div class="validation-message text-red-500 text-sm mt-1 hidden"></div>
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group">
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+            Email Address <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            placeholder="Enter your email address"
+            data-validation="required|email"
+          />
+          <div class="validation-message text-red-500 text-sm mt-1 hidden"></div>
+        </div>
+
+        <!-- Phone Field -->
+        <div class="form-group">
+          <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            placeholder="Enter your phone number"
+            data-validation="phone"
+          />
+          <div class="validation-message text-red-500 text-sm mt-1 hidden"></div>
+        </div>
+
+        <!-- Student Type (Conditional Logic Trigger) -->
+        <div class="form-group">
+          <label for="student_type" class="block text-sm font-medium text-gray-700 mb-2">
+            Student Type
+          </label>
+          <select
+            id="student_type"
+            name="student_type"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            data-conditional-trigger="true"
+          >
+            <option value="">Select student type</option>
+            <option value="individual">Individual Learner</option>
+            <option value="corporate">Corporate Employee</option>
+            <option value="student">Academic Student</option>
+            <option value="professional">Working Professional</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Conditional Fields -->
+      {enableConditionalLogic && (
+        <div class="conditional-fields mt-6">
+          <!-- Corporate Fields -->
+          <div class="conditional-group hidden" data-show-when="student_type=corporate">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="form-group">
+                <label for="company_name" class="block text-sm font-medium text-gray-700 mb-2">
+                  Company Name
+                </label>
+                <input
+                  type="text"
+                  id="company_name"
+                  name="company_name"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your company name"
+                />
+              </div>
+              <div class="form-group">
+                <label for="department" class="block text-sm font-medium text-gray-700 mb-2">
+                  Department
+                </label>
+                <input
+                  type="text"
+                  id="department"
+                  name="department"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your department"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Academic Fields -->
+          <div class="conditional-group hidden" data-show-when="student_type=student">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="form-group">
+                <label for="institution" class="block text-sm font-medium text-gray-700 mb-2">
+                  Institution Name
+                </label>
+                <input
+                  type="text"
+                  id="institution"
+                  name="institution"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your institution name"
+                />
+              </div>
+              <div class="form-group">
+                <label for="study_level" class="block text-sm font-medium text-gray-700 mb-2">
+                  Study Level
+                </label>
+                <select
+                  id="study_level"
+                  name="study_level"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                >
+                  <option value="">Select level</option>
+                  <option value="undergraduate">Undergraduate</option>
+                  <option value="graduate">Graduate</option>
+                  <option value="postgraduate">Postgraduate</option>
+                  <option value="phd">PhD</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+
+    <!-- Step 2: Course Experience -->
+    <div class="form-step hidden" data-step="2">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Course Selection -->
+        <div class="form-group">
+          <label for="course" class="block text-sm font-medium text-gray-700 mb-2">
+            Course Attended <span class="text-red-500">*</span>
+          </label>
+          <select
+            id="course"
+            name="course"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            data-validation="required"
+          >
+            <option value="">Select a course</option>
+            <option value="azure-training">Microsoft Azure Training</option>
+            <option value="devops-complete">DevOps Complete Training</option>
+            <option value="docker-mastery">Docker Containerization Mastery</option>
+            <option value="kubernetes">Kubernetes Container Orchestration</option>
+            <option value="ansible-expert">Ansible Expert</option>
+            <option value="jenkins-expert">Jenkins Expert</option>
+            <option value="cyber-security">Cyber Security</option>
+            <option value="ai-generalist">AI Generalist Expert</option>
+          </select>
+          <div class="validation-message text-red-500 text-sm mt-1 hidden"></div>
+        </div>
+
+        <!-- Trainer Selection -->
+        <div class="form-group">
+          <label for="trainer" class="block text-sm font-medium text-gray-700 mb-2">
+            Trainer Name
+          </label>
+          <input
+            type="text"
+            id="trainer"
+            name="trainer"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            placeholder="Enter trainer name"
+          />
+        </div>
+
+        <!-- Rating -->
+        <div class="form-group col-span-1 md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Overall Rating <span class="text-red-500">*</span>
+          </label>
+          <div class="star-rating flex items-center space-x-1" data-rating="0">
+            {[1, 2, 3, 4, 5].map(star => (
+              <button
+                type="button"
+                class="star-button text-3xl text-gray-300 hover:text-yellow-400 transition-colors duration-200"
+                data-rating={star}
+              >
+                ★
+              </button>
+            ))}
+            <span class="ml-3 text-sm text-gray-600" id="rating-text">Click to rate</span>
+          </div>
+          <input type="hidden" name="rating" id="rating-value" data-validation="required" />
+          <div class="validation-message text-red-500 text-sm mt-1 hidden"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Detailed Feedback -->
+    <div class="form-step hidden" data-step="3">
+      <div class="space-y-6">
+        <!-- Comments -->
+        <div class="form-group">
+          <label for="comments" class="block text-sm font-medium text-gray-700 mb-2">
+            Comments & Feedback
+          </label>
+          <textarea
+            id="comments"
+            name="comments"
+            rows="4"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            placeholder="Share your detailed feedback about the course..."
+          ></textarea>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="form-group">
+          <label for="suggestions" class="block text-sm font-medium text-gray-700 mb-2">
+            Suggestions for Improvement
+          </label>
+          <textarea
+            id="suggestions"
+            name="suggestions"
+            rows="3"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            placeholder="What could be improved in the course?"
+          ></textarea>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="form-group">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Would you recommend this course to others?
+          </label>
+          <div class="flex space-x-4">
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="recommend"
+                value="yes"
+                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              />
+              <span class="ml-2 text-sm text-gray-700">Yes, definitely</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="recommend"
+                value="maybe"
+                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              />
+              <span class="ml-2 text-sm text-gray-700">Maybe</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="recommend"
+                value="no"
+                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              />
+              <span class="ml-2 text-sm text-gray-700">No</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Additional Information -->
+    <div class="form-step hidden" data-step="4">
+      <div class="space-y-6">
+        <!-- Areas for Improvement -->
+        <div class="form-group">
+          <label for="improvements" class="block text-sm font-medium text-gray-700 mb-2">
+            What areas need the most improvement?
+          </label>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {[
+              'Course Content',
+              'Trainer Delivery',
+              'Practical Exercises',
+              'Course Materials',
+              'Duration',
+              'Difficulty Level',
+              'Support Resources',
+              'Assessment Methods',
+              'Interactive Elements'
+            ].map(area => (
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="improvements[]"
+                  value={area.toLowerCase().replace(' ', '_')}
+                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span class="ml-2 text-sm text-gray-700">{area}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <!-- Future Courses -->
+        <div class="form-group">
+          <label for="future_courses" class="block text-sm font-medium text-gray-700 mb-2">
+            What courses would you like to see in the future?
+          </label>
+          <textarea
+            id="future_courses"
+            name="future_courses"
+            rows="3"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            placeholder="Suggest new courses or topics you'd like to learn..."
+          ></textarea>
+        </div>
+
+        <!-- Newsletter Subscription -->
+        <div class="form-group">
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              name="newsletter"
+              value="yes"
+              class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <span class="ml-2 text-sm text-gray-700">
+              Subscribe to our newsletter for updates on new courses and training opportunities
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Navigation -->
+    <div class="form-navigation flex justify-between items-center pt-6 border-t border-gray-200">
+      <button
+        type="button"
+        id="prev-step"
+        class="px-6 py-3 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled
+      >
+        Previous
+      </button>
+
+      <div class="flex items-center space-x-4">
+        <!-- Auto-save Indicator -->
+        {enableAutoSave && (
+          <div class="auto-save-indicator flex items-center text-sm text-gray-500">
+            <svg class="w-4 h-4 mr-1 animate-spin hidden" id="save-spinner" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span id="save-status">Auto-save enabled</span>
+          </div>
+        )}
+
+        <button
+          type="button"
+          id="next-step"
+          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+        >
+          Next
+        </button>
+
+        <button
+          type="submit"
+          id="submit-form"
+          class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 hidden"
+        >
+          Submit Feedback
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Progress Save Modal -->
+  <div id="save-progress-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Save Progress</h3>
+      <p class="text-gray-600 mb-6">Your progress has been automatically saved. You can continue filling out this form later.</p>
+      <div class="flex justify-end space-x-3">
+        <button
+          type="button"
+          class="px-4 py-2 text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+          onclick="closeSaveModal()"
+        >
+          Continue
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          onclick="emailProgress()"
+        >
+          Email Link
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+class EnhancedFormManager {
+  constructor() {
+    this.currentStep = 1;
+    this.totalSteps = 4;
+    this.formData = {};
+    this.autoSaveEnabled = document.querySelector('[data-auto-save="true"]') !== null;
+    this.validationRules = {};
+    
+    this.init();
+  }
+
+  init() {
+    this.setupEventListeners();
+    this.setupValidation();
+    this.setupConditionalLogic();
+    this.setupAutoSave();
+    this.setupStarRating();
+    this.loadSavedProgress();
+  }
+
+  setupEventListeners() {
+    // Navigation buttons
+    document.getElementById('next-step')?.addEventListener('click', () => this.nextStep());
+    document.getElementById('prev-step')?.addEventListener('click', () => this.prevStep());
+    document.getElementById('submit-form')?.addEventListener('click', (e) => this.submitForm(e));
+
+    // Form input changes
+    document.querySelectorAll('input, select, textarea').forEach(input => {
+      input.addEventListener('change', () => this.handleInputChange(input));
+      input.addEventListener('blur', () => this.validateField(input));
+    });
+  }
+
+  setupValidation() {
+    document.querySelectorAll('[data-validation]').forEach(field => {
+      const rules = field.getAttribute('data-validation').split('|');
+      this.validationRules[field.name] = rules;
+    });
+  }
+
+  setupConditionalLogic() {
+    document.querySelectorAll('[data-conditional-trigger]').forEach(trigger => {
+      trigger.addEventListener('change', () => this.handleConditionalLogic(trigger));
+    });
+  }
+
+  setupAutoSave() {
+    if (this.autoSaveEnabled) {
+      setInterval(() => this.autoSave(), 30000); // Auto-save every 30 seconds
+    }
+  }
+
+  setupStarRating() {
+    document.querySelectorAll('.star-button').forEach(star => {
+      star.addEventListener('click', (e) => this.handleStarRating(e));
+      star.addEventListener('mouseover', (e) => this.previewStarRating(e));
+    });
+
+    document.querySelector('.star-rating')?.addEventListener('mouseleave', () => {
+      this.resetStarPreview();
+    });
+  }
+
+  handleStarRating(e) {
+    e.preventDefault();
+    const rating = parseInt(e.target.getAttribute('data-rating'));
+    const container = e.target.closest('.star-rating');
+    
+    container.setAttribute('data-rating', rating);
+    document.getElementById('rating-value').value = rating;
+    
+    this.updateStarDisplay(container, rating);
+    this.updateRatingText(rating);
+    this.validateField(document.getElementById('rating-value'));
+  }
+
+  previewStarRating(e) {
+    const rating = parseInt(e.target.getAttribute('data-rating'));
+    const container = e.target.closest('.star-rating');
+    this.updateStarDisplay(container, rating, true);
+  }
+
+  resetStarPreview() {
+    const container = document.querySelector('.star-rating');
+    const currentRating = parseInt(container.getAttribute('data-rating'));
+    this.updateStarDisplay(container, currentRating);
+  }
+
+  updateStarDisplay(container, rating, isPreview = false) {
+    const stars = container.querySelectorAll('.star-button');
+    stars.forEach((star, index) => {
+      if (index < rating) {
+        star.classList.remove('text-gray-300');
+        star.classList.add(isPreview ? 'text-yellow-300' : 'text-yellow-400');
+      } else {
+        star.classList.remove('text-yellow-300', 'text-yellow-400');
+        star.classList.add('text-gray-300');
+      }
+    });
+  }
+
+  updateRatingText(rating) {
+    const texts = {
+      1: 'Poor',
+      2: 'Fair',
+      3: 'Good',
+      4: 'Very Good',
+      5: 'Excellent'
+    };
+    document.getElementById('rating-text').textContent = texts[rating] || 'Click to rate';
+  }
+
+  handleConditionalLogic(trigger) {
+    const value = trigger.value;
+    const fieldName = trigger.name;
+    
+    // Hide all conditional groups first
+    document.querySelectorAll('.conditional-group').forEach(group => {
+      group.classList.add('hidden');
+    });
+
+    // Show relevant conditional group
+    const targetGroup = document.querySelector(`[data-show-when="${fieldName}=${value}"]`);
+    if (targetGroup) {
+      targetGroup.classList.remove('hidden');
+    }
+  }
+
+  validateField(field) {
+    const rules = this.validationRules[field.name];
+    if (!rules) return true;
+
+    const value = field.value.trim();
+    let isValid = true;
+    let errorMessage = '';
+
+    for (const rule of rules) {
+      if (rule === 'required' && !value) {
+        isValid = false;
+        errorMessage = 'This field is required';
+        break;
+      }
+      
+      if (rule.startsWith('min:')) {
+        const minLength = parseInt(rule.split(':')[1]);
+        if (value.length < minLength) {
+          isValid = false;
+          errorMessage = `Minimum ${minLength} characters required`;
+          break;
+        }
+      }
+      
+      if (rule === 'email' && value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid email address';
+          break;
+        }
+      }
+      
+      if (rule === 'phone' && value) {
+        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        if (!phoneRegex.test(value.replace(/[\s\-\(\)]/g, ''))) {
+          isValid = false;
+          errorMessage = 'Please enter a valid phone number';
+          break;
+        }
+      }
+    }
+
+    this.showValidationMessage(field, isValid, errorMessage);
+    return isValid;
+  }
+
+  showValidationMessage(field, isValid, message) {
+    const messageElement = field.parentElement.querySelector('.validation-message');
+    
+    if (isValid) {
+      field.classList.remove('border-red-500');
+      field.classList.add('border-green-500');
+      messageElement.classList.add('hidden');
+    } else {
+      field.classList.remove('border-green-500');
+      field.classList.add('border-red-500');
+      messageElement.textContent = message;
+      messageElement.classList.remove('hidden');
+    }
+  }
+
+  validateCurrentStep() {
+    const currentStepElement = document.querySelector(`[data-step="${this.currentStep}"]`);
+    const fields = currentStepElement.querySelectorAll('input[required], select[required], textarea[required]');
+    let isValid = true;
+
+    fields.forEach(field => {
+      if (!this.validateField(field)) {
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  }
+
+  nextStep() {
+    if (!this.validateCurrentStep()) {
+      this.showNotification('Please fill in all required fields', 'error');
+      return;
+    }
+
+    if (this.currentStep < this.totalSteps) {
+      this.hideCurrentStep();
+      this.currentStep++;
+      this.showCurrentStep();
+      this.updateProgress();
+      this.updateNavigation();
+      
+      if (this.autoSaveEnabled) {
+        this.autoSave();
+      }
+    }
+  }
+
+  prevStep() {
+    if (this.currentStep > 1) {
+      this.hideCurrentStep();
+      this.currentStep--;
+      this.showCurrentStep();
+      this.updateProgress();
+      this.updateNavigation();
+    }
+  }
+
+  hideCurrentStep() {
+    document.querySelector(`[data-step="${this.currentStep}"]`).classList.add('hidden');
+  }
+
+  showCurrentStep() {
+    document.querySelector(`[data-step="${this.currentStep}"]`).classList.remove('hidden');
+  }
+
+  updateProgress() {
+    // Update step indicators
+    document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+      const stepNumber = index + 1;
+      
+      if (stepNumber < this.currentStep) {
+        indicator.classList.add('bg-green-600', 'border-green-600', 'text-white');
+        indicator.classList.remove('bg-blue-600', 'border-blue-600', 'border-gray-300', 'text-gray-400');
+      } else if (stepNumber === this.currentStep) {
+        indicator.classList.add('bg-blue-600', 'border-blue-600', 'text-white');
+        indicator.classList.remove('bg-green-600', 'border-green-600', 'border-gray-300', 'text-gray-400');
+      } else {
+        indicator.classList.add('border-gray-300', 'text-gray-400');
+        indicator.classList.remove('bg-blue-600', 'border-blue-600', 'bg-green-600', 'border-green-600', 'text-white');
+      }
+    });
+
+    // Update step connectors
+    document.querySelectorAll('.step-connector').forEach((connector, index) => {
+      if (index < this.currentStep - 1) {
+        connector.classList.add('bg-green-600');
+        connector.classList.remove('bg-gray-300', 'bg-blue-600');
+      } else if (index === this.currentStep - 1) {
+        connector.classList.add('bg-blue-600');
+        connector.classList.remove('bg-gray-300', 'bg-green-600');
+      } else {
+        connector.classList.add('bg-gray-300');
+        connector.classList.remove('bg-blue-600', 'bg-green-600');
+      }
+    });
+
+    // Update step info
+    const stepInfo = [
+      { title: 'Basic Information', description: 'Tell us about yourself' },
+      { title: 'Course Experience', description: 'Share your course experience' },
+      { title: 'Detailed Feedback', description: 'Provide detailed feedback' },
+      { title: 'Additional Information', description: 'Any additional details' }
+    ];
+
+    document.getElementById('step-title').textContent = stepInfo[this.currentStep - 1].title;
+    document.getElementById('step-description').textContent = stepInfo[this.currentStep - 1].description;
+  }
+
+  updateNavigation() {
+    const prevButton = document.getElementById('prev-step');
+    const nextButton = document.getElementById('next-step');
+    const submitButton = document.getElementById('submit-form');
+
+    prevButton.disabled = this.currentStep === 1;
+    
+    if (this.currentStep === this.totalSteps) {
+      nextButton.classList.add('hidden');
+      submitButton.classList.remove('hidden');
+    } else {
+      nextButton.classList.remove('hidden');
+      submitButton.classList.add('hidden');
+    }
+  }
+
+  handleInputChange(input) {
+    this.formData[input.name] = input.value;
+    
+    if (this.autoSaveEnabled) {
+      clearTimeout(this.autoSaveTimeout);
+      this.autoSaveTimeout = setTimeout(() => this.autoSave(), 2000);
+    }
+  }
+
+  autoSave() {
+    if (!this.autoSaveEnabled) return;
+
+    const formData = new FormData(document.getElementById('enhanced-form'));
+    const data = Object.fromEntries(formData.entries());
+    
+    // Add current step to saved data
+    data.currentStep = this.currentStep;
+    
+    // Save to localStorage
+    localStorage.setItem(`form_progress_${document.querySelector('[data-form-id]').getAttribute('data-form-id')}`, JSON.stringify(data));
+    
+    this.showAutoSaveIndicator();
+  }
+
+  showAutoSaveIndicator() {
+    const spinner = document.getElementById('save-spinner');
+    const status = document.getElementById('save-status');
+    
+    spinner.classList.remove('hidden');
+    status.textContent = 'Saving...';
+    
+    setTimeout(() => {
+      spinner.classList.add('hidden');
+      status.textContent = 'Saved';
+      
+      setTimeout(() => {
+        status.textContent = 'Auto-save enabled';
+      }, 2000);
+    }, 1000);
+  }
+
+  loadSavedProgress() {
+    const formId = document.querySelector('[data-form-id]').getAttribute('data-form-id');
+    const savedData = localStorage.getItem(`form_progress_${formId}`);
+    
+    if (savedData) {
+      const data = JSON.parse(savedData);
+      
+      // Restore form values
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === 'currentStep') return;
+        
+        const field = document.querySelector(`[name="${key}"]`);
+        if (field) {
+          if (field.type === 'checkbox' || field.type === 'radio') {
+            field.checked = field.value === value;
+          } else {
+            field.value = value;
+          }
+        }
+      });
+      
+      // Restore current step
+      if (data.currentStep && data.currentStep > 1) {
+        this.currentStep = data.currentStep;
+        this.hideCurrentStep();
+        this.showCurrentStep();
+        this.updateProgress();
+        this.updateNavigation();
+      }
+      
+      this.showNotification('Previous progress restored', 'success');
+    }
+  }
+
+  submitForm(e) {
+    e.preventDefault();
+    
+    if (!this.validateCurrentStep()) {
+      this.showNotification('Please fill in all required fields', 'error');
+      return;
+    }
+
+    const formData = new FormData(document.getElementById('enhanced-form'));
+    const data = Object.fromEntries(formData.entries());
+    
+    // Add form metadata
+    data.formId = document.querySelector('[data-form-id]').getAttribute('data-form-id');
+    data.submittedAt = new Date().toISOString();
+    
+    this.showNotification('Submitting feedback...', 'info');
+    
+    // Simulate form submission
+    setTimeout(() => {
+      // Clear saved progress
+      const formId = document.querySelector('[data-form-id]').getAttribute('data-form-id');
+      localStorage.removeItem(`form_progress_${formId}`);
+      
+      this.showNotification('Feedback submitted successfully!', 'success');
+      
+      // Redirect or reset form
+      setTimeout(() => {
+        window.location.href = '/thank-you';
+      }, 2000);
+    }, 2000);
+  }
+
+  showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 transition-all duration-300 ${
+      type === 'success' ? 'bg-green-600' :
+      type === 'error' ? 'bg-red-600' :
+      type === 'warning' ? 'bg-yellow-600' : 'bg-blue-600'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    }, 3000);
+  }
+}
+
+// Initialize enhanced form when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  new EnhancedFormManager();
+});
+
+// Global functions for modal
+function closeSaveModal() {
+  document.getElementById('save-progress-modal').classList.add('hidden');
+}
+
+function emailProgress() {
+  const email = prompt('Enter your email address to receive a link to continue:');
+  if (email) {
+    // Simulate sending email
+    alert('A link to continue your progress has been sent to ' + email);
+    closeSaveModal();
+  }
+}
+</script>
+
+<style>
+.form-step {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.form-step.hidden {
+  display: none;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-indicator {
+  transition: all 0.3s ease;
+}
+
+.step-connector {
+  transition: all 0.3s ease;
+}
+
+.star-button {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.star-button:hover {
+  transform: scale(1.1);
+}
+
+.form-group {
+  position: relative;
+}
+
+.validation-message {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.conditional-group {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .multi-step-progress .flex {
+    flex-direction: column;
+    space-y: 4;
+  }
+  
+  .step-connector {
+    width: 2px;
+    height: 20px;
+    margin: 8px 0;
+  }
+  
+  .form-navigation {
+    flex-direction: column;
+    space-y: 4;
+  }
+}
+</style>

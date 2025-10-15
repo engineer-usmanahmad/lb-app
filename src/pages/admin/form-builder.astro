@@ -394,6 +394,12 @@ export const prerender = false;
           
           // Show all form action buttons when a form is selected
           document.getElementById('form-actions-container').style.display = 'flex';
+          // Ensure all actions are visible for existing forms
+          document.getElementById('save-form-btn').style.display = 'inline-flex';
+          document.getElementById('load-form-btn').style.display = 'inline-flex';
+          document.getElementById('preview-form-btn').style.display = 'inline-flex';
+          document.getElementById('copy-link-btn').style.display = 'inline-flex';
+          document.getElementById('view-submissions-btn').style.display = 'inline-flex';
           
           // Render form fields
           renderFormFields();
@@ -635,8 +641,14 @@ export const prerender = false;
         document.getElementById('form-template').value = 'standard';
         document.getElementById('form-active').checked = true;
         
-        // Hide all form action buttons when creating a new form
-         document.getElementById('form-actions-container').style.display = 'none';
+        // Show form action buttons when creating a new form
+        document.getElementById('form-actions-container').style.display = 'flex';
+        // Only show Save for new form; hide other actions
+        document.getElementById('save-form-btn').style.display = 'inline-flex';
+        document.getElementById('load-form-btn').style.display = 'none';
+        document.getElementById('preview-form-btn').style.display = 'none';
+        document.getElementById('copy-link-btn').style.display = 'none';
+        document.getElementById('view-submissions-btn').style.display = 'none';
         
         renderFormFields();
       });
@@ -863,15 +875,13 @@ export const prerender = false;
     async function deleteForm(formId, event) {
       event.stopPropagation(); // Prevent form loading when delete button is clicked
       
-      if (!confirm('Are you sure you want to delete this form? This action cannot be undone.')) {
+      if (!confirm('Are you sure you want to delete this form?')) {
         return;
       }
       
       try {
-        const response = await fetch('/api/admin/form-builder', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: formId })
+        const response = await fetch(`/api/admin/form-builder?id=${encodeURIComponent(formId)}`, {
+          method: 'DELETE'
         });
         
         const result = await response.json();
