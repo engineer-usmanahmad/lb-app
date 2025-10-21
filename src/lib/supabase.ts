@@ -1559,5 +1559,354 @@ export const courses: Course[] = [
         projects: 'ABC'
       }
     ]
+  },
+  {
+    id: 'docker-kubernetes-cicd-mastery',
+    title: 'Complete Docker, Kubernetes & CI/CD Mastery - Basics to Advanced',
+    description: 'Master the complete DevOps toolkit from basics to advanced level. Learn Docker, Kubernetes, Jenkins, and GitHub Actions with hands-on real-world projects. Perfect for DevOps engineers, developers, and IT professionals looking to master containerization, orchestration, and CI/CD automation.',
+    duration: '11-12 Sessions',
+    level: 'Basics to Advanced',
+    image: 'https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?auto=compress&cs=tinysrgb&w=800',
+    features: [
+      'Complete understanding of containerization concepts and architecture',
+      'Master Docker from installation to advanced container management',
+      'Build and manage Docker images using Dockerfiles and best practices',
+      'Work with Docker networking, volumes, and bind mounts effectively',
+      'Implement Docker Compose for multi-container applications',
+      'Understand Kubernetes architecture and core components deeply',
+      'Deploy and manage applications on Kubernetes clusters',
+      'Master Kubernetes Pods, Deployments, Services, and ReplicaSets',
+      'Implement Kubernetes ConfigMaps, Secrets, PV/PVC for data management',
+      'Configure auto-scaling with HPA and load balancing',
+      'Master Jenkins CI/CD pipelines and GitHub Actions automation',
+      '8+ Real-world projects for production environments',
+      '**Build 3 real-world Docker projects for production environments**',
+      '**Deploy 3 real-world Kubernetes projects in cloud environments**',
+      '**Build automated deployment pipelines for production applications**'
+    ],
+    price: 24999,
+    originalPrice: 32999,
+    is_free: false,
+    schedule: 'Weekends (Saturday & Sunday)',
+    timing: '2PM to 4PM (PKT)',
+    modules: [
+      {
+        id: 'section-docker',
+        title: 'Section 1: Docker Mastery',
+        duration: '',
+        topics: [],
+        projects: ''
+      },
+      {
+        id: 'docker-intro',
+        title: 'Module 1: Introduction to Containerization',
+        duration: '1 session',
+        topics: [
+          'What is containerization and why it matters',
+          'Containerization architecture with detailed diagrams',
+          'Containerization vs Virtualization - Key differences',
+          'Benefits and use cases of containers'
+        ],
+        projects: ''
+      },
+      {
+        id: 'docker-fundamentals',
+        title: 'Module 2: Docker Fundamentals',
+        duration: '1 session',
+        topics: [
+          'Introduction to Docker and its ecosystem',
+          'Docker installation on Linux, Windows, and Mac',
+          'Understanding Docker architecture',
+          'Docker CLI commands and best practices'
+        ],
+        projects: ''
+      },
+      {
+        id: 'docker-images-containers',
+        title: 'Module 3: Docker Images & Containers',
+        duration: '1 session',
+        topics: [
+          'Docker containers vs Docker images explained',
+          'Creating and managing containers',
+          'Container lifecycle management',
+          'Working with container logs and debugging'
+        ],
+        projects: ''
+      },
+      {
+        id: 'docker-registry',
+        title: 'Module 4: Docker Hub & Registry',
+        duration: '1 session',
+        topics: [
+          'Introduction to Docker Hub',
+          'Pushing and pulling images from Docker Hub',
+          'Creating private registries',
+          'Image tagging and versioning strategies'
+        ],
+        projects: ''
+      },
+      {
+        id: 'docker-networking',
+        title: 'Module 5: Docker Networking',
+        duration: '1 session',
+        topics: [
+          'Docker network types (bridge, host, overlay, none)',
+          'Creating custom networks',
+          'Container communication and DNS',
+          'Network security best practices'
+        ],
+        projects: ''
+      },
+      {
+        id: 'docker-storage',
+        title: 'Module 6: Docker Storage',
+        duration: '1 session',
+        topics: [
+          'Understanding Docker volumes',
+          'Creating and managing volumes',
+          'Docker bind mounts explained',
+          'Data persistence strategies'
+        ],
+        projects: ''
+      },
+      {
+        id: 'dockerfile-building',
+        title: 'Module 7: Dockerfile & Image Building',
+        duration: '1 session',
+        topics: [
+          'Dockerfile syntax and instructions',
+          'Building optimized Docker images',
+          'Multi-stage builds',
+          'Image layer caching and best practices'
+        ],
+        projects: ''
+      },
+      {
+        id: 'docker-compose',
+        title: 'Module 8: Docker Compose',
+        duration: '1 session',
+        topics: [
+          'Introduction to Docker Compose',
+          'Writing docker-compose.yml files',
+          'Multi-container application deployment',
+          'Docker Compose networking and volumes'
+        ],
+        projects: ''
+      },
+      {
+        id: 'docker-projects',
+        title: 'Module 9: Docker Real-World Projects',
+        duration: '1 session',
+        topics: [
+          'Project 1: Deploying a full-stack web application with Docker',
+          'Project 2: Building a microservices architecture using Docker',
+          'Project 3: CI/CD pipeline integration with Docker'
+        ],
+        projects: '3 Real-World Projects'
+      },
+      {
+        id: 'section-kubernetes',
+        title: 'Section 2: Kubernetes Mastery',
+        duration: '',
+        topics: [],
+        projects: ''
+      },
+      {
+        id: 'k8s-intro',
+        title: 'Module 10: Kubernetes Introduction',
+        duration: '1 session',
+        topics: [
+          'What is Kubernetes and why use it',
+          'Kubernetes architecture with detailed diagrams',
+          'Control plane and worker node components',
+          'Kubernetes vs Docker Swarm comparison'
+        ],
+        projects: ''
+      },
+      {
+        id: 'k8s-components',
+        title: 'Module 11: Kubernetes Components Deep Dive',
+        duration: '1 session',
+        topics: [
+          'API Server, Scheduler, and Controller Manager',
+          'etcd - Kubernetes data store',
+          'Kubelet and Kube-proxy explained',
+          'Container Runtime Interface (CRI)'
+        ],
+        projects: ''
+      },
+      {
+        id: 'k8s-installation',
+        title: 'Module 12: Kubernetes Installation & Setup',
+        duration: '1 session',
+        topics: [
+          'Installing Minikube for local development',
+          'Kubeadm cluster setup on bare metal/VMs',
+          'AWS EKS (Elastic Kubernetes Service) setup',
+          'Google Kubernetes Engine (GKE) setup'
+        ],
+        projects: ''
+      },
+      {
+        id: 'k8s-pods',
+        title: 'Module 13: Kubernetes Pods',
+        duration: '1 session',
+        topics: [
+          'Understanding Pods - the smallest unit',
+          'Creating and managing Pods',
+          'Multi-container Pods',
+          'Pod lifecycle and troubleshooting'
+        ],
+        projects: ''
+      },
+      {
+        id: 'k8s-deployments',
+        title: 'Module 14: Kubernetes Deployments',
+        duration: '1 session',
+        topics: [
+          'Deployment concepts and strategies',
+          'Creating declarative deployments',
+          'Rolling updates and rollbacks',
+          'Deployment scaling techniques'
+        ],
+        projects: ''
+      },
+      {
+        id: 'k8s-replicasets',
+        title: 'Module 15: Kubernetes ReplicaSets',
+        duration: '1 session',
+        topics: [
+          'ReplicaSet fundamentals',
+          'Managing replica counts',
+          'Self-healing capabilities',
+          'ReplicaSet vs Deployment'
+        ],
+        projects: ''
+      },
+      {
+        id: 'k8s-services',
+        title: 'Module 16: Kubernetes Services',
+        duration: '1 session',
+        topics: [
+          'Service types (ClusterIP, NodePort, LoadBalancer)',
+          'Service discovery mechanisms',
+          'Exposing applications externally',
+          'Ingress controllers'
+        ],
+        projects: ''
+      },
+      {
+        id: 'k8s-config',
+        title: 'Module 17: Kubernetes Configuration Management',
+        duration: '1 session',
+        topics: [
+          'ConfigMaps for application configuration',
+          'Secrets for sensitive data management',
+          'Environment variables in Kubernetes',
+          'Configuration best practices'
+        ],
+        projects: ''
+      },
+      {
+        id: 'k8s-storage',
+        title: 'Module 18: Kubernetes Storage',
+        duration: '1 session',
+        topics: [
+          'Persistent Volumes (PV) concepts',
+          'Persistent Volume Claims (PVC)',
+          'Storage classes and dynamic provisioning',
+          'StatefulSets for stateful applications'
+        ],
+        projects: ''
+      },
+      {
+        id: 'k8s-jobs',
+        title: 'Module 19: Kubernetes Jobs & CronJobs',
+        duration: '1 session',
+        topics: [
+          'Running batch jobs in Kubernetes',
+          'CronJobs for scheduled tasks',
+          'Job completion and failure handling',
+          'Parallel job execution'
+        ],
+        projects: ''
+      },
+      {
+        id: 'k8s-autoscaling',
+        title: 'Module 20: Kubernetes Auto-Scaling',
+        duration: '1 session',
+        topics: [
+          'Horizontal Pod Autoscaler (HPA) configuration',
+          'Vertical Pod Autoscaler (VPA) setup',
+          'Cluster Autoscaler for node scaling',
+          'Metrics Server installation and usage'
+        ],
+        projects: ''
+      },
+      {
+        id: 'k8s-projects',
+        title: 'Module 21: Kubernetes Real-World Projects',
+        duration: '1 session',
+        topics: [
+          'Project 1: Deploying a production-ready microservices application',
+          'Project 2: Setting up a complete CI/CD pipeline with Kubernetes',
+          'Project 3: Implementing auto-scaling and load balancing in cloud'
+        ],
+        projects: '3 Real-World Projects'
+      },
+      {
+        id: 'section-cicd',
+        title: 'Section 3: Jenkins & GitHub Actions (CI/CD Automation)',
+        duration: '',
+        topics: [],
+        projects: ''
+      },
+      {
+        id: 'jenkins-mastery',
+        title: 'Module 22: Jenkins Mastery',
+        duration: '2 sessions',
+        topics: [
+          'Introduction to CI/CD - What is Continuous Integration and Continuous Deployment',
+          'Benefits and best practices of CI/CD',
+          'CI/CD pipeline concepts',
+          'Jenkins Architecture - Jenkins architecture diagram and components',
+          'Master-slave architecture',
+          'Jenkins ecosystem and plugins',
+          'Jenkins Installation & Setup - Installing Jenkins on Linux/Windows',
+          'Initial configuration and setup',
+          'Jenkins dashboard overview',
+          'Basic Jenkins Jobs - Creating freestyle jobs',
+          'Job configuration and parameters',
+          'Build triggers and scheduling',
+          'Post-build actions',
+          'Advanced Jenkins Pipelines - Declarative vs Scripted pipelines',
+          'Pipeline syntax and stages',
+          'Parallel execution',
+          'Pipeline best practices',
+          'Jenkinsfile creation',
+          'Jenkins Administration - User management and security',
+          'Plugin management',
+          'Backup and restore',
+          'Performance optimization',
+          'Jenkins monitoring',
+          'Jenkins Real-World Project - Complete CI/CD pipeline with Docker integration',
+          'Automated build, test, and deployment',
+          'Container registry integration'
+        ],
+        projects: '1 Real-World Project'
+      },
+      {
+        id: 'github-actions-mastery',
+        title: 'Module 23: GitHub Actions Mastery',
+        duration: '2 sessions',
+        topics: [
+          'Introduction to GitHub Actions - What is GitHub Actions',
+          'Benefits of GitHub Actions - Native GitHub integration',
+          'Basic to Advanced Workflows - Creating first workflow',
+          'Project 2: Automated Kubernetes deployment with GitHub Actions'
+        ],
+        projects: '1 Real-World Project'
+      }
+    ]
   }
 ];
