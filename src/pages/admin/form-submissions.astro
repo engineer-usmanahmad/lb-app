@@ -181,13 +181,40 @@ if (!form && !error) {
                             minute: '2-digit'
                           })}
                         </td>
-                        {fields.map((field) => (
-                          <td class="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                            <div class="truncate" title={submission.submission_data[`field_${field.id}`] || '-'}>
-                              {submission.submission_data[`field_${field.id}`] || '-'}
-                            </div>
-                          </td>
-                        ))}
+{fields.map((field) => {
+                          // Try different possible field key formats
+                          const possibleKeys = [
+                            `field_${field.id}`,
+                            field.id,
+                            field.field_name,
+                            field.label
+                          ];
+                          
+                          let value = '-';
+                          for (const key of possibleKeys) {
+                            if (submission.submission_data[key] !== undefined) {
+                              value = submission.submission_data[key];
+                              break;
+                            }
+                          }
+                          
+                          // If still no match, try to find by field order or label match
+                          if (value === '-') {
+                            const submissionKeys = Object.keys(submission.submission_data);
+                            const fieldIndex = fields.indexOf(field);
+                            if (submissionKeys[fieldIndex]) {
+                              value = submission.submission_data[submissionKeys[fieldIndex]];
+                            }
+                          }
+                          
+                          return (
+                            <td class="px-6 py-4 text-sm text-gray-900 max-w-xs">
+                              <div class="truncate" title={value || '-'}>
+                                {value || '-'}
+                              </div>
+                            </td>
+                          );
+                        })}
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button 
                             class="text-indigo-600 hover:text-indigo-900 view-details-btn" 
@@ -244,7 +271,31 @@ if (!form && !error) {
           const row = [
             new Date(submission.submitted_at).toLocaleString(),
             ...fields.map(field => {
-              const value = submission.submission_data[`field_${field.id}`] || '';
+              // Try different possible field key formats
+              const possibleKeys = [
+                `field_${field.id}`,
+                field.id,
+                field.field_name,
+                field.label
+              ];
+              
+              let value = '';
+              for (const key of possibleKeys) {
+                if (submission.submission_data[key] !== undefined) {
+                  value = submission.submission_data[key];
+                  break;
+                }
+              }
+              
+              // If still no match, try to find by field order
+              if (value === '') {
+                const submissionKeys = Object.keys(submission.submission_data);
+                const fieldIndex = fields.indexOf(field);
+                if (submissionKeys[fieldIndex]) {
+                  value = submission.submission_data[submissionKeys[fieldIndex]];
+                }
+              }
+              
               // Escape commas and quotes in CSV
               return `"${String(value).replace(/"/g, '""')}"`;
             })
@@ -272,7 +323,31 @@ if (!form && !error) {
         const modalContent = document.getElementById('modal-content');
         
         modalContent.innerHTML = fields.map(field => {
-          const value = submissionData[`field_${field.id}`] || 'No response';
+          // Try different possible field key formats
+          const possibleKeys = [
+            `field_${field.id}`,
+            field.id,
+            field.field_name,
+            field.label
+          ];
+          
+          let value = 'No response';
+          for (const key of possibleKeys) {
+            if (submissionData[key] !== undefined) {
+              value = submissionData[key];
+              break;
+            }
+          }
+          
+          // If still no match, try to find by field order
+          if (value === 'No response') {
+            const submissionKeys = Object.keys(submissionData);
+            const fieldIndex = fields.indexOf(field);
+            if (submissionKeys[fieldIndex]) {
+              value = submissionData[submissionKeys[fieldIndex]];
+            }
+          }
+          
           return `
             <div class="border-b border-gray-200 pb-3">
               <dt class="text-sm font-medium text-gray-500">${field.label}</dt>

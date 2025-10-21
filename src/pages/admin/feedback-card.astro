@@ -1,0 +1,423 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import FeedbackAnalyticsCard from '../../components/FeedbackAnalyticsCard.astro';
+import { supabaseAdmin } from '../../lib/supabase-admin';
+
+// Auth guard (support both admin and user for now)
+const admin = Astro.locals.admin;
+const user = Astro.locals.user;
+if (!admin && !user) {
+  return Astro.redirect('/auth/login');
+}
+
+// Get form ID from URL parameter
+const formId = Astro.url.searchParams.get('form_id');
+
+// Fetch real analytics data
+let analyticsData = {
+  totalSubmissions: 0,
+  averageRating: 0,
+  topFeedback: [],
+  formName: "Feedback Analytics",
+  questionRatings: []
+};
+
+try {
+  let formFilter = {};
+  let formName = "Feedback Analytics";
+  
+  // Debug logging
+  console.log('Form ID from URL:', formId);
+  
+  // If form ID is provided, filter by that form
+  let formFieldsMap = {};
+  if (formId) {
+    // Get form details and field information
+    const { data: formData, error: formError } = await supabaseAdmin
+      .from('form_templates')
+      .select('*')
+      .eq('id', formId)
+      .single();
+    
+    if (formData) {
+      formName = formData.name || formData.title;
+      formFilter = { form_id: formId };
+      
+      // Get form fields from the form_fields table for proper labels
+      const { data: formFields, error: fieldsError } = await supabaseAdmin
+        .from('form_fields')
+        .select('*')
+        .eq('form_id', formId)
+        .order('field_order');
+      
+      // Create a mapping of field IDs to field data for better titles
+      if (formFields) {
+        formFields.forEach(field => {
+          if (field.id) {
+            formFieldsMap[field.id] = field;
+            formFieldsMap[`field_${field.id}`] = field;
+          }
+        });
+      }
+    }
+  }
+
+  // Get total count of submissions for this form
+  const { count: totalCount, error: countError } = await supabaseAdmin
+    .from('form_submissions')
+    .select('*', { count: 'exact', head: true })
+    .match(formFilter);
+
+  // Get submissions for this form to calculate ratings
+  const { data: submissions, error: submissionsError } = await supabaseAdmin
+    .from('form_submissions')
+    .select('*')
+    .match(formFilter)
+    .order('submitted_at', { ascending: false });
+
+  // Only use mock data when no form ID is specified (general analytics view)
+  let useMockData = false;
+  if ((!submissions || submissions.length === 0) && !formId) {
+    useMockData = true;
+    // Create mock data to demonstrate the card functionality for general view
+    const mockSubmissions = [
+      {
+        submission_data: {
+          overall_rating: 5,
+          content_quality: 4,
+          instructor_performance: 5,
+          course_materials: 4,
+          feedback_comments: "Excellent session! Very informative and well-structured. The instructor explained complex concepts clearly.",
+          suggestions: "Maybe add more hands-on exercises for better practice."
+        }
+      },
+      {
+        submission_data: {
+          overall_rating: 4,
+          content_quality: 5,
+          instructor_performance: 4,
+          course_materials: 5,
+          feedback_comments: "Great content and delivery. Learned a lot about DevOps practices.",
+          suggestions: "Could use more real-world examples and case studies."
+        }
+      },
+      {
+        submission_data: {
+          overall_rating: 5,
+          content_quality: 5,
+          instructor_performance: 5,
+          course_materials: 4,
+          feedback_comments: "Outstanding session! The instructor was very knowledgeable and engaging.",
+          suggestions: "Perfect as is. Maybe extend the duration for more in-depth coverage."
+        }
+      }
+    ];
+    
+    if (useMockData) {
+      submissions = mockSubmissions;
+      analyticsData.totalSubmissions = mockSubmissions.length;
+    }
+  }
+
+  // Only set totalSubmissions from totalCount if we're not using mock data
+  if (!useMockData) {
+    analyticsData.totalSubmissions = totalCount || 0;
+  }
+  analyticsData.formName = formName;
+
+  // Process all submissions (real data or mock data) for rating calculations
+  if (submissions && submissions.length > 0) {
+    let totalRating = 0;
+    let ratingCount = 0;
+    const questionRatings = {};
+    const feedbackTexts = [];
+
+    // Helper function to generate meaningful question titles
+    function getQuestionTitle(fieldKey, fieldData = null) {
+      // First, try to get the actual field label from form data
+      if (fieldData && fieldData.label) {
+        return fieldData.label;
+      }
+      
+      // Try to get field data from the form fields map
+      const fieldInfo = formFieldsMap[fieldKey];
+      if (fieldInfo && fieldInfo.label) {
+        return fieldInfo.label;
+      }
+      
+      // Common question patterns based on field naming
+      const questionMappings = {
+        'overall': 'Overall Experience',
+        'content': 'Content Quality',
+        'instructor': 'Instructor Performance',
+        'material': 'Course Materials',
+        'support': 'Support Quality',
+        'recommend': 'Recommendation Rating',
+        'satisfaction': 'Overall Satisfaction',
+        'delivery': 'Content Delivery',
+        'clarity': 'Explanation Clarity',
+        'pace': 'Course Pace',
+        'engagement': 'Student Engagement',
+        'practical': 'Practical Application',
+        'knowledge': 'Knowledge Gained',
+        'value': 'Value for Money'
+      };
+
+      // Try to match common patterns
+      for (const [pattern, title] of Object.entries(questionMappings)) {
+        if (fieldKey.toLowerCase().includes(pattern)) {
+          return title;
+        }
+      }
+
+      // If it's a UUID-based field key, try to get a more meaningful name
+      if (fieldKey.match(/^field_[a-f0-9-]+$/i)) {
+        // Extract the UUID part and use it as a unique identifier
+        const uuid = fieldKey.replace(/^field_/, '');
+        return `Rating Question (${uuid.substring(0, 8)})`;
+      }
+
+      // If no pattern matches, create a readable title from the field key
+      return fieldKey
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase())
+        .replace(/Field /g, '');
+    }
+
+    submissions.forEach(submission => {
+      try {
+        const data = typeof submission.submission_data === 'string' 
+          ? JSON.parse(submission.submission_data) 
+          : submission.submission_data;
+        
+        if (data) {
+          // Process each field in the response
+          Object.entries(data).forEach(([key, value]) => {
+            // Check if this is a rating field (1-5 scale)
+            if (typeof value === 'number' && value >= 1 && value <= 5) {
+              totalRating += value;
+              ratingCount++;
+              
+              // Get the question title to use as the grouping key
+              const questionTitle = getQuestionTitle(key);
+              
+              // Track individual question ratings grouped by title, not field ID
+              if (!questionRatings[questionTitle]) {
+                questionRatings[questionTitle] = { 
+                  total: 0, 
+                  count: 0, 
+                  title: questionTitle
+                };
+              }
+              questionRatings[questionTitle].total += value;
+              questionRatings[questionTitle].count++;
+            }
+            
+            // Check if this is a string rating (convert to number)
+            if (typeof value === 'string') {
+              const numValue = parseFloat(value);
+              if (!isNaN(numValue) && numValue >= 1 && numValue <= 5) {
+                totalRating += numValue;
+                ratingCount++;
+                
+                // Get the question title to use as the grouping key
+                const questionTitle = getQuestionTitle(key);
+                
+                if (!questionRatings[questionTitle]) {
+                  questionRatings[questionTitle] = { 
+                    total: 0, 
+                    count: 0, 
+                    title: questionTitle
+                  };
+                }
+                questionRatings[questionTitle].total += numValue;
+                questionRatings[questionTitle].count++;
+              } else if (value.length > 10 && value.length < 500) {
+                // Collect meaningful feedback text (longer responses)
+                feedbackTexts.push(value.trim());
+              }
+            }
+          });
+        }
+      } catch (e) {
+        // Skip invalid JSON
+      }
+    });
+
+    // Calculate overall average rating
+    if (ratingCount > 0) {
+      analyticsData.averageRating = Math.round((totalRating / ratingCount) * 10) / 10;
+    }
+
+    // Calculate average for each question
+    analyticsData.questionRatings = Object.values(questionRatings).map(q => ({
+      title: q.title,
+      average: Math.round((q.total / q.count) * 10) / 10,
+      count: q.count
+    }));
+
+    // Get top feedback
+    if (feedbackTexts.length > 0) {
+      const uniqueFeedback = [...new Set(feedbackTexts)].slice(0, 3);
+      if (uniqueFeedback.length > 0) {
+        analyticsData.topFeedback = uniqueFeedback;
+      }
+    }
+  }
+
+} catch (err) {
+  console.error('Error fetching analytics data:', err);
+  // Use default data if there's an error
+}
+---
+
+<Layout title="Feedback Analytics Card - LbisTech">
+  <div class="min-h-screen bg-gray-100 py-8">
+    <!-- Header -->
+    <div class="max-w-4xl mx-auto px-4 mb-8">
+      <div class="bg-white rounded-lg shadow-sm border p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Feedback Analytics Card</h1>
+            <p class="text-gray-600 mt-1">Professional graphics card for social media sharing</p>
+          </div>
+          <div class="flex gap-3">
+            <a href="/admin/feedback-forms" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-600 text-white hover:bg-gray-700 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Back to Feedback
+            </a>
+            <button id="export-card-btn" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
+              <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+              </svg>
+              Export Card
+            </button>
+            <button id="screenshot-btn" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">
+              <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+              </svg>
+              Screenshot Tips
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Display -->
+    <div class="flex justify-center">
+      <div class="card-container">
+        <FeedbackAnalyticsCard 
+          totalSubmissions={analyticsData.totalSubmissions}
+          averageRating={analyticsData.averageRating}
+          topFeedback={analyticsData.topFeedback}
+          formName={analyticsData.formName}
+          questionRatings={analyticsData.questionRatings}
+        />
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="max-w-4xl mx-auto px-4 mt-8">
+      <div class="bg-white rounded-lg shadow-sm border p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">How to Share This Card</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="text-center">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-2">Screenshot</h3>
+            <p class="text-sm text-gray-600">Use your browser's screenshot tool or press Cmd+Shift+4 (Mac) / Win+Shift+S (Windows) to capture the card</p>
+          </div>
+          <div class="text-center">
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-2">Export</h3>
+            <p class="text-sm text-gray-600">Click the "Export Card" button to download as a high-quality PNG image</p>
+          </div>
+          <div class="text-center">
+            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-2">Share</h3>
+            <p class="text-sm text-gray-600">Post on LinkedIn, Twitter, Facebook, or Instagram to showcase your feedback analytics</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include html2canvas for export functionality -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const exportBtn = document.getElementById('export-card-btn');
+      const screenshotBtn = document.getElementById('screenshot-btn');
+      const card = document.getElementById('analytics-card');
+
+      if (exportBtn && card) {
+        exportBtn.addEventListener('click', () => {
+          exportBtn.innerHTML = '<svg class="animate-spin h-4 w-4 mr-2 inline-block" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle></svg>Exporting...';
+          exportBtn.disabled = true;
+
+          html2canvas(card, {
+            backgroundColor: null,
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            width: 800,
+            height: 600
+          }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `feedback-analytics-${new Date().toISOString().split('T')[0]}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+            
+            exportBtn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/></svg>Export Card';
+            exportBtn.disabled = false;
+          }).catch(err => {
+            console.error('Export failed:', err);
+            alert('Export failed. Please try taking a screenshot instead.');
+            exportBtn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/></svg>Export Card';
+            exportBtn.disabled = false;
+          });
+        });
+      }
+
+      if (screenshotBtn) {
+        screenshotBtn.addEventListener('click', () => {
+          const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+          const shortcut = isMac ? 'Cmd+Shift+4' : 'Win+Shift+S';
+          
+          alert(`Screenshot Tips:\n\n1. Use ${shortcut} to open screenshot tool\n2. Select the analytics card area\n3. The image will be saved to your desktop/downloads\n4. Share on your favorite social media platform!\n\nOptimal size: 800x600 pixels`);
+        });
+      }
+    });
+  </script>
+
+  <style>
+    .card-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Ensure the card is properly centered and sized for screenshots */
+    .card-container .feedback-analytics-card {
+      margin: 0;
+    }
+  </style>
+</Layout>

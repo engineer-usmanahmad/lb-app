@@ -1,0 +1,645 @@
+---
+interface Props {
+  totalSubmissions?: number;
+  averageRating?: number;
+  topFeedback?: string[];
+  formName?: string;
+  questionRatings?: Array<{
+    title: string;
+    average: number;
+    count: number;
+  }>;
+}
+
+const {
+  totalSubmissions = 0,
+  averageRating = 0,
+  topFeedback = [],
+  formName = "Feedback Analytics",
+  questionRatings = []
+} = Astro.props;
+
+// Calculate dynamic card height based on content
+const baseHeight = 700; // Increased base height
+const questionHeight = 120; // Increased height per question rating for better display
+const feedbackHeight = 80; // Increased height per feedback item
+const headerHeight = 150; // Space for header and title
+const statsHeight = 200; // Space for stats section
+const paddingBuffer = 100; // Extra padding buffer
+
+const dynamicHeight = Math.max(
+  baseHeight,
+  headerHeight + statsHeight + (questionRatings.length * questionHeight) + (topFeedback.length * feedbackHeight) + paddingBuffer
+);
+
+const ratingStars = Math.round(averageRating);
+const fullStars = '★'.repeat(ratingStars);
+const emptyStars = '☆'.repeat(5 - ratingStars);
+---
+
+<div class="feedback-analytics-card" id="analytics-card" style={`--card-height: ${dynamicHeight}px`}>
+  <!-- Scrollable Content Container -->
+  <div class="card-content-scroll">
+    <!-- Header Section -->
+    <div class="card-header">
+      <div class="header-content">
+        <div class="logo-section">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div class="company-info">
+            <h1 class="company-name">LbisTech</h1>
+            <p class="tagline">Excellence in Education</p>
+          </div>
+        </div>
+        <div class="card-title">
+          <h2 class="form-title">{formName}</h2>
+          <p class="subtitle">Feedback Analytics Summary</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Stats Grid -->
+    <div class="stats-grid">
+      <!-- Total Submissions -->
+      <div class="stat-card primary">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{totalSubmissions.toLocaleString()}</div>
+          <div class="stat-label">Total Responses</div>
+        </div>
+      </div>
+
+      <!-- Average Rating -->
+      <div class="stat-card secondary">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="rating-display">
+            <span class="rating-number">{averageRating}</span>
+            <div class="stars">{fullStars}{emptyStars}</div>
+          </div>
+          <div class="stat-label">Overall Average Rating</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Ratings Section -->
+    {questionRatings.length > 0 && (
+      <div class="question-ratings-section">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+          </svg>
+          Question-wise Ratings
+        </h3>
+        <div class="question-ratings-grid">
+          {questionRatings.map((question) => {
+            const qRatingStars = Math.round(question.average);
+            const qFullStars = '★'.repeat(qRatingStars);
+            const qEmptyStars = '☆'.repeat(5 - qRatingStars);
+            
+            return (
+              <div class="question-rating-card">
+                <div class="question-header">
+                  <div class="question-label">Feedback Question</div>
+                  <div class="question-title">{question.title}</div>
+                </div>
+                <div class="question-rating">
+                  <span class="rating-value">{question.average}</span>
+                  <div class="rating-stars">{qFullStars}{qEmptyStars}</div>
+                  <span class="response-count">({question.count} responses)</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    )}
+
+    <!-- Top Feedback Section -->
+    <div class="feedback-section">
+      <h3 class="section-title">
+        <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+          <path d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+        </svg>
+        Top Feedback Highlights
+      </h3>
+      <div class="feedback-list">
+        {topFeedback.map((feedback, index) => (
+          <div class="feedback-item">
+            <div class="feedback-number">{index + 1}</div>
+            <div class="feedback-text">"{feedback}"</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer">
+      <div class="footer-content">
+        <div class="website">www.lbistech.com</div>
+        <div class="social-handles">
+          <span>@LbisTech</span>
+          <span>#FeedbackAnalytics</span>
+          <span>#EducationExcellence</span>
+        </div>
+      </div>
+      <div class="generated-date">
+        Generated on {new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .feedback-analytics-card {
+    width: 800px;
+    height: 600px; /* Fixed height for consistent display */
+    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 25%, #7c3aed 50%, #db2777 75%, #dc2626 100%);
+    border-radius: 24px;
+    color: white;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  }
+
+  .feedback-analytics-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    pointer-events: none;
+  }
+
+  /* Scrollable content container */
+  .card-content-scroll {
+    height: 100%;
+    overflow-y: auto;
+    padding: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Custom scrollbar styling */
+  .card-content-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .card-content-scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+
+  .card-content-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
+
+  .card-content-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .card-header {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 24px;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+  }
+
+  .company-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .company-name {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .tagline {
+    font-size: 12px;
+    opacity: 0.8;
+    margin: 2px 0 0 0;
+  }
+
+  .card-title {
+    text-align: right;
+  }
+
+  .form-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .card-title h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .form-name {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 4px 0 0 0;
+    font-weight: 500;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    opacity: 0.8;
+    margin: 4px 0 0 0;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stat-card {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 20px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  .stat-card.primary {
+    background: rgba(59, 130, 246, 0.25);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+
+  .stat-card.secondary {
+    background: rgba(245, 158, 11, 0.25);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    flex-shrink: 0;
+    backdrop-filter: blur(10px);
+  }
+
+  .stat-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .stat-content {
+    flex: 1;
+  }
+
+  .stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .rating-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .rating-number {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .stars {
+    font-size: 16px;
+    color: #fbbf24;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    opacity: 0.8;
+    font-weight: 500;
+  }
+
+  /* Question Ratings Section */
+  .question-ratings-section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 1;
+  }
+
+  .question-ratings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 cards per row */
+    gap: 16px; /* Reduced gap for better spacing */
+  }
+
+  .question-rating-card {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px; /* Slightly smaller border radius */
+    padding: 16px; /* Reduced padding for smaller cards */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    backdrop-filter: blur(10px);
+    min-height: 120px; /* Ensure consistent card height */
+  }
+
+  .question-rating-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  .question-header {
+    margin-bottom: 12px;
+  }
+
+  .question-label {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    color: #fbbf24;
+  }
+
+  .question-title {
+    font-size: 14px; /* Reduced font size for smaller cards */
+    font-weight: 600;
+    line-height: 1.4;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .question-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Reduced gap */
+    flex-wrap: wrap;
+  }
+
+  .rating-value {
+    font-size: 18px; /* Reduced font size */
+    font-weight: 700;
+    color: #fbbf24;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .rating-stars {
+    font-size: 14px; /* Reduced font size */
+    color: #fbbf24;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .response-count {
+    font-size: 11px; /* Reduced font size */
+    opacity: 0.8;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 3px 6px; /* Reduced padding */
+    border-radius: 6px;
+  }
+
+  .feedback-section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .feedback-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .feedback-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+
+  .feedback-item:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .feedback-number {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .feedback-text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #ffffff;
+    font-style: italic;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .website {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .social-handles {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    opacity: 0.8;
+  }
+
+  .generated-date {
+    font-size: 11px;
+    opacity: 0.7;
+    text-align: right;
+  }
+
+  /* Social Media Optimizations */
+  @media (max-width: 1024px) {
+    .feedback-analytics-card {
+      width: 600px;
+      height: 450px;
+      padding: 24px;
+    }
+
+    .card-title h2 {
+      font-size: 24px;
+    }
+
+    .stats-grid {
+      gap: 12px;
+    }
+
+    .stat-card {
+      padding: 16px;
+    }
+
+    .stat-number {
+      font-size: 20px;
+    }
+  }
+
+  /* Print and Screenshot Optimizations */
+  @media print {
+    .feedback-analytics-card {
+      width: 100%;
+      height: auto;
+      box-shadow: none;
+      page-break-inside: avoid;
+    }
+  }
+</style>
+
+<script>
+  // Add export functionality
+  function exportAsImage() {
+    const card = document.getElementById('analytics-card');
+    if (!card) return;
+
+    // Use html2canvas if available, otherwise provide download instructions
+    if (typeof html2canvas !== 'undefined') {
+      html2canvas(card, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'feedback-analytics-summary.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    } else {
+      // Fallback: provide instructions for manual screenshot
+      alert('To save this card:\n1. Right-click on the card\n2. Select "Save image as..." or take a screenshot\n3. Share on your social media platforms!');
+    }
+  }
+
+  // Add export button functionality if needed
+  document.addEventListener('DOMContentLoaded', () => {
+    const exportBtn = document.getElementById('export-card-btn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', exportAsImage);
+    }
+  });
+</script>
