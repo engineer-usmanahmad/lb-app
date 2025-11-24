@@ -861,8 +861,8 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
                  spellcheck="false">
             </div>
             
-            <!-- Hidden textarea for form submission -->
-            <textarea id="post-content" name="content" class="hidden" required></textarea>
+            <!-- Hidden textarea for form submission (synced programmatically) -->
+            <textarea id="post-content" name="content" class="hidden"></textarea>
           </div>
 
           <div>
@@ -1578,6 +1578,15 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
       const createPostForm = document.getElementById('create-post-form');
       const postTitle = document.getElementById('post-title');
       const postSlug = document.getElementById('post-slug');
+      const editorContentEl = document.getElementById('post-content-editor');
+      const hiddenTextareaEl = document.getElementById('post-content');
+
+      // Keep hidden textarea in sync with rich text editor to avoid HTML5 required issues
+      editorContentEl?.addEventListener('input', function() {
+        if (hiddenTextareaEl) {
+          hiddenTextareaEl.value = editorContentEl.innerHTML.trim();
+        }
+      });
       
       // Edit post buttons
       document.querySelectorAll('.edit-post-btn').forEach(btn => {
@@ -1665,6 +1674,12 @@ const uniqueEventCategories = [...new Set(events?.map(e => e.category) || [])].l
         const hiddenTextarea = document.getElementById('post-content');
         if (editorContent && hiddenTextarea) {
           hiddenTextarea.value = editorContent.innerHTML;
+        }
+
+        // Client-side validation for content to provide clear feedback
+        if (!hiddenTextarea || !hiddenTextarea.value || hiddenTextarea.value.trim() === '') {
+          alert('Content is required. Please add blog content before publishing.');
+          return;
         }
         
         const formData = new FormData(this);
