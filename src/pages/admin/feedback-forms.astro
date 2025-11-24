@@ -110,14 +110,22 @@ if (initialFormId) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
       <div class="bg-white rounded-xl shadow-sm border">
         <div class="px-4 pt-4">
-          <nav class="flex gap-2" aria-label="Tabs">
-            <button id="tab-individual" class="tab-btn inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-600 bg-indigo-600 text-white shadow-sm">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L6.5 20l2-7L3 9h7z"/></svg>
-              Individual Responses
-            </button>
-            <button id="tab-summary" class="tab-btn inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-indigo-50 hover:border-indigo-200">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h4v16H4zM10 10h4v10h-4zM16 6h4v14h-4z"/></svg>
-              Summary Analytics
+          <nav class="flex gap-2 items-center justify-between" aria-label="Tabs">
+            <div class="flex gap-2">
+              <button id="tab-individual" class="tab-btn inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-600 bg-indigo-600 text-white shadow-sm">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L6.5 20l2-7L3 9h7z"/></svg>
+                Individual Responses
+              </button>
+              <button id="tab-summary" class="tab-btn inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-indigo-50 hover:border-indigo-200">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h4v16H4zM10 10h4v10h-4zM16 6h4v14h-4z"/></svg>
+                Summary Analytics
+              </button>
+            </div>
+            <button id="generate-feedback-card" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
+              </svg>
+              Generate Feedback Card
             </button>
           </nav>
         </div>
@@ -220,6 +228,7 @@ if (initialFormId) {
     let submissions = initialData.initialSubmissions || [];
     let pageIndex = 0;
     let selectedIndex = 0;
+    let currentFormId = null; // Track the current form ID globally
 
     const formSelect = document.getElementById('form-select');
     const applyBtn = document.getElementById('apply-filters');
@@ -248,6 +257,7 @@ if (initialFormId) {
     const textSearch = document.getElementById('text-search');
     const textList = document.getElementById('text-list');
     const wordCloud = document.getElementById('word-cloud');
+    const generateCardBtn = document.getElementById('generate-feedback-card');
 
     let ratingChart, ynChart, mcChart;
 
@@ -264,17 +274,70 @@ if (initialFormId) {
       return String(k || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
     }
 
-    function getAnswerForField(field, payload) {
+    function getAnswerForField(field, payload, formId) {
       if (!field || !payload) return null;
       const label = String(field.label || field.field_name || '').trim();
       const fid = field.id;
+      const fieldName = field.field_name || '';
 
-      // 1) Direct key matches on root
-      if (label && payload[label] !== undefined) return payload[label];
-      if (field.field_name && payload[field.field_name] !== undefined) return payload[field.field_name];
-      if (fid && payload[fid] !== undefined) return payload[fid];
+      // Historical field mappings for forms where field IDs changed over time
+      // This handles the case where field IDs changed but we need to access old submission data
+      const historicalFieldMappings = {};
+      
+      // Linux form (form ID: de5c59d2-26b5-4949-9488-2d222fe196d3)
+      if (formId === 'de5c59d2-26b5-4949-9488-2d222fe196d3') {
+        Object.assign(historicalFieldMappings, {
+          // Current field ID -> historical field ID (1:1 mapping based on submission order)
+          '6cdbcae0-4335-4193-b9a1-f8daa2c0247e': ['29f4ddf4-8d7d-446e-9607-3283313ad61f'], // Course content relevance
+          '9ebd3d55-2298-4281-9e22-838f464af550': ['454f9857-5973-4b36-956d-5c7e9f9fa7f9'], // Course structure
+          'b03675c3-1526-4296-87b0-ddbc5a08b1ea': ['59827024-ba7e-4672-8c74-dc70d4ef4d74'], // Hands-on labs
+          '9866ddfa-4d4d-4bc6-81f2-81bb1433c280': ['b0360229-3277-43a4-93fd-0687c9b0f1c6'], // Trainer expertise
+          '21e2a521-d677-423c-850c-8583e61b1023': ['cbab43a8-9447-4672-87fd-b0f6438e9ffc'], // Trainer communication
+          '5984f38a-db6d-45f8-b651-a6a39c877187': ['d7ecfa32-083e-4153-b9db-09119f564a0c'], // Trainer support
+          '9b98d29a-a733-4899-b472-5c7e11de6d80': ['eed0a824-f71a-4578-8286-9785d6f7529d'], // Course materials
+          'b4e94ec4-8ee9-457b-a75a-46312f302ee7': ['f973a8db-60cf-480a-8a23-f9ed31cb539b']  // Overall satisfaction
+        });
+      }
+      
+      // Add more form mappings here as needed:
+      // if (formId === 'another-form-id') {
+      //   Object.assign(historicalFieldMappings, {
+      //     'current-field-id': ['historical-field-id']
+      //   });
+      // }
+
+      // 1) Direct key matches on root with multiple possible formats
+      const possibleKeys = [
+        `field_${fid}`,
+        fid,
+        fieldName,
+        label,
+        normalizeKey(label),
+        normalizeKey(fieldName)
+      ].filter(Boolean);
+      
+      // Add historical field IDs to possible keys
+      if (fid && historicalFieldMappings[fid]) {
+        historicalFieldMappings[fid].forEach(historicalId => {
+          possibleKeys.push(`field_${historicalId}`, historicalId);
+        });
+      }
+      
+      for (const key of possibleKeys) {
+        if (payload[key] !== undefined) return payload[key];
+      }
+
       // 1a) Keys shaped like 'field_<uuid>' or containing field id
       if (fid) {
+        // First try exact match with field_ prefix
+        const fieldKey = `field_${fid}`;
+        if (payload[fieldKey] !== undefined) {
+          const v = payload[fieldKey];
+          if (v && typeof v === 'object') return v.value ?? v.answer ?? v.response ?? v.selected ?? v.text ?? null;
+          return v ?? null;
+        }
+        
+        // Then try case-insensitive matching
         const fidLower = String(fid).toLowerCase();
         const idKey = Object.keys(payload || {}).find(k => {
           const kn = String(k).toLowerCase();
@@ -288,7 +351,12 @@ if (initialFormId) {
       }
       const labNorm = normalizeKey(label);
       const candidates = Object.keys(payload || {});
-      const matchKey = candidates.find(k => normalizeKey(k).includes(labNorm));
+      const matchKey = candidates.find(k => {
+        const normalizedKey = normalizeKey(k);
+        return normalizedKey.includes(labNorm) || 
+               (fid && normalizedKey.includes(normalizeKey(fid))) ||
+               normalizedKey.includes(normalizeKey(fieldName));
+      });
       if (matchKey && payload[matchKey] !== undefined) return payload[matchKey];
 
       // 2) Common nested shapes: answers/responses array or object
@@ -339,7 +407,9 @@ if (initialFormId) {
             const iid = item?.id;
             return (
               (ilabel && ilabel.includes(labNorm)) ||
-              (iid && fid && String(iid) === String(fid))
+              (iid && fid && String(iid) === String(fid)) ||
+              (item?.label && item?.label === label) ||
+              (item?.field_name && item?.field_name === fieldName)
             );
           });
           if (found) return found.value ?? found.answer ?? found.response ?? found.selected ?? found.text ?? null;
@@ -484,7 +554,7 @@ if (initialFormId) {
       detailTitle.textContent = String(respondentName);
       detailMeta.textContent = `${respondentEmail ? respondentEmail + ' • ' : ''}${submittedAt} • ID: ${sub.id || '—'}`;
       fields.forEach((f) => {
-        const rawVal = getAnswerForField(f, payload);
+        const rawVal = getAnswerForField(f, payload, currentFormId);
         const card = document.createElement('div');
         card.className = 'rounded-xl border bg-white p-4 shadow-sm hover:shadow-md transition';
         const ft = String(f.field_type || '').toLowerCase();
@@ -553,23 +623,47 @@ if (initialFormId) {
         if (parentCard) (parentCard as HTMLElement).style.display = 'none';
       });
 
-      // Average for the specific "Review/Feedback" rating question
+      // Average across all rating fields (more robust approach)
       const avgEl = document.getElementById('stat-average');
       let avg = null;
-      const reviewField = fields.find(f => {
-        const l = String(f.label || f.field_name || '').toLowerCase();
-        return l.includes('review') || l.includes('feedback');
+      const ratingFields = fields.filter(f => {
+        const ft = String(f.field_type || '').toLowerCase();
+        return ft.includes('rating');
       });
-      if (reviewField) {
-        let sum = 0;
-        let count = 0;
-        submissions.forEach(s => {
-          const p = parsePayload(s.response_data || s.submission_data || s.data) || {};
-          const v = getAnswerForField(reviewField, p);
-          const n = Number(v);
-          if (!isNaN(n)) { sum += n; count += 1; }
+      
+      console.log('Summary Analytics Debug:', {
+        totalFields: fields.length,
+        ratingFields: ratingFields.length,
+        ratingFieldIds: ratingFields.map(f => f.id),
+        totalSubmissions: submissions.length
+      });
+      
+      if (ratingFields.length > 0) {
+        let totalSum = 0;
+        let totalCount = 0;
+        
+        // Calculate average across all rating fields and all submissions
+        ratingFields.forEach(field => {
+          console.log(`Processing rating field: ${field.label || field.field_name} (ID: ${field.id})`);
+          submissions.forEach((s, index) => {
+            const p = parsePayload(s.response_data || s.submission_data || s.data) || {};
+            const v = getAnswerForField(field, p, currentFormId);
+            const n = Number(v);
+            console.log(`  Submission ${index + 1}: value="${v}", parsed=${n}, valid=${!isNaN(n) && n >= 1 && n <= 5}`);
+            if (!isNaN(n) && n >= 1 && n <= 5) { 
+              totalSum += n; 
+              totalCount += 1; 
+            }
+          });
         });
-        avg = count ? (sum / count) : null;
+        
+        console.log('Summary calculation:', {
+          totalSum,
+          totalCount,
+          average: totalCount ? (totalSum / totalCount) : null
+        });
+        
+        avg = totalCount ? (totalSum / totalCount) : null;
       }
       if (avgEl) avgEl.textContent = avg != null ? avg.toFixed(2) : '—';
 
@@ -581,8 +675,18 @@ if (initialFormId) {
           const ft = String(f.field_type || '').toLowerCase();
           const answersRaw = submissions.map(s => {
             const p = parsePayload(s.response_data || s.submission_data || s.data) || {};
-            return getAnswerForField(f, p);
+            return getAnswerForField(f, p, currentFormId);
           }).filter(a => a !== null && a !== undefined && a !== '');
+          
+          // Debug logging
+          console.log(`Field: ${f.label || f.field_name}`, {
+            fieldId: f.id,
+            fieldType: ft,
+            totalSubmissions: submissions.length,
+            answersFound: answersRaw.length,
+            answers: answersRaw
+          });
+          
           const wrap = document.createElement('div');
           wrap.className = 'rounded-xl border bg-white p-4 shadow-sm';
           const title = `<div class=\"text-sm font-medium text-gray-800 mb-2\">${f.label || f.field_name || 'Question'}</div>`;
@@ -596,6 +700,13 @@ if (initialFormId) {
             const fullStars = avgQ != null ? Math.round(avgQ) : 0;
             const emptyStars = 5 - fullStars;
             const distCounts = [1,2,3,4,5].map(star => nums.filter(n => Math.round(n) === star).length);
+            
+            console.log(`Rating field ${f.label}:`, {
+              nums,
+              sum,
+              avgQ,
+              count: nums.length
+            });
             body = `
               <div class=\"flex items-center gap-4\">
                 <div class=\"flex items-center text-yellow-500 text-2xl\">${'★'.repeat(fullStars)}${'☆'.repeat(emptyStars)}</div>
@@ -700,6 +811,7 @@ if (initialFormId) {
 
     async function loadFormData() {
       const formId = formSelect?.value;
+      currentFormId = formId; // Update the global form ID
       try {
         clearMessage();
         // Validate input
@@ -733,6 +845,7 @@ if (initialFormId) {
           throw new Error(`Failed to fetch form fields (${fRes.status})`);
         }
         const fJson = await fRes.json();
+        // The API returns an object with form and fields properties
         fields = fJson.fields || [];
 
         // Build server-side params without date filters
@@ -762,6 +875,13 @@ if (initialFormId) {
         showMessage('Data loaded successfully.', 'success');
       } catch (err) {
         console.error('Failed to load form data', err);
+        console.error('Error details:', {
+          message: err.message,
+          stack: err.stack,
+          formId: formId,
+          fieldsLength: fields ? fields.length : 'undefined',
+          submissionsLength: submissions ? submissions.length : 'undefined'
+        });
         subList.innerHTML = '<div class="text-sm text-red-600">Failed to load data. Please retry or adjust filters.</div>';
         qaCards.innerHTML = '';
         statTotal.textContent = '0';
@@ -838,20 +958,35 @@ if (initialFormId) {
       });
     }
     if (formSelect) {
-      formSelect.addEventListener('change', () => {
-        console.log('Form changed');
-        clearMessage();
-        // Reset view until user clicks Apply
-        submissions = [];
-        fields = [];
-        pageIndex = 0;
-        selectedIndex = 0;
-        subList.innerHTML = '<div class="text-sm text-gray-500">Select a form and click Apply to load submissions.</div>';
-        qaCards.innerHTML = '';
-        statTotal.textContent = '0';
-        statLatest.textContent = '—';
-      });
-    }
+        formSelect.addEventListener('change', () => {
+          console.log('Form changed');
+          clearMessage();
+          // Reset view until user clicks Apply
+          submissions = [];
+          fields = [];
+          pageIndex = 0;
+          selectedIndex = 0;
+          subList.innerHTML = '<div class="text-sm text-gray-500">Select a form and click Apply to load submissions.</div>';
+          qaCards.innerHTML = '';
+          statTotal.textContent = '0';
+          statLatest.textContent = '—';
+          
+          // Enable/disable generate card button based on form selection
+          if (generateCardBtn) {
+            generateCardBtn.disabled = !formSelect.value;
+          }
+        });
+      }
+
+      // Generate Feedback Card button
+      if (generateCardBtn) {
+        generateCardBtn.addEventListener('click', () => {
+          const formId = formSelect?.value;
+          if (formId) {
+            window.open(`/admin/feedback-card?form=${encodeURIComponent(formId)}`, '_blank');
+          }
+        });
+      }
 
     // Initial render
     document.addEventListener('DOMContentLoaded', () => {

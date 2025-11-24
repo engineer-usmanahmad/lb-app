@@ -137,3 +137,54 @@ export const GET: APIRoute = async ({ url }) => {
     });
   }
 };
+
+export const POST: APIRoute = async ({ request }) => {
+  try {
+    if (!supabaseAdmin) {
+      return new Response(JSON.stringify({ error: 'Service unavailable' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const body = await request.json();
+    const { form_id, submission_data } = body;
+
+    if (!form_id || !submission_data) {
+      return new Response(JSON.stringify({ error: 'form_id and submission_data are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Insert the submission
+    const { data, error } = await supabaseAdmin
+      .from('form_submissions')
+      .insert({
+        form_id,
+        submission_data,
+        submitted_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating submission:', error);
+      return new Response(JSON.stringify({ error: 'Failed to create submission' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true, data }), {
+      status: 201,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    console.error('Submissions POST API error:', error);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+};
