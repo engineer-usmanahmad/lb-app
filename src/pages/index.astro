@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import AnnouncementSlider from '../components/AnnouncementSlider.astro';
+import BrandPositioning from '../components/BrandPositioning.astro';
 import CourseCard from '../components/CourseCard.astro';
 import TestimonialSlider from '../components/TestimonialSlider.astro';
 import NeedHelpCard from '../components/NeedHelpCard.astro';
@@ -19,50 +20,9 @@ const featuredCourses = courses.filter(course =>
   
   <!-- Course Announcement Slider -->
   <AnnouncementSlider />
-  
-  <!-- Why Choose LbisTech -->
-  <section class="py-16 bg-gray-50">
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose LbisTech?</h2>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-          We're committed to providing world-class technology education that prepares you for real-world challenges.
-        </p>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="text-center">
-          <div class="w-16 h-16 bg-coral-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-2">Expert Instructors</h3>
-          <p class="text-gray-600">Learn from industry professionals with years of real-world experience.</p>
-        </div>
-        
-        <div class="text-center">
-          <div class="w-16 h-16 bg-coral-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-2">Hands-on Learning</h3>
-          <p class="text-gray-600">Practice with real projects and scenarios you'll encounter in your career.</p>
-        </div>
-        
-        <div class="text-center">
-          <div class="w-16 h-16 bg-coral-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-2">24/7 Support</h3>
-          <p class="text-gray-600">Get help whenever you need it with our dedicated support team.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+
+  <!-- Brand Positioning -->
+  <BrandPositioning />
   
   <!-- Featured Courses -->
   <section class="py-16">
@@ -92,6 +52,60 @@ const featuredCourses = courses.filter(course =>
   <!-- Student Testimonials Slider -->
   <TestimonialSlider />
   
+  <!-- Why Choose LbisTech -->
+  <section class="py-16 bg-white border-t border-gray-200">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose LbisTech?</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          We're committed to providing world-class technology education with proven results that prepare you for real-world success.
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="text-center p-6 rounded-xl hover:shadow-lg transition-shadow duration-300">
+          <div class="w-16 h-16 bg-coral-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Expert Instructors</h3>
+          <p class="text-gray-600">Learn from industry professionals with years of real-world experience. Our instructors like Usman Ahmad, Uzair Azmat, and Syed Asad Raza actively work in the field and bring current practices to every session.</p>
+        </div>
+        
+        <div class="text-center p-6 rounded-xl hover:shadow-lg transition-shadow duration-300">
+          <div class="w-16 h-16 bg-coral-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Hands-on Learning</h3>
+          <p class="text-gray-600">Practice with 50+ real-world labs and projects you'll encounter in your career. Every course includes practical scenarios that simulate actual workplace challenges.</p>
+        </div>
+        
+        <div class="text-center p-6 rounded-xl hover:shadow-lg transition-shadow duration-300">
+          <div class="w-16 h-16 bg-coral-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">24/7 Support</h3>
+          <p class="text-gray-600">Get help whenever you need it with our dedicated support team, active community of 8,000+ members, and lifetime access to course resources.</p>
+        </div>
+
+        <div class="text-center p-6 rounded-xl hover:shadow-lg transition-shadow duration-300">
+          <div class="w-16 h-16 bg-coral-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM12 18a6 6 0 100-12 6 6 0 000 12zm0-4a2 2 0 100-4 2 2 0 000 4z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Proven Results</h3>
+          <p class="text-gray-600">Join 5000+ successful graduates with a 98% certification pass rate. Our students secure positions at leading companies including Systems Limited, TechLogix, and NetSol Technologies.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA Section -->
   <section class="py-16 bg-coral-500 text-white">
     <div class="container mx-auto px-4 text-center">

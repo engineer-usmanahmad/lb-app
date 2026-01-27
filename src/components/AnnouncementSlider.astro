@@ -3,122 +3,108 @@
 ---
 
 <!-- Add top margin to prevent overlap with sticky header -->
-<div class="announcement-slider-container relative overflow-hidden mt-0">
+<div class="announcement-slider-container relative overflow-hidden mt-0 font-sans bg-slate-900">
   <!-- Slider Wrapper -->
-  <div class="slider-wrapper relative h-[600px] lg:h-[500px]">
+  <div class="slider-wrapper relative min-h-[700px] h-auto flex flex-col">
     
     <!-- Slide 1: AWS 3-in-1 Certification -->
-    <div class="slide active" data-slide="1">
-      <div class="slide-background bg-gradient-to-br from-[#1e3a5f] to-[#2d4a6d] relative overflow-hidden">
-        <!-- Background Pattern -->
-        <div class="absolute inset-0 opacity-10">
-          <div class="aws-pattern absolute top-10 right-10 text-6xl">☁️</div>
-          <div class="aws-pattern absolute bottom-20 left-20 text-4xl">🔧</div>
-          <div class="aws-pattern absolute top-1/2 right-1/4 text-3xl">⚡</div>
+    <div class="slide active h-full flex-1 w-full" data-slide="1">
+      <div class="slide-background bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] relative overflow-hidden h-full">
+        <!-- Abstract Tech Background -->
+        <div class="absolute inset-0 opacity-20">
+          <div class="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSIvPjwvc3ZnPg==')] mask-image-gradient"></div>
+          <div class="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
+          <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
         </div>
         
-        <!-- Floating Particles -->
-        <div class="particles absolute inset-0">
-          <div class="particle particle-1"></div>
-          <div class="particle particle-2"></div>
-          <div class="particle particle-3"></div>
-        </div>
-        
-        <div class="container mx-auto px-6 h-full flex items-center">
-          <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 w-full items-center">
+        <div class="container mx-auto px-6 h-auto lg:h-full pt-20 pb-24 lg:pt-20 lg:pb-24 flex items-start lg:items-center relative z-10">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full items-center">
             
-            <!-- Left Content (60%) -->
-            <div class="lg:col-span-3 text-white z-10">
-              <div class="course-tag text-[#ef5753] text-sm uppercase font-semibold mb-4 tracking-wider">
-                🎓 COMPREHENSIVE AWS TRAINING
+            <!-- Left Content -->
+            <div class="text-white space-y-6">
+              <div class="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5 backdrop-blur-sm">
+                <span class="flex h-2 w-2 relative">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                <span class="text-blue-200 text-sm font-medium tracking-wide">PREMIUM CLOUD TRAINING</span>
               </div>
               
-              <h2 class="text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-                Master AWS Cloud with<br>
-                <span class="text-[#ef5753]">3-in-1 Certification</span>
+              <h2 class="text-4xl lg:text-6xl font-bold leading-tight">
+                Master AWS Cloud<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">3-in-1 Certification</span>
               </h2>
               
-              <p class="text-xl text-gray-300 mb-2 font-medium">
-                Solutions Architect | Developer | SysOps Administrator
+              <p class="text-lg text-slate-300 max-w-xl leading-relaxed">
+                The ultimate path to becoming a Cloud Architect. Cover Solutions Architect, Developer, and SysOps Administrator in one comprehensive program.
               </p>
               
-              <p class="text-gray-400 mb-6 text-lg leading-relaxed">
-                Complete AWS journey covering all three Associate certifications 
-                with hands-on labs and real-world projects.
-              </p>
-              
-              <!-- Features -->
-              <div class="features mb-8 space-y-3">
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">3 AWS Certifications in 1 Course</span>
+              <div class="grid grid-cols-2 gap-4 max-w-md">
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>3 Certifications</span>
                 </div>
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">50+ Hands-on Labs</span>
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>50+ Hands-on Labs</span>
                 </div>
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">Real-world Projects</span>
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Lifetime Access</span>
                 </div>
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">Lifetime Access</span>
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Real Projects</span>
                 </div>
               </div>
-              
-              <!-- Pricing -->
-              <div class="pricing mb-8">
-                <span class="original-price text-gray-500 text-lg line-through mr-4">PKR 60,000</span>
-                <span class="sale-price text-3xl font-bold text-[#ef5753]">PKR 48,000</span>
-              </div>
-              
-              <!-- Buttons -->
-              <div class="buttons flex flex-col sm:flex-row gap-4 mb-6">
-                <a href="/enroll/aws-3-in-1" class="enroll-btn bg-gradient-to-r from-[#ef5753] to-[#ff6b6b] text-white px-9 py-4 rounded-full font-semibold text-lg shadow-lg hover:scale-105 transition-all duration-300 text-center inline-block">
-                  Enroll Now
+
+              <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <a href="/enroll/aws-3-in-1" class="group relative px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-lg text-white font-semibold transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] overflow-hidden">
+                  <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+                  <span class="relative flex items-center justify-center gap-2">
+                    Enroll Now
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                  </span>
                 </a>
-                <a href="/courses/aws-3-in-1" class="details-btn border-2 border-white/50 text-white px-9 py-4 rounded-full font-medium text-lg hover:bg-white hover:text-[#1e3a5f] transition-all duration-300 text-center inline-block">
-                  View Details
-                </a>
-              </div>
-              
-              <!-- Urgency Banner -->
-              <div class="urgency-banner bg-black/30 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/20">
-                <span class="text-yellow-400 mr-2">⏰</span>
-                <span class="text-white text-sm font-medium">Limited Seats - Batch Starting Soon!</span>
+                <div class="flex items-center gap-3 px-6">
+                  <div class="text-right">
+                    <div class="text-sm text-slate-400 line-through">PKR 60,000</div>
+                    <div class="text-2xl font-bold text-white">PKR 48,000</div>
+                  </div>
+                </div>
               </div>
             </div>
             
-            <!-- Right Visual (40%) -->
-            <div class="lg:col-span-2 relative h-80 lg:h-full flex items-center justify-center">
-              <div class="aws-visual relative">
-                <!-- AWS Logo -->
-                <div class="aws-logo text-6xl lg:text-8xl text-[#ff9900] mb-8 text-center floating-animation">
-                  <svg viewBox="0 0 100 60" class="w-24 h-16 lg:w-32 lg:h-20 mx-auto">
-                    <path fill="#ff9900" d="M15.7 26.4c0-1.5.1-2.7.4-3.6.2-.9.6-1.8 1.1-2.6.2-.3.3-.6.3-.8 0-.4-.3-.6-.8-.6-.4 0-.8.1-1.2.4-1.9 1.3-2.9 3.3-2.9 6.1 0 2.7.9 4.8 2.8 6.2.4.3.8.4 1.2.4.5 0 .8-.2.8-.6 0-.2-.1-.5-.3-.8-.5-.8-.9-1.7-1.1-2.6-.3-.9-.4-2.1-.4-3.6zm8.9-8.5c-2.4 0-4.3.7-5.8 2.1-.3.3-.5.6-.5 1 0 .3.2.4.5.4.2 0 .5-.1.8-.4 1.2-1 2.6-1.5 4.2-1.5 1.9 0 3.4.6 4.4 1.7 1 1.1 1.5 2.6 1.5 4.4v.8l-5.3.3c-2.8.2-4.9.7-6.4 1.7-1.5 2.2 2.4-2.2 4.2 0 1.6.5 2.9 1.6 3.9 1.1 1 2.4 1.5 4 1.5 1.9 0 3.6-.8 5.1-2.4.2.8.5 1.4.9 1.8.4.4.9.6 1.6.6.4 0 .9-.1 1.4-.3.5-.2.8-.4.8-.7 0-.2-.1-.4-.2-.5-.3-.3-.5-.7-.6-1.2-.1-.5-.2-1.2-.2-2.1v-6.2c0-2.4-.6-4.3-1.9-5.6-1.3-1.3-3.1-2-5.4-2zm2.5 15.1c0 1.5-.5 2.8-1.4 3.8-.9 1-2 1.5-3.2 1.5-1 0-1.8-.3-2.4-.8-.6-.5-.9-1.3-.9-2.2 0-1.1.4-2 1.3-2.6.9-.6 2.2-1 4-1.2l2.6-.2v1.7z"/>
+            <!-- Right Visual (Professional SVG Composition) -->
+            <div class="relative h-[400px] flex items-center justify-center lg:justify-end">
+              <div class="relative w-80 h-80">
+                <!-- Glowing Orb -->
+                <div class="absolute inset-0 bg-blue-500/20 rounded-full blur-[60px] animate-pulse-slow"></div>
+                
+                <!-- Central Cloud Icon -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-br from-white to-blue-100 rounded-2xl shadow-2xl flex items-center justify-center z-20 animate-float">
+                  <svg class="w-20 h-20 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.42 9.22a7.5 7.5 0 0 0-13.84 2.3C2.18 11.96 0 13.98 0 16.5A5.5 5.5 0 0 0 5.5 22h13A5.5 5.5 0 0 0 24 16.5c0-2.82-2.11-5.18-4.83-5.45c-.25-2.03-1.1-3.95-2.75-5.28z"/>
                   </svg>
                 </div>
-                
-                <!-- Certification Badges -->
-                <div class="certification-badges absolute -top-4 -right-4 space-y-2">
-                  <div class="badge bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-white floating-animation-delayed">
-                    Solutions Architect
+
+                <!-- Orbiting Elements -->
+                <div class="absolute inset-0 animate-spin-slow">
+                  <!-- Satellite 1 -->
+                  <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-16 h-16 bg-slate-800/90 backdrop-blur-md border border-slate-700 rounded-xl flex flex-col items-center justify-center shadow-xl transform hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 text-yellow-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <span class="text-[8px] font-bold text-slate-300">ARCH</span>
                   </div>
-                  <div class="badge bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-white floating-animation-delayed-2">
-                    Developer
+                  <!-- Satellite 2 -->
+                  <div class="absolute bottom-10 -right-4 w-16 h-16 bg-slate-800/90 backdrop-blur-md border border-slate-700 rounded-xl flex flex-col items-center justify-center shadow-xl transform rotate-120 hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 text-green-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    <span class="text-[8px] font-bold text-slate-300">DEV</span>
                   </div>
-                  <div class="badge bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-white floating-animation-delayed-3">
-                    SysOps Admin
+                  <!-- Satellite 3 -->
+                  <div class="absolute bottom-10 -left-4 w-16 h-16 bg-slate-800/90 backdrop-blur-md border border-slate-700 rounded-xl flex flex-col items-center justify-center shadow-xl transform rotate-240 hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 text-purple-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                    <span class="text-[8px] font-bold text-slate-300">OPS</span>
                   </div>
-                </div>
-                
-                <!-- Service Icons -->
-                <div class="service-icons absolute inset-0">
-                  <div class="icon ec2 absolute top-0 left-0 text-2xl opacity-60 floating-animation">🖥️</div>
-                  <div class="icon s3 absolute top-0 right-0 text-2xl opacity-60 floating-animation-delayed">🗄️</div>
-                  <div class="icon lambda absolute bottom-0 left-0 text-2xl opacity-60 floating-animation-delayed-2">⚡</div>
-                  <div class="icon rds absolute bottom-0 right-0 text-2xl opacity-60 floating-animation-delayed-3">🗃️</div>
                 </div>
               </div>
             </div>
@@ -128,112 +114,193 @@
     </div>
     
     <!-- Slide 2: DevOps Zero to Hero -->
-    <div class="slide" data-slide="2">
-      <div class="slide-background bg-gradient-to-br from-[#1e3a5f] to-[#2d4a6d] relative overflow-hidden">
-        <!-- Background Pattern -->
-        <div class="absolute inset-0 opacity-10">
-          <div class="devops-pattern absolute top-10 right-10 text-6xl">🔄</div>
-          <div class="devops-pattern absolute bottom-20 left-20 text-4xl">⚙️</div>
-          <div class="devops-pattern absolute top-1/2 right-1/4 text-3xl">🚀</div>
+    <div class="slide h-full flex-1 w-full" data-slide="2">
+      <div class="slide-background bg-gradient-to-br from-[#0f172a] via-[#0f252a] to-[#0f172a] relative overflow-hidden h-full">
+        <!-- Abstract Tech Background -->
+        <div class="absolute inset-0 opacity-20">
+          <div class="absolute top-0 right-0 w-full h-full bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/10 rounded-full blur-[100px]"></div>
         </div>
         
-        <!-- Floating Particles -->
-        <div class="particles absolute inset-0">
-          <div class="particle particle-1"></div>
-          <div class="particle particle-2"></div>
-          <div class="particle particle-3"></div>
-        </div>
-        
-        <div class="container mx-auto px-6 h-full flex items-center">
-          <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 w-full items-center">
+        <div class="container mx-auto px-6 h-auto lg:h-full pt-20 pb-24 lg:pt-20 lg:pb-24 flex items-start lg:items-center relative z-10">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full items-center">
             
-            <!-- Left Content (60%) -->
-            <div class="lg:col-span-3 text-white z-10">
-              <div class="course-tag text-[#ef5753] text-sm uppercase font-semibold mb-4 tracking-wider">
-                🚀 COMPLETE DEVOPS TRANSFORMATION
+            <!-- Left Content -->
+            <div class="text-white space-y-6">
+              <div class="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 backdrop-blur-sm">
+                <span class="flex h-2 w-2 relative">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-emerald-200 text-sm font-medium tracking-wide">CAREER TRANSFORMATION</span>
               </div>
               
-              <h2 class="text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+              <h2 class="text-4xl lg:text-6xl font-bold leading-tight">
                 DevOps Zero to<br>
-                <span class="text-[#ef5753]">Hero Journey</span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">Hero Journey</span>
               </h2>
               
-              <p class="text-xl text-gray-300 mb-2 font-medium">
-                From Basics to Advanced Production Deployments
+              <p class="text-lg text-slate-300 max-w-xl leading-relaxed">
+                Bridge the gap between development and operations. Master the complete CI/CD lifecycle, automation, and infrastructure as code.
               </p>
               
-              <p class="text-gray-400 mb-6 text-lg leading-relaxed">
-                Master complete DevOps lifecycle with CI/CD, containerization, 
-                orchestration, and cloud automation.
-              </p>
-              
-              <!-- Features -->
-              <div class="features mb-8 space-y-3">
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">12+ DevOps Tools Covered</span>
+              <div class="grid grid-cols-2 gap-4 max-w-md">
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>12+ Tools Covered</span>
                 </div>
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">Jenkins, Docker, Kubernetes, Terraform</span>
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>CI/CD Pipelines</span>
                 </div>
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">CI/CD Pipeline Implementation</span>
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Terraform & Ansible</span>
                 </div>
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">Cloud Deployments (AWS/Azure)</span>
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Job Ready Skills</span>
                 </div>
               </div>
-              
-              <!-- Pricing -->
-              <div class="pricing mb-8">
-                <span class="original-price text-gray-500 text-lg line-through mr-4">PKR 75,000</span>
-                <span class="sale-price text-3xl font-bold text-[#ef5753]">PKR 60,000</span>
-              </div>
-              
-              <!-- Buttons -->
-              <div class="buttons flex flex-col sm:flex-row gap-4 mb-6">
-                <a href="/enroll/devops-zero-to-hero" class="enroll-btn bg-gradient-to-r from-[#ef5753] to-[#ff6b6b] text-white px-9 py-4 rounded-full font-semibold text-lg shadow-lg hover:scale-105 transition-all duration-300 text-center inline-block">
-                  Enroll Now
+
+              <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <a href="/enroll/devops-zero-to-hero" class="group relative px-8 py-4 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-white font-semibold transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] overflow-hidden">
+                  <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+                  <span class="relative flex items-center justify-center gap-2">
+                    Start Journey
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                  </span>
                 </a>
-                <a href="/courses/devops-zero-to-hero" class="details-btn border-2 border-white/50 text-white px-9 py-4 rounded-full font-medium text-lg hover:bg-white hover:text-[#1e3a5f] transition-all duration-300 text-center inline-block">
-                  View Details
-                </a>
-              </div>
-              
-              <!-- Urgency Banner -->
-              <div class="urgency-banner bg-black/30 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/20">
-                <span class="text-yellow-400 mr-2">⏰</span>
-                <span class="text-white text-sm font-medium">Early Bird Offer - Save 32%!</span>
+                <div class="flex items-center gap-3 px-6">
+                  <div class="text-right">
+                    <div class="text-sm text-slate-400 line-through">PKR 75,000</div>
+                    <div class="text-2xl font-bold text-white">PKR 60,000</div>
+                  </div>
+                </div>
               </div>
             </div>
             
-            <!-- Right Visual (40%) -->
-            <div class="lg:col-span-2 relative h-80 lg:h-full flex items-center justify-center">
-              <div class="devops-visual relative">
-                <!-- DevOps Infinity Loop -->
-                <div class="infinity-loop text-6xl lg:text-8xl text-[#ef5753] mb-8 text-center rotating-animation">
-                  ∞
-                </div>
+            <!-- Right Visual (Infinity Loop SVG) -->
+            <div class="relative h-[400px] flex items-center justify-center lg:justify-end">
+              <div class="relative w-96 h-64">
+                <svg class="w-full h-full drop-shadow-2xl animate-float" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Infinity Path Background -->
+                  <path d="M100,50 C70,50 70,20 40,20 S10,35 10,50 S20,80 40,80 S70,50 100,50 S130,20 160,20 S190,35 190,50 S180,80 160,80 S130,50 100,50" 
+                        stroke="#0f3d3e" stroke-width="12" stroke-linecap="round"/>
+                  
+                  <!-- Infinity Path Active -->
+                  <path class="animate-draw-path" d="M100,50 C70,50 70,20 40,20 S10,35 10,50 S20,80 40,80 S70,50 100,50 S130,20 160,20 S190,35 190,50 S180,80 160,80 S130,50 100,50" 
+                        stroke="url(#gradient-devops)" stroke-width="6" stroke-linecap="round" stroke-dasharray="400" stroke-dashoffset="400"/>
+
+                  
+                  <defs>
+                    <linearGradient id="gradient-devops" x1="0" y1="0" x2="200" y2="0">
+                      <stop offset="0%" stop-color="#34d399"/>
+                      <stop offset="100%" stop-color="#2dd4bf"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
                 
-                <!-- Tool Icons in Circle -->
-                <div class="tool-circle absolute inset-0 w-48 h-48 mx-auto">
-                  <div class="tool jenkins absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 text-2xl rotating-tools" style="color: #d33833;">🔧</div>
-                  <div class="tool docker absolute top-1/4 right-0 transform translate-x-2 text-2xl rotating-tools" style="color: #2496ed;">🐳</div>
-                  <div class="tool kubernetes absolute bottom-1/4 right-0 transform translate-x-2 text-2xl rotating-tools" style="color: #326ce5;">⚙️</div>
-                  <div class="tool git absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 text-2xl rotating-tools" style="color: #f05032;">📝</div>
-                  <div class="tool terraform absolute bottom-1/4 left-0 transform -translate-x-2 text-2xl rotating-tools" style="color: #623ce4;">🏗️</div>
-                  <div class="tool ansible absolute top-1/4 left-0 transform -translate-x-2 text-2xl rotating-tools" style="color: #ee0000;">⚡</div>
+                <!-- Floating Icons around loop -->
+                <div class="absolute top-0 left-1/4 animate-bounce-slow text-3xl">⚙️</div>
+                <div class="absolute bottom-0 right-1/4 animate-bounce-delayed text-3xl">🚀</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Slide 3: Docker & Kubernetes -->
+    <div class="slide h-full flex-1 w-full" data-slide="3">
+      <div class="slide-background bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#0f172a] relative overflow-hidden h-full">
+        <!-- Abstract Tech Background -->
+        <div class="absolute inset-0 opacity-20">
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.1)_0,transparent_70%)]"></div>
+          <div class="grid grid-cols-6 gap-4 absolute inset-0 transform -skew-y-12 scale-150 opacity-10">
+             <div class="h-full w-1 bg-indigo-500/50"></div>
+             <div class="h-full w-1 bg-indigo-500/50"></div>
+             <div class="h-full w-1 bg-indigo-500/50"></div>
+             <div class="h-full w-1 bg-indigo-500/50"></div>
+             <div class="h-full w-1 bg-indigo-500/50"></div>
+             <div class="h-full w-1 bg-indigo-500/50"></div>
+          </div>
+        </div>
+        
+        <div class="container mx-auto px-6 h-auto lg:h-full pt-20 pb-24 lg:pt-20 lg:pb-24 flex items-start lg:items-center relative z-10">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full items-center">
+            
+            <!-- Left Content -->
+            <div class="text-white space-y-6">
+              <div class="inline-flex items-center space-x-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-1.5 backdrop-blur-sm">
+                <span class="flex h-2 w-2 relative">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                </span>
+                <span class="text-indigo-200 text-sm font-medium tracking-wide">CONTAINER MASTERY</span>
+              </div>
+              
+              <h2 class="text-4xl lg:text-6xl font-bold leading-tight">
+                Docker & Kubernetes<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400">Master Class</span>
+              </h2>
+              
+              <p class="text-lg text-slate-300 max-w-xl leading-relaxed">
+                Scale your applications with confidence. Learn to containerize, orchestrate, and manage microservices at scale.
+              </p>
+              
+              <div class="grid grid-cols-2 gap-4 max-w-md">
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Production Deployment</span>
                 </div>
-                
-                <!-- Pipeline Visualization -->
-                <div class="pipeline absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                  <div class="pipeline-step w-3 h-3 bg-green-400 rounded-full pulse-animation"></div>
-                  <div class="pipeline-step w-3 h-3 bg-yellow-400 rounded-full pulse-animation-delayed"></div>
-                  <div class="pipeline-step w-3 h-3 bg-blue-400 rounded-full pulse-animation-delayed-2"></div>
-                  <div class="pipeline-step w-3 h-3 bg-purple-400 rounded-full pulse-animation-delayed-3"></div>
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Microservices Arch</span>
+                </div>
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Helm Charts</span>
+                </div>
+                <div class="flex items-center space-x-2 text-sm text-slate-300">
+                  <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Cloud Native</span>
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <a href="/enroll/docker-kubernetes-mastery" class="group relative px-8 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-white font-semibold transition-all duration-300 shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] overflow-hidden">
+                  <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+                  <span class="relative flex items-center justify-center gap-2">
+                    Enroll Now
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                  </span>
+                </a>
+                <div class="flex items-center gap-3 px-6">
+                  <div class="text-right">
+                    <div class="text-sm text-slate-400 line-through">PKR 21,999</div>
+                    <div class="text-2xl font-bold text-white">PKR 14,999</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Right Visual (3D Cubes) -->
+            <div class="relative h-[400px] flex items-center justify-center lg:justify-end perspective-1000">
+              <div class="relative transform-style-3d animate-float">
+                <!-- CSS 3D Cube Cluster -->
+                <div class="grid grid-cols-2 gap-4 transform rotate-x-12 rotate-y-12 rotate-z-12">
+                   <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg shadow-lg opacity-90 backdrop-blur-sm border border-white/20"></div>
+                   <div class="w-24 h-24 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-lg shadow-lg opacity-90 backdrop-blur-sm border border-white/20 mt-8"></div>
+                   <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg shadow-lg opacity-90 backdrop-blur-sm border border-white/20 -mt-8"></div>
+                   <div class="w-24 h-24 bg-gradient-to-br from-pink-500 to-pink-700 rounded-lg shadow-lg opacity-90 backdrop-blur-sm border border-white/20"></div>
+                </div>
+                <!-- Connecting Lines -->
+                <div class="absolute inset-0 pointer-events-none">
+                   <svg class="w-full h-full absolute top-0 left-0" style="overflow: visible">
+                      <line x1="20%" y1="20%" x2="80%" y2="80%" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
+                      <line x1="80%" y1="20%" x2="20%" y2="80%" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
+                   </svg>
                 </div>
               </div>
             </div>
@@ -242,148 +309,26 @@
       </div>
     </div>
     
-    <!-- Slide 3: Docker & Kubernetes Mastery -->
-    <div class="slide" data-slide="3">
-      <div class="slide-background bg-gradient-to-br from-[#1e3a5f] to-[#2d4a6d] relative overflow-hidden">
-        <!-- Background Pattern -->
-        <div class="absolute inset-0 opacity-10">
-          <div class="container-pattern absolute top-10 right-10 text-6xl">📦</div>
-          <div class="container-pattern absolute bottom-20 left-20 text-4xl">🚢</div>
-          <div class="container-pattern absolute top-1/2 right-1/4 text-3xl">⚓</div>
-        </div>
-        
-        <!-- Floating Particles -->
-        <div class="particles absolute inset-0">
-          <div class="particle particle-1"></div>
-          <div class="particle particle-2"></div>
-          <div class="particle particle-3"></div>
-        </div>
-        
-        <div class="container mx-auto px-6 h-full flex items-center">
-          <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 w-full items-center">
-            
-            <!-- Left Content (60%) -->
-            <div class="lg:col-span-3 text-white z-10">
-              <div class="course-tag text-[#ef5753] text-sm uppercase font-semibold mb-4 tracking-wider">
-                🎉 NEW COURSE LAUNCH
-              </div>
-              
-              <h2 class="text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-                Complete Docker &<br>
-                <span class="text-[#ef5753]">Kubernetes Mastery</span>
-              </h2>
-              
-              <p class="text-xl text-gray-300 mb-2 font-medium">
-                Basics to Advanced Level
-              </p>
-              
-              <p class="text-gray-400 mb-6 text-lg leading-relaxed">
-                Master containerization and orchestration from Docker fundamentals 
-                to advanced Kubernetes deployments.
-              </p>
-              
-              <!-- Features -->
-              <div class="features mb-8 space-y-3">
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">21 Comprehensive Modules</span>
-                </div>
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">6+ Real-World Projects</span>
-                </div>
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">Docker & Kubernetes Mastery</span>
-                </div>
-                <div class="flex items-center text-white">
-                  <span class="text-green-400 mr-3 text-lg">✓</span>
-                  <span class="text-base">Cloud Deployments (EKS, GKE)</span>
-                </div>
-              </div>
-              
-              <!-- Pricing -->
-              <div class="pricing mb-8">
-                <span class="original-price text-gray-500 text-lg line-through mr-4">PKR 21,999</span>
-                <span class="sale-price text-3xl font-bold text-[#ef5753]">PKR 14,999</span>
-              </div>
-              
-              <!-- Buttons -->
-              <div class="buttons flex flex-col sm:flex-row gap-4 mb-6">
-                <a href="/enroll/docker-kubernetes-mastery" class="enroll-btn bg-gradient-to-r from-[#ef5753] to-[#ff6b6b] text-white px-9 py-4 rounded-full font-semibold text-lg shadow-lg hover:scale-105 transition-all duration-300 text-center inline-block">
-                  Enroll Now
-                </a>
-                <a href="/courses/docker-kubernetes-mastery" class="details-btn border-2 border-white/50 text-white px-9 py-4 rounded-full font-medium text-lg hover:bg-white hover:text-[#1e3a5f] transition-all duration-300 text-center inline-block">
-                  View Details
-                </a>
-              </div>
-              
-              <!-- Urgency Banner -->
-              <div class="urgency-banner bg-black/30 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/20">
-                <span class="text-yellow-400 mr-2">⏰</span>
-                <span class="text-white text-sm font-medium">Launch Special: Limited Time 32% OFF!</span>
-              </div>
-            </div>
-            
-            <!-- Right Visual (40%) -->
-            <div class="lg:col-span-2 relative h-80 lg:h-full flex items-center justify-center">
-              <div class="docker-k8s-visual relative">
-                <!-- Docker + Kubernetes Combined -->
-                <div class="combined-logo flex items-center justify-center mb-8">
-                  <div class="docker-whale text-5xl lg:text-7xl mr-4 floating-animation" style="color: #2496ed;">🐳</div>
-                  <div class="plus text-3xl text-white mx-2">+</div>
-                  <div class="k8s-wheel text-5xl lg:text-7xl ml-4 rotating-animation" style="color: #326ce5;">⚙️</div>
-                </div>
-                
-                <!-- Container Boxes -->
-                <div class="container-stack absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-                  <div class="container-box w-8 h-6 bg-blue-500/60 rounded mb-1 container-animation"></div>
-                  <div class="container-box w-8 h-6 bg-green-500/60 rounded mb-1 container-animation-delayed"></div>
-                  <div class="container-box w-8 h-6 bg-purple-500/60 rounded container-animation-delayed-2"></div>
-                </div>
-                
-                <!-- Orchestration Network -->
-                <div class="network-lines absolute inset-0">
-                  <div class="network-line absolute top-1/4 left-1/4 w-1/2 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-                  <div class="network-line absolute top-3/4 left-1/4 w-1/2 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-                  <div class="network-line absolute left-1/4 top-1/4 w-px h-1/2 bg-gradient-to-b from-transparent via-white/30 to-transparent"></div>
-                  <div class="network-line absolute right-1/4 top-1/4 w-px h-1/2 bg-gradient-to-b from-transparent via-white/30 to-transparent"></div>
-                </div>
-                
-                <!-- Pod Icons -->
-                <div class="pod-icons absolute inset-0">
-                  <div class="pod absolute top-0 right-0 text-lg opacity-60 floating-animation">🔵</div>
-                  <div class="pod absolute bottom-0 left-0 text-lg opacity-60 floating-animation-delayed">🟢</div>
-                  <div class="pod absolute top-1/2 left-0 text-lg opacity-60 floating-animation-delayed-2">🟣</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
   
   <!-- Navigation Controls -->
-  <div class="navigation-controls">
-    <!-- Arrow Buttons -->
-    <button class="nav-btn prev-btn absolute left-6 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full border-2 border-white/50 bg-black/20 backdrop-blur-sm text-white hover:bg-white/20 transition-all duration-300 z-20">
-      <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-      </svg>
-    </button>
-    
-    <button class="nav-btn next-btn absolute right-6 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full border-2 border-white/50 bg-black/20 backdrop-blur-sm text-white hover:bg-white/20 transition-all duration-300 z-20">
-      <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-      </svg>
-    </button>
-    
-    <!-- Pagination Dots with better positioning and padding -->
-    <div class="pagination-dots absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20 pb-4">
-      <button class="dot w-3 h-3 rounded-full bg-[#ef5753] transition-all duration-300" data-slide="1"></button>
-      <button class="dot w-3 h-3 rounded-full bg-white/30 hover:bg-white/50 transition-all duration-300" data-slide="2"></button>
-      <button class="dot w-3 h-3 rounded-full bg-white/30 hover:bg-white/50 transition-all duration-300" data-slide="3"></button>
+  <div class="navigation-controls absolute bottom-8 left-0 right-0 z-30 pointer-events-none">
+    <div class="container mx-auto px-6 relative flex justify-between items-center h-full">
+      <!-- Arrow Buttons -->
+      <button class="nav-btn prev-btn w-12 h-12 rounded-full border border-white/20 bg-black/20 backdrop-blur-md text-white hover:bg-white/20 transition-all duration-300 pointer-events-auto flex items-center justify-center group">
+        <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+      </button>
+      
+      <!-- Pagination Dots -->
+      <div class="pagination-dots flex space-x-3 pointer-events-auto bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+        <button class="dot w-2.5 h-2.5 rounded-full bg-white transition-all duration-300" data-slide="1"></button>
+        <button class="dot w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-white/50 transition-all duration-300" data-slide="2"></button>
+        <button class="dot w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-white/50 transition-all duration-300" data-slide="3"></button>
+      </div>
+      
+      <button class="nav-btn next-btn w-12 h-12 rounded-full border border-white/20 bg-black/20 backdrop-blur-md text-white hover:bg-white/20 transition-all duration-300 pointer-events-auto flex items-center justify-center group">
+        <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+      </button>
     </div>
   </div>
 </div>
@@ -405,23 +350,29 @@
       // Hide all slides
       slides.forEach(slide => {
         slide.classList.remove('active');
-        slide.style.display = 'none';
+        slide.style.opacity = '0';
+        setTimeout(() => {
+            if(!slide.classList.contains('active')) slide.style.display = 'none';
+        }, 500); // Fade out duration
       });
       
       // Show current slide
       const targetSlide = document.querySelector(`[data-slide="${slideNumber}"]`);
       if (targetSlide) {
-        targetSlide.classList.add('active');
         targetSlide.style.display = 'block';
+        // Force reflow
+        targetSlide.offsetHeight; 
+        targetSlide.classList.add('active');
+        targetSlide.style.opacity = '1';
       }
       
       // Update dots
       dots.forEach((dot, index) => {
-        dot.classList.remove('bg-[#ef5753]');
-        dot.classList.add('bg-white/30');
+        dot.classList.remove('bg-white', 'w-8');
+        dot.classList.add('bg-white/30', 'w-2.5');
         if (index + 1 === slideNumber) {
-          dot.classList.add('bg-[#ef5753]');
-          dot.classList.remove('bg-white/30');
+          dot.classList.remove('bg-white/30', 'w-2.5');
+          dot.classList.add('bg-white', 'w-8'); // Active dot is wider
         }
       });
       
@@ -457,7 +408,7 @@
       nextBtn.addEventListener('click', () => {
         stopAutoPlay();
         nextSlide();
-        startAutoPlay(); // Restart auto-play after manual navigation
+        startAutoPlay();
       });
     }
     
@@ -465,7 +416,7 @@
       prevBtn.addEventListener('click', () => {
         stopAutoPlay();
         prevSlide();
-        startAutoPlay(); // Restart auto-play after manual navigation
+        startAutoPlay();
       });
     }
     
@@ -474,7 +425,7 @@
       dot.addEventListener('click', () => {
         stopAutoPlay();
         showSlide(index + 1);
-        startAutoPlay(); // Restart auto-play after manual navigation
+        startAutoPlay();
       });
     });
     
@@ -492,1073 +443,42 @@
 </script>
 
 <style>
-  /* Main Slider Container - Fixed Height and Padding */
   .announcement-slider-container {
-    min-height: 600px; /* Increased to accommodate navigation */
-    height: auto;
-    padding: 50px 0 80px 0; /* Added extra bottom padding for navigation */
-    overflow: visible;
-    background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6d 100%);
-    position: relative;
-  }
-
-  @media (min-width: 1024px) {
-    .announcement-slider-container {
-      min-height: 600px; /* Increased to accommodate navigation */
-      padding: 60px 0 100px 0; /* More padding on desktop */
-    }
-  }
-
-  .slider-wrapper {
-    height: auto;
-    min-height: 480px; /* Reduced from 550px */
-    overflow: visible; /* Changed from hidden to visible to prevent button clipping */
-    position: relative;
-    padding-bottom: 80px; /* Add bottom padding to accommodate navigation buttons */
+    /* Ensure no clipping */
+    overflow: hidden; 
   }
   
   .slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transform: translateX(100%);
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: visible !important; /* Prevent clipping */
-  }
-  
-  .slide.active {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  
-  .slide.prev {
-    transform: translateX(-100%);
-  }
-  
-  .slide-background {
-    width: 100%;
-    height: 100%;
-    min-height: 550px; /* Ensure minimum height */
-    position: relative;
-    display: flex;
-    align-items: center; /* Vertically center content */
-    padding: 40px 0; /* Add vertical padding */
-  }
-  
-  /* Individual Slide Layout - Improved Centering */
-  .slide .container {
-    display: flex;
-    align-items: center;
-    min-height: 550px; /* Prevent compression */
-  }
-  
-  .slide .grid {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 550px;
-    gap: 60px; /* Space between left and right */
-  }
-  
-  /* Left Content Area */
-  .lg\\:col-span-3 {
-    flex: 0 0 58%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-right: 40px;
-  }
-  
-  /* Right Visual Area - Fixed Container */
-  .lg\\:col-span-2 {
-    flex: 0 0 38%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    min-height: 450px; /* Prevent compression */
-    height: 500px; /* Set explicit height */
-    padding: 40px 20px; /* Add padding to prevent edge clipping */
-  }
-  
-  /* Image Container Fixes */
-  .slider-illustration, 
-  .slider-graphic,
-  .aws-visual,
-  .devops-visual,
-  .docker-k8s-visual {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* Maintain aspect ratio */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-  }
-  
-  /* Icon Size Improvements */
-  
-  /* AWS Certification Badges - Increased to 120px */
-  .certification-badge, 
-  .aws-badge,
-  .aws-logo svg {
-    width: 120px !important; /* Increased from 100px */
-    height: 120px !important;
-    font-size: 14px; /* Text inside badges */
-  }
-  
-  .certification-badge img,
-  .aws-badge img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  
-  /* Tool Icons (DevOps slide) - Increased to 90px */
-  .tool-icon, 
-  .devops-icon,
-  .tool {
-    width: 90px !important; /* Increased from 80px */
-    height: 90px !important;
-    font-size: 3.5rem !important; /* Increased for emoji icons */
-  }
-  
-  .tool-icon img,
-  .devops-icon img {
-    width: 100%;
-    height: 100%;
-  }
-  
-  /* Docker/Kubernetes Logos - Increased to 160px */
-  .docker-logo, 
-  .kubernetes-logo,
-  .docker-whale,
-  .k8s-wheel {
-    width: 160px !important; /* Increased from 140px */
-    height: 160px !important;
-    font-size: 6rem !important; /* Increased for emoji icons */
-  }
-  
-  /* AWS Service Icons - Increased to 70px */
-  .service-icon, 
-  .aws-service-icon {
-    width: 70px !important; /* Increased from 60px */
-    height: 70px !important;
-    opacity: 0.3; /* Keep subtle as background elements */
-  }
-  
-  /* DevOps Infinity Loop - Larger */
-  .infinity-loop {
-    font-size: 7rem !important; /* Increased from 6rem */
-  }
-  
-  @media (min-width: 1024px) {
-    .infinity-loop {
-      font-size: 9rem !important; /* Increased from 8rem */
-    }
-    
-    .docker-whale,
-    .k8s-wheel {
-      font-size: 8rem !important; /* Increased from 7rem */
-    }
-  }
-  
-  /* Navigation Controls Styling - Improved Positioning */
-  .navigation-controls {
-    position: absolute;
-    bottom: 20px; /* Positioned within the container padding */
-    left: 0;
-    right: 0;
-    height: 60px; /* Fixed height for navigation area */
-    z-index: 30;
-  }
-  
-  .pagination-dots {
-    position: absolute;
-    bottom: 20px; /* Positioned within the container padding */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    padding-bottom: 1rem !important;
-    background: rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 0.5rem 1rem 1rem 1rem;
-  }
-  
-  /* Arrow Navigation Position - Enhanced Visibility */
-  .nav-btn,
-  .slider-button-prev,
-  .slider-button-next,
-  .swiper-button-prev,
-  .swiper-button-next {
-    position: absolute;
-    top: 45%; /* Move up from 50% to 45% */
-    transform: translateY(-50%);
-    z-index: 30; /* Higher z-index for better visibility */
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 50px !important; /* Increased button size */
-    height: 50px !important;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.5) !important; /* More visible background */
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.7) !important;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Add shadow for visibility */
-  }
-  
-  .slider-button-prev,
-  .swiper-button-prev,
-  .prev-btn {
-    left: 20px; /* Moved further from edge to prevent clipping */
-  }
-  
-  .slider-button-next,
-  .swiper-button-next,
-  .next-btn {
-    right: 20px; /* Moved further from edge to prevent clipping */
-  }
-
-  /* Ensure arrows are properly aligned vertically with content */
-  @media (min-width: 768px) {
-    .slider-button-prev,
-    .slider-button-next,
-    .swiper-button-prev,
-    .swiper-button-next {
-      top: 42%; /* Fine-tune for desktop */
-    }
-  }
-  
-  .dot {
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .dot:hover {
-    transform: scale(1.2);
-  }
-  
-  .nav-btn {
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .nav-btn:hover {
-    transform: translateY(-50%) scale(1.1);
-    background: rgba(255, 255, 255, 0.3) !important;
-  }
-  
-  /* Particles */
-  .particles {
-    pointer-events: none;
-  }
-  
-  .particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-  }
-  
-  .particle-1 {
-    top: 20%;
-    left: 10%;
-    animation: float 6s ease-in-out infinite;
-  }
-  
-  .particle-2 {
-    top: 60%;
-    right: 15%;
-    animation: float 8s ease-in-out infinite reverse;
-  }
-  
-  .particle-3 {
-    bottom: 30%;
-    left: 20%;
-    animation: float 7s ease-in-out infinite;
+    transition: opacity 0.5s ease-in-out;
   }
   
   /* Animations */
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
+  }
+  .animate-shimmer { animation: shimmer 2s infinite; }
+  
   @keyframes float {
-    0%, 100% { transform: translateY(0px) translateX(0px); }
-    25% { transform: translateY(-20px) translateX(10px); }
-    50% { transform: translateY(-10px) translateX(-5px); }
-    75% { transform: translateY(-15px) translateX(5px); }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
   }
+  .animate-float { animation: float 6s ease-in-out infinite; }
   
-  .floating-animation {
-    animation: floating 3s ease-in-out infinite;
-  }
-  
-  .floating-animation-delayed {
-    animation: floating 3s ease-in-out infinite 0.5s;
-  }
-  
-  .floating-animation-delayed-2 {
-    animation: floating 3s ease-in-out infinite 1s;
-  }
-  
-  .floating-animation-delayed-3 {
-    animation: floating 3s ease-in-out infinite 1.5s;
-  }
-  
-  @keyframes floating {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-  
-  .rotating-animation {
-    animation: rotate 10s linear infinite;
-  }
-  
-  .rotating-tools {
-    animation: rotateTools 15s linear infinite;
-  }
-  
-  @keyframes rotate {
+  @keyframes spin-slow {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
   }
+  .animate-spin-slow { animation: spin-slow 20s linear infinite; }
   
-  @keyframes rotateTools {
-    from { transform: rotate(0deg) translateX(60px) rotate(0deg); }
-    to { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+  @keyframes draw-path {
+    0% { stroke-dashoffset: 400; }
+    100% { stroke-dashoffset: 0; }
   }
-  
-  .pulse-animation {
-    animation: pulse 2s ease-in-out infinite;
-  }
-  
-  .pulse-animation-delayed {
-    animation: pulse 2s ease-in-out infinite 0.3s;
-  }
-  
-  .pulse-animation-delayed-2 {
-    animation: pulse 2s ease-in-out infinite 0.6s;
-  }
-  
-  .pulse-animation-delayed-3 {
-    animation: pulse 2s ease-in-out infinite 0.9s;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.1); }
-  }
-  
-  .container-animation {
-    animation: containerDeploy 3s ease-in-out infinite;
-  }
-  
-  .container-animation-delayed {
-    animation: containerDeploy 3s ease-in-out infinite 0.5s;
-  }
-  
-  .container-animation-delayed-2 {
-    animation: containerDeploy 3s ease-in-out infinite 1s;
-  }
-  
-  @keyframes containerDeploy {
-    0%, 100% { transform: translateY(0px) scale(1); opacity: 1; }
-    50% { transform: translateY(-5px) scale(1.05); opacity: 0.8; }
-  }
-  
-  /* Button Hover Effects */
-  .enroll-btn {
-    box-shadow: 0 6px 20px rgba(239, 87, 83, 0.4);
-  }
-  
-  .enroll-btn:hover {
-    box-shadow: 0 8px 25px rgba(239, 87, 83, 0.6);
-  }
-  
-  /* Navigation */
-  .nav-btn:hover {
-    transform: translateY(-50%) scale(1.1);
-  }
-  
-  .dot.active {
-    background-color: #ef5753;
-  }
-  
-  /* Responsive Design - Enhanced */
-  @media (max-width: 767px) {
-    .announcement-slider-container {
-      min-height: auto;
-      padding: 30px 0; /* Reduced from 40px */
-    }
-    
-    .slider-wrapper {
-      min-height: auto;
-    }
-    
-    .slide-background {
-      padding: 2rem 0;
-      min-height: auto;
-    }
-    
-    .slide .grid {
-      flex-direction: column;
-      min-height: auto;
-      gap: 2rem;
-    }
-    
-    .lg\\:col-span-3,
-    .lg\\:col-span-2 {
-      flex: none;
-      width: 100%;
-      padding-right: 0;
-    }
-    
-    .lg\\:col-span-2 {
-      min-height: 280px; /* Reduced from 300px */
-      margin-top: 30px;
-      margin-left: 0 !important; /* Reset DevOps positioning for mobile */
-      height: auto;
-    }
-    
-    .text-4xl.lg\\:text-5xl {
-      font-size: 2rem;
-      line-height: 1.2;
-    }
-    
-    .buttons {
-      flex-direction: column;
-    }
-    
-    .enroll-btn,
-    .details-btn {
-      width: 100%;
-      text-align: center;
-    }
-    
-    .nav-btn,
-    .slider-button-prev,
-    .slider-button-next {
-      display: none;
-    }
-    
-    /* Mobile Icon Sizes - Updated */
-    .certification-badge, .aws-badge { width: 80px !important; height: 80px !important; } /* Increased from 70px */
-    .tool-icon, .devops-icon, .tool { width: 60px !important; height: 60px !important; font-size: 2.2rem !important; } /* Increased from 55px */
-    .docker-logo, .kubernetes-logo, .docker-whale, .k8s-wheel { width: 100px !important; height: 100px !important; font-size: 4.5rem !important; } /* Increased font-size */
-    .aws-service-icon { width: 50px !important; height: 50px !important; } /* Added */
-    .infinity-loop { font-size: 4.5rem !important; } /* Increased from 4rem */
-    
-    /* Reset DevOps positioning for mobile */
-    .devops-visual,
-    .devops-icons-wrapper,
-    .tool-circle,
-    .slide[data-slide="2"] .infinity-loop {
-      transform: none !important;
-    }
-  }
-  
-  @media (min-width: 768px) and (max-width: 1199px) {
-    .announcement-slider-container {
-      min-height: 480px; /* Reduced from 550px */
-      padding: 40px 0; /* Reduced from 60px */
-    }
-    
-    .slider-wrapper {
-      min-height: 440px; /* Reduced */
-    }
-    
-    .slide .grid {
-      gap: 40px;
-    }
-    
-    .lg\\:col-span-3 {
-      flex: 0 0 60%;
-    }
-    
-    .lg\\:col-span-2 {
-      flex: 0 0 35%;
-      min-height: 360px; /* Reduced from 400px */
-    }
-    
-    .text-4xl.lg\\:text-5xl {
-      font-size: 2.5rem;
-    }
-    
-    /* Tablet Icon Sizes - Updated */
-    .certification-badge, .aws-badge { width: 100px !important; height: 100px !important; } /* Increased from 85px */
-    .tool-icon, .devops-icon, .tool { width: 75px !important; height: 75px !important; font-size: 2.8rem !important; } /* Increased from 70px */
-    .docker-logo, .kubernetes-logo, .docker-whale, .k8s-wheel { width: 140px !important; height: 140px !important; font-size: 6.5rem !important; } /* Increased from 120px */
-    .aws-service-icon { width: 60px !important; height: 60px !important; } /* Added */
-    .infinity-loop { font-size: 6rem !important; } /* Increased from 5rem */
-  }
-  /* DevOps Slide Specific - Move Icons Left */
-  .slide[data-slide="2"] .lg\\:col-span-2,
-  .devops-slide .slider-right,
-  .slide-devops .slider-right-side {
-    padding-left: 0 !important; /* Remove left padding */
-    padding-right: 60px !important; /* Add right padding instead */
-    justify-content: flex-start !important; /* Align items to left */
-    margin-left: -40px !important; /* Move entire container left */
-  }
+  .animate-draw-path { animation: draw-path 3s ease-out forwards infinite; }
 
-  /* DevOps Visual Container */
-  .devops-visual {
-    transform: translateX(-30px); /* Shift left by 30px */
-    width: 100%;
-    max-width: 450px; /* Limit width */
-  }
-
-  /* DevOps Icons Wrapper */
-  .devops-icons-wrapper {
-    transform: translateX(-30px); /* Shift left by 30px */
-    width: 100%;
-    max-width: 450px; /* Limit width */
-  }
-
-  /* Adjust individual tool icons positioning */
-  .devops-tool-icon,
-  .tool {
-    margin-right: 15px; /* Space between icons */
-  }
-
-  /* Tool Circle Positioning for DevOps Slide */
-  .tool-circle {
-    transform: translateX(-20px); /* Move tool circle left */
-  }
-
-  /* Infinity Loop Positioning */
-  .slide[data-slide="2"] .infinity-loop {
-    transform: translateX(-20px); /* Move infinity loop left */
-  }
-  
-  .dot {
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .dot:hover {
-    transform: scale(1.2);
-  }
-  
-  .nav-btn {
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .nav-btn:hover {
-    transform: translateY(-50%) scale(1.1);
-    background: rgba(255, 255, 255, 0.3) !important;
-  }
-  
-  /* Particles */
-  .particles {
-    pointer-events: none;
-  }
-  
-  .particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-  }
-  
-  .particle-1 {
-    top: 20%;
-    left: 10%;
-    animation: float 6s ease-in-out infinite;
-  }
-  
-  .particle-2 {
-    top: 60%;
-    right: 15%;
-    animation: float 8s ease-in-out infinite reverse;
-  }
-  
-  .particle-3 {
-    bottom: 30%;
-    left: 20%;
-    animation: float 7s ease-in-out infinite;
-  }
-  
-  /* Animations */
-  @keyframes float {
-    0%, 100% { transform: translateY(0px) translateX(0px); }
-    25% { transform: translateY(-20px) translateX(10px); }
-    50% { transform: translateY(-10px) translateX(-5px); }
-    75% { transform: translateY(-15px) translateX(5px); }
-  }
-  
-  .floating-animation {
-    animation: floating 3s ease-in-out infinite;
-  }
-  
-  .floating-animation-delayed {
-    animation: floating 3s ease-in-out infinite 0.5s;
-  }
-  
-  .floating-animation-delayed-2 {
-    animation: floating 3s ease-in-out infinite 1s;
-  }
-  
-  .floating-animation-delayed-3 {
-    animation: floating 3s ease-in-out infinite 1.5s;
-  }
-  
-  @keyframes floating {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-  
-  .rotating-animation {
-    animation: rotate 10s linear infinite;
-  }
-  
-  .rotating-tools {
-    animation: rotateTools 15s linear infinite;
-  }
-  
-  @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  
-  @keyframes rotateTools {
-    from { transform: rotate(0deg) translateX(60px) rotate(0deg); }
-    to { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
-  }
-  
-  .pulse-animation {
-    animation: pulse 2s ease-in-out infinite;
-  }
-  
-  .pulse-animation-delayed {
-    animation: pulse 2s ease-in-out infinite 0.3s;
-  }
-  
-  .pulse-animation-delayed-2 {
-    animation: pulse 2s ease-in-out infinite 0.6s;
-  }
-  
-  .pulse-animation-delayed-3 {
-    animation: pulse 2s ease-in-out infinite 0.9s;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.1); }
-  }
-  
-  .container-animation {
-    animation: containerDeploy 3s ease-in-out infinite;
-  }
-  
-  .container-animation-delayed {
-    animation: containerDeploy 3s ease-in-out infinite 0.5s;
-  }
-  
-  .container-animation-delayed-2 {
-    animation: containerDeploy 3s ease-in-out infinite 1s;
-  }
-  
-  @keyframes containerDeploy {
-    0%, 100% { transform: translateY(0px) scale(1); opacity: 1; }
-    50% { transform: translateY(-5px) scale(1.05); opacity: 0.8; }
-  }
-  
-  /* Button Hover Effects */
-  .enroll-btn {
-    box-shadow: 0 6px 20px rgba(239, 87, 83, 0.4);
-  }
-  
-  .enroll-btn:hover {
-    box-shadow: 0 8px 25px rgba(239, 87, 83, 0.6);
-  }
-  
-  /* Navigation */
-  .nav-btn:hover {
-    transform: translateY(-50%) scale(1.1);
-  }
-  
-  .dot.active {
-    background-color: #ef5753;
-  }
-  
-  /* Responsive Design - Enhanced */
-  @media (max-width: 767px) {
-    .announcement-slider-container {
-      min-height: auto;
-      padding: 40px 0;
-    }
-    
-    .slide-background {
-      padding: 2rem 0;
-      min-height: auto;
-    }
-    
-    .slide .grid {
-      flex-direction: column;
-      min-height: auto;
-      gap: 2rem;
-    }
-    
-    .lg\\:col-span-3,
-    .lg\\:col-span-2 {
-      flex: none;
-      width: 100%;
-      padding-right: 0;
-    }
-    
-    .lg\\:col-span-2 {
-      min-height: 300px;
-      margin-top: 30px;
-      height: auto;
-    }
-    
-    .text-4xl.lg\\:text-5xl {
-      font-size: 2rem;
-      line-height: 1.2;
-    }
-    
-    .buttons {
-      flex-direction: column;
-    }
-    
-    .enroll-btn,
-    .details-btn {
-      width: 100%;
-      text-align: center;
-    }
-    
-    .nav-btn,
-    .slider-button-prev,
-    .slider-button-next {
-      display: none;
-    }
-    
-    /* Mobile Icon Sizes */
-    .certification-badge, .aws-badge { width: 70px !important; height: 70px !important; }
-    .tool-icon, .devops-icon, .tool { width: 55px !important; height: 55px !important; font-size: 2rem !important; }
-    .docker-logo, .kubernetes-logo, .docker-whale, .k8s-wheel { width: 100px !important; height: 100px !important; font-size: 4rem !important; }
-    .infinity-loop { font-size: 4rem !important; }
-  }
-  
-  @media (min-width: 768px) and (max-width: 1199px) {
-    .announcement-slider-container {
-      min-height: 550px;
-      padding: 60px 0;
-    }
-    
-    .slide .grid {
-      gap: 40px;
-    }
-    
-    .lg\\:col-span-3 {
-      flex: 0 0 60%;
-    }
-    
-    .lg\\:col-span-2 {
-      flex: 0 0 35%;
-      min-height: 400px;
-    }
-    
-    .text-4xl.lg\\:text-5xl {
-      font-size: 2.5rem;
-    }
-    
-    /* Tablet Icon Sizes */
-    .certification-badge, .aws-badge { width: 85px !important; height: 85px !important; }
-    .tool-icon, .devops-icon, .tool { width: 70px !important; height: 70px !important; font-size: 2.5rem !important; }
-    .docker-logo, .kubernetes-logo, .docker-whale, .k8s-wheel { width: 120px !important; height: 120px !important; font-size: 5.5rem !important; }
-    .infinity-loop { font-size: 5rem !important; }
-  }
-  /* Remove Bottom Line/Border from All Slider Elements */
-  .announcement-slider-container,
-  .hero-slider,
-  .slider-container,
-  .slider-slide,
-  .slider-wrapper,
-  .slide,
-  .slide-background {
-    border-bottom: none !important;
-    border: none !important;
-  }
-
-  /* Remove any bottom border from Swiper */
-  .swiper-container,
-  .swiper-wrapper,
-  .swiper-slide {
-    border-bottom: none !important;
-    border: none !important;
-  }
-
-  /* Hide decorative elements that might create lines */
-  .slider-divider,
-  .slider-line,
-  .hero-divider {
-    display: none !important;
-  }
-
-  /* Remove any pseudo-elements creating lines */
-  .announcement-slider-container::after,
-  .hero-slider::after,
-  .slider-container::after,
-  .slider-slide::after,
-  .slide::after,
-  .slide-background::after {
-    display: none !important;
-    content: none !important;
-  }
-
-  /* Ensure no borders on any child elements */
-  .announcement-slider-container *,
-  .slider-wrapper *,
-  .slide * {
-    border-bottom: none !important;
-  }
-  
-  .dot {
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .dot:hover {
-    transform: scale(1.2);
-  }
-  
-  .nav-btn {
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .nav-btn:hover {
-    transform: translateY(-50%) scale(1.1);
-    background: rgba(255, 255, 255, 0.3) !important;
-  }
-  
-  /* Particles */
-  .particles {
-    pointer-events: none;
-  }
-  
-  .particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-  }
-  
-  .particle-1 {
-    top: 20%;
-    left: 10%;
-    animation: float 6s ease-in-out infinite;
-  }
-  
-  .particle-2 {
-    top: 60%;
-    right: 15%;
-    animation: float 8s ease-in-out infinite reverse;
-  }
-  
-  .particle-3 {
-    bottom: 30%;
-    left: 20%;
-    animation: float 7s ease-in-out infinite;
-  }
-  
-  /* Animations */
-  @keyframes float {
-    0%, 100% { transform: translateY(0px) translateX(0px); }
-    25% { transform: translateY(-20px) translateX(10px); }
-    50% { transform: translateY(-10px) translateX(-5px); }
-    75% { transform: translateY(-15px) translateX(5px); }
-  }
-  
-  .floating-animation {
-    animation: floating 3s ease-in-out infinite;
-  }
-  
-  .floating-animation-delayed {
-    animation: floating 3s ease-in-out infinite 0.5s;
-  }
-  
-  .floating-animation-delayed-2 {
-    animation: floating 3s ease-in-out infinite 1s;
-  }
-  
-  .floating-animation-delayed-3 {
-    animation: floating 3s ease-in-out infinite 1.5s;
-  }
-  
-  @keyframes floating {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-  
-  .rotating-animation {
-    animation: rotate 10s linear infinite;
-  }
-  
-  .rotating-tools {
-    animation: rotateTools 15s linear infinite;
-  }
-  
-  @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  
-  @keyframes rotateTools {
-    from { transform: rotate(0deg) translateX(60px) rotate(0deg); }
-    to { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
-  }
-  
-  .pulse-animation {
-    animation: pulse 2s ease-in-out infinite;
-  }
-  
-  .pulse-animation-delayed {
-    animation: pulse 2s ease-in-out infinite 0.3s;
-  }
-  
-  .pulse-animation-delayed-2 {
-    animation: pulse 2s ease-in-out infinite 0.6s;
-  }
-  
-  .pulse-animation-delayed-3 {
-    animation: pulse 2s ease-in-out infinite 0.9s;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.1); }
-  }
-  
-  .container-animation {
-    animation: containerDeploy 3s ease-in-out infinite;
-  }
-  
-  .container-animation-delayed {
-    animation: containerDeploy 3s ease-in-out infinite 0.5s;
-  }
-  
-  .container-animation-delayed-2 {
-    animation: containerDeploy 3s ease-in-out infinite 1s;
-  }
-  
-  @keyframes containerDeploy {
-    0%, 100% { transform: translateY(0px) scale(1); opacity: 1; }
-    50% { transform: translateY(-5px) scale(1.05); opacity: 0.8; }
-  }
-  
-  /* Button Hover Effects */
-  .enroll-btn {
-    box-shadow: 0 6px 20px rgba(239, 87, 83, 0.4);
-  }
-  
-  .enroll-btn:hover {
-    box-shadow: 0 8px 25px rgba(239, 87, 83, 0.6);
-  }
-  
-  /* Navigation */
-  .nav-btn:hover {
-    transform: translateY(-50%) scale(1.1);
-  }
-  
-  .dot.active {
-    background-color: #ef5753;
-  }
-  
-  /* Responsive Design - Enhanced */
-  @media (max-width: 767px) {
-    .announcement-slider-container {
-      min-height: auto;
-      padding: 40px 0;
-    }
-    
-    .slide-background {
-      padding: 2rem 0;
-      min-height: auto;
-    }
-    
-    .slide .grid {
-      flex-direction: column;
-      min-height: auto;
-      gap: 2rem;
-    }
-    
-    .lg\\:col-span-3,
-    .lg\\:col-span-2 {
-      flex: none;
-      width: 100%;
-      padding-right: 0;
-    }
-    
-    .lg\\:col-span-2 {
-      min-height: 300px;
-      margin-top: 30px;
-      height: auto;
-    }
-    
-    .text-4xl.lg\\:text-5xl {
-      font-size: 2rem;
-      line-height: 1.2;
-    }
-    
-    .buttons {
-      flex-direction: column;
-    }
-    
-    .enroll-btn,
-    .details-btn {
-      width: 100%;
-      text-align: center;
-    }
-    
-    .nav-btn,
-    .slider-button-prev,
-    .slider-button-next {
-      display: none;
-    }
-    
-    /* Mobile Icon Sizes */
-    .certification-badge, .aws-badge { width: 70px !important; height: 70px !important; }
-    .tool-icon, .devops-icon, .tool { width: 55px !important; height: 55px !important; font-size: 2rem !important; }
-    .docker-logo, .kubernetes-logo, .docker-whale, .k8s-wheel { width: 100px !important; height: 100px !important; font-size: 4rem !important; }
-    .infinity-loop { font-size: 4rem !important; }
-  }
-  
-  @media (min-width: 768px) and (max-width: 1199px) {
-    .announcement-slider-container {
-      min-height: 550px;
-      padding: 60px 0;
-    }
-    
-    .slide .grid {
-      gap: 40px;
-    }
-    
-    .lg\\:col-span-3 {
-      flex: 0 0 60%;
-    }
-    
-    .lg\\:col-span-2 {
-      flex: 0 0 35%;
-      min-height: 400px;
-    }
-    
-    .text-4xl.lg\\:text-5xl {
-      font-size: 2.5rem;
-    }
-    
-    /* Tablet Icon Sizes */
-    .certification-badge, .aws-badge { width: 85px !important; height: 85px !important; }
-    .tool-icon, .devops-icon, .tool { width: 70px !important; height: 70px !important; font-size: 2.5rem !important; }
-    .docker-logo, .kubernetes-logo, .docker-whale, .k8s-wheel { width: 120px !important; height: 120px !important; font-size: 5.5rem !important; }
-    .infinity-loop { font-size: 5rem !important; }
-  }
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+  }
+  .animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
+</style>

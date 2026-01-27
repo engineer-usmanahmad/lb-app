@@ -3,7 +3,6 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import NeedHelpCard from '../components/NeedHelpCard.astro';
-import { trainers } from '../lib/supabase';
 ---
 
 <Layout title="About Us - LbisTech" description="Learn about LbisTech's mission to provide world-class technology education">
@@ -21,38 +20,77 @@ import { trainers } from '../lib/supabase';
     </div>
   </section>
   
-  <!-- Mission Section -->
-  <section class="py-16">
+  <!-- Vision & Mission Section -->
+  <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <div>
-          <h2 class="text-3xl font-bold text-gray-900 mb-6">Our Mission</h2>
-          <p class="text-lg text-gray-600 mb-6">
-            At LbisTech, we believe that quality technology education should be accessible to everyone. 
-            Our mission is to bridge the gap between academic learning and industry requirements by 
-            providing practical, hands-on training that prepares students for real-world challenges.
-          </p>
-          <p class="text-lg text-gray-600 mb-8">
-            We are committed to staying at the forefront of technology trends and ensuring our 
-            curriculum reflects the latest industry standards and best practices.
-          </p>
-          <div class="grid grid-cols-2 gap-6">
-            <div class="text-center">
-              <div class="text-3xl font-bold text-coral-500 mb-2">5000+</div>
-              <div class="text-gray-600">Students Trained</div>
-            </div>
-            <div class="text-center">
-              <div class="text-3xl font-bold text-coral-500 mb-2">95%</div>
-              <div class="text-gray-600">Success Rate</div>
-            </div>
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Our Vision & Mission</h2>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <!-- Vision Card -->
+        <div class="bg-gradient-to-br from-white to-blue-50 p-[60px] rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 relative group">
+          <div class="w-20 h-20 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+            <span class="text-5xl">🎯</span>
           </div>
+          <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 group-hover:text-coral-500 transition-colors">Our Vision</h3>
+          <p class="text-gray-600 leading-relaxed text-lg">
+            To be the leading catalyst in Pakistan's digital transformation by creating a generation of world-class technology professionals who drive innovation and excellence in cloud computing, DevOps, cybersecurity, and emerging technologies.
+          </p>
         </div>
-        <div>
-          <img 
-            src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800" 
-            alt="LbisTech Learning Environment" 
-            class="rounded-lg shadow-lg"
-          />
+
+        <!-- Mission Card -->
+        <div class="bg-gradient-to-br from-white to-emerald-50 p-[60px] rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 relative group">
+          <div class="w-20 h-20 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+            <span class="text-5xl">🚀</span>
+          </div>
+          <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 group-hover:text-coral-500 transition-colors">Our Mission</h3>
+          <p class="text-gray-600 leading-relaxed text-lg">
+            LbisTech empowers aspiring and established IT professionals through industry-aligned, hands-on certification programs delivered by expert practitioners. We bridge the gap between academic knowledge and real-world application, ensuring our students are not just certified but career-ready to meet the demands of Pakistan's growing tech ecosystem and the global market.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LbisTech by the Numbers (Statistics Grid) -->
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">LbisTech by the Numbers</h2>
+        <p class="text-lg text-gray-600">Our impact on the tech community speaks for itself</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <!-- Stat 1 -->
+        <div class="bg-gray-50 p-8 rounded-xl text-center hover:shadow-lg transition-shadow border border-gray-100">
+          <div class="text-4xl font-bold text-coral-500 mb-2">8000+</div>
+          <div class="text-gray-700 font-semibold">Students Trained</div>
+        </div>
+        <!-- Stat 2 -->
+        <div class="bg-gray-50 p-8 rounded-xl text-center hover:shadow-lg transition-shadow border border-gray-100">
+          <div class="text-4xl font-bold text-coral-500 mb-2">98%</div>
+          <div class="text-gray-700 font-semibold">Success Rate</div>
+        </div>
+        <!-- Stat 3 -->
+        <div class="bg-gray-50 p-8 rounded-xl text-center hover:shadow-lg transition-shadow border border-gray-100">
+          <div class="text-4xl font-bold text-coral-500 mb-2">5,900+</div>
+          <div class="text-gray-700 font-semibold">Community Members</div>
+        </div>
+        <!-- Stat 4 -->
+        <div class="bg-gray-50 p-8 rounded-xl text-center hover:shadow-lg transition-shadow border border-gray-100">
+          <div class="text-4xl font-bold text-coral-500 mb-2">12+</div>
+          <div class="text-gray-700 font-semibold">Courses Offered</div>
+        </div>
+        <!-- Stat 5 -->
+        <div class="bg-gray-50 p-8 rounded-xl text-center hover:shadow-lg transition-shadow border border-gray-100">
+          <div class="text-4xl font-bold text-coral-500 mb-2">50+</div>
+          <div class="text-gray-700 font-semibold">Hands-on Labs per Course</div>
+        </div>
+        <!-- Stat 6 -->
+        <div class="bg-gray-50 p-8 rounded-xl text-center hover:shadow-lg transition-shadow border border-gray-100">
+          <div class="text-4xl font-bold text-coral-500 mb-2">7</div>
+          <div class="text-gray-700 font-semibold">Expert Instructors</div>
         </div>
       </div>
     </div>
@@ -107,78 +145,252 @@ import { trainers } from '../lib/supabase';
       </div>
     </div>
   </section>
-  
-  <!-- Team Section -->
-  <section class="py-16">
+
+  <!-- What Makes LbisTech Different Section -->
+  <section class="py-[100px] bg-gradient-to-b from-white to-gray-50">
     <div class="container mx-auto px-4">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-900 mb-4">Meet Our Expert Trainers</h2>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-          Learn from industry professionals with years of real-world experience in cloud technologies and DevOps practices.
+      <div class="text-center mb-16 animate-fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">What Makes LbisTech Different</h2>
+        <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+          Six Reasons Why 8000+ Professionals Choose LbisTech for Career Transformation
         </p>
       </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-        {trainers.map(trainer => (
-          <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <div class="relative">
-              <img 
-                src={trainer.image} 
-                alt={trainer.name}
-                class="w-full h-48 object-cover"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-              <div class="absolute bottom-4 left-4 text-white">
-                <h3 class="text-lg font-bold">{trainer.name}</h3>
-                <p class="text-coral-300 text-sm">{trainer.title}</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <!-- Card 1 -->
+        <div class="bg-white p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-slide-up" style="animation-delay: 0.1s;">
+          <div class="text-4xl mb-6">👨‍🏫</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4">Industry-Expert Instructors</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Learn from practitioners who actively work in the field—not just trainers. Our instructors bring current industry practices directly into the classroom.
+          </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-white p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-slide-up" style="animation-delay: 0.2s;">
+          <div class="text-4xl mb-6">📚</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4">Multi-Certification Programs</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Unique bundled offerings like AWS 3-in-1 and integrated DevOps programs covering 12+ tools provide exceptional value and holistic skill development.
+          </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-white p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-slide-up" style="animation-delay: 0.3s;">
+          <div class="text-4xl mb-6">🏆</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4">98% Success Rate</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Our proven track record of 8000+ trained professionals succeeding in certifications and securing positions at leading companies like Systems Limited and TechLogix.
+          </p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="bg-white p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-slide-up" style="animation-delay: 0.4s;">
+          <div class="text-4xl mb-6">🤝</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4">24/7 Community Support</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Round-the-clock expert support and permanent access to course materials, ensuring continuous learning and career support beyond graduation.
+          </p>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="bg-white p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-slide-up" style="animation-delay: 0.5s;">
+          <div class="text-4xl mb-6">💻</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4">Hands-On Project Learning</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Every course includes 50+ hands-on labs and real-world projects that simulate actual workplace scenarios for practical skill development.
+          </p>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="bg-white p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-slide-up" style="animation-delay: 0.6s;">
+          <div class="text-4xl mb-6">💰</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4">Affordable Excellence</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Premium quality training at competitive rates with 20-32% discounts and flexible learning options, making professional certification accessible.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The LbisTech Advantage Section -->
+  <section class="py-[100px] bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white overflow-hidden relative">
+    <!-- Decorative Elements -->
+    <div class="absolute top-0 right-0 w-96 h-96 bg-coral-500/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+    <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -ml-20 -mb-20"></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <!-- Left Column: Content -->
+        <div class="space-y-12">
+          <div>
+            <h2 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+              The LbisTech <span class="text-coral-500">X-Factor</span>
+            </h2>
+            <p class="text-2xl text-gray-200 font-light mb-8">
+              From Zero to Industry-Ready in Weeks, Not Years
+            </p>
+            <p class="text-xl font-semibold text-white/90 leading-relaxed border-l-4 border-coral-500 pl-6">
+              What sets LbisTech apart isn't just what we teach—it's how we transform careers.
+            </p>
+          </div>
+
+          <div class="space-y-8">
+            <!-- Feature 1 -->
+            <div class="flex gap-6 group">
+              <div class="flex-shrink-0 w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl group-hover:bg-coral-500 transition-colors duration-300">
+                🚀
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-white mb-2">RAPID SKILL ACQUISITION</h3>
+                <p class="text-gray-300 leading-relaxed">
+                  Students progress from absolute beginners to job-ready professionals in 6-20 weeks through our intensive, structured learning paths.
+                </p>
               </div>
             </div>
+
+            <!-- Feature 2 -->
+            <div class="flex gap-6 group">
+              <div class="flex-shrink-0 w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl group-hover:bg-coral-500 transition-colors duration-300">
+                🌐
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-white mb-2">ACTIVE COMMUNITY ECOSYSTEM</h3>
+                <p class="text-gray-300 leading-relaxed">
+                  Access to a thriving community of 5,900+ members, WhatsApp groups, and peer networks providing ongoing support, job leads, and collaboration opportunities.
+                </p>
+              </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="flex gap-6 group">
+              <div class="flex-shrink-0 w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl group-hover:bg-coral-500 transition-colors duration-300">
+                💼
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-white mb-2">CAREER PLACEMENT PIPELINE</h3>
+                <p class="text-gray-300 leading-relaxed">
+                  Our alumni network at top tech companies creates a direct pipeline for job placements, internships, and referrals.
+                </p>
+              </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="flex gap-6 group">
+              <div class="flex-shrink-0 w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl group-hover:bg-coral-500 transition-colors duration-300">
+                ☁️
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-white mb-2">MULTI-CLOUD SPECIALIZATION</h3>
+                <p class="text-gray-300 leading-relaxed">
+                  Unlike single-platform trainers, we specialize in AWS, Azure, GCP, and Huawei Cloud—preparing students for diverse organizational needs.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Visual/Stats (Asymmetric Layout) -->
+        <div class="relative mt-12 lg:mt-0">
+          <!-- Main Testimonial Card -->
+          <div class="bg-white text-gray-900 p-8 md:p-10 rounded-2xl shadow-2xl relative z-20 animate-fade-in">
+            <div class="absolute -top-6 -left-6 text-6xl text-coral-500 opacity-20 font-serif">"</div>
             
-            <div class="p-6">
-              <p class="text-gray-600 mb-4 text-sm line-clamp-3">{trainer.bio}</p>
-              
-              <div class="mb-4">
-                <div class="flex flex-wrap gap-2">
-                  {trainer.specializations.slice(0, 3).map(spec => (
-                    <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
-                      {spec}
-                    </span>
-                  ))}
+            <p class="text-xl md:text-2xl font-medium leading-relaxed mb-8 relative z-10">
+              The 'LbisTech Certified' badge is actively sought by employers in Pakistan, as evidenced by successful placements at Systems Limited, NetSol, Corvit Systems, and Inbox Business Technologies.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-gray-100 pt-8">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-500">LT</div>
+                <div>
+                  <div class="font-bold text-gray-900">Trusted by Industry</div>
+                  <div class="text-sm text-gray-500">Top Tech Companies</div>
                 </div>
               </div>
               
-              <div class="grid grid-cols-2 gap-4 mb-4 text-center">
-                <div>
-                  <div class="text-lg font-bold text-coral-500">{trainer.successStats.passRate}</div>
-                  <div class="text-xs text-gray-500">Pass Rate</div>
-                </div>
-                <div>
-                  <div class="text-lg font-bold text-coral-500">{trainer.successStats.studentsmentored}</div>
-                  <div class="text-xs text-gray-500">Students</div>
-                </div>
-              </div>
-              
-              <a 
-                href={`/trainers/${trainer.id}`} 
-                class="w-full bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg text-center font-semibold transition-colors block text-sm"
-              >
-                View Profile
+              <a href="/our-success" class="bg-coral-500 hover:bg-coral-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg hover:shadow-coral-500/30 flex items-center gap-2 group">
+                See Our Success Stories
+                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
               </a>
             </div>
           </div>
-        ))}
-      </div>
-      
-      <div class="text-center">
-        <a href="/trainers" class="bg-coral-500 hover:bg-coral-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
-          Meet All Trainers
-        </a>
+          
+          <!-- Decorative Background Elements -->
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-white/10 to-transparent rounded-full blur-3xl -z-10"></div>
+        </div>
       </div>
     </div>
   </section>
   
+  <!-- Success Stories Section (Mini Testimonials) -->
+  <section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Student Success Stories</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Hear from our graduates who have successfully transitioned into top tech roles.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <!-- Testimonial 1 -->
+        <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">AS</div>
+            <div>
+              <div class="font-bold text-gray-900">Ahmed S.</div>
+              <div class="text-sm text-gray-500">Cloud Engineer at Systems Ltd</div>
+            </div>
+          </div>
+          <p class="text-gray-600 italic">
+            "The hands-on labs were a game changer. I went from knowing nothing about AWS to getting certified and hired within 4 months."
+          </p>
+        </div>
+
+        <!-- Testimonial 2 -->
+        <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold">FK</div>
+            <div>
+              <div class="font-bold text-gray-900">Fatima K.</div>
+              <div class="text-sm text-gray-500">DevOps Engineer at NetSol</div>
+            </div>
+          </div>
+          <p class="text-gray-600 italic">
+            "LbisTech doesn't just teach tools; they teach you how to think like an engineer. The career support was exceptional."
+          </p>
+        </div>
+
+        <!-- Testimonial 3 -->
+        <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold">MR</div>
+            <div>
+              <div class="font-bold text-gray-900">Muhammad R.</div>
+              <div class="text-sm text-gray-500">Solutions Architect at TechLogix</div>
+            </div>
+          </div>
+          <p class="text-gray-600 italic">
+            "The multi-cloud approach gave me a significant edge in interviews. I felt prepared for any scenario."
+          </p>
+        </div>
+      </div>
+      
+      <div class="text-center mt-12">
+        <a href="/our-success" class="text-coral-500 font-semibold hover:text-coral-600 inline-flex items-center">
+          Read more success stories
+          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA Section -->
-  <section class="py-16 bg-primary-900 text-white">
+  <section class="py-16 bg-primary-900 text-white border-b border-white/10">
     <div class="container mx-auto px-4 text-center">
       <h2 class="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
       <p class="text-lg mb-8 max-w-2xl mx-auto">
